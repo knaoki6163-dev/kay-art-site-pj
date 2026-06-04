@@ -70,14 +70,8 @@
         <p class="section-head__desc">カテゴリで絞り込んで、気になる作品を拡大してご覧いただけます。</p>
       </div>
 
-      <!-- フィルター -->
-      <div class="filters" role="tablist" aria-label="カテゴリで絞り込み">
-        <button class="filter is-active" data-filter="all" role="tab" aria-selected="true">すべて</button>
-        <button class="filter" data-filter="landscape" role="tab" aria-selected="false">風景</button>
-        <button class="filter" data-filter="flower" role="tab" aria-selected="false">花</button>
-        <button class="filter" data-filter="cityscape" role="tab" aria-selected="false">街並み</button>
-        <button class="filter" data-filter="still" role="tab" aria-selected="false">静物</button>
-      </div>
+      <!-- フィルター（カテゴリはサーバーから取得してJSが生成） -->
+      <div class="filters" role="tablist" aria-label="カテゴリで絞り込み"></div>
 
       <!-- メーソンリーギャラリー（JSが生成） -->
       <div class="gallery" id="gallery" aria-live="polite"></div>
@@ -150,6 +144,7 @@
     </nav>
     <nav class="footer-links" aria-label="その他">
       <a href="privacy.html">プライバシーポリシー</a>
+      <a href="/admin/">管理画面</a>
     </nav>
     <p class="copyright">© <span id="year"></span> Aquarelle. All works are original watercolor paintings.</p>
   </footer>

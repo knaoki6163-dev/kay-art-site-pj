@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex" />
+  <title>管理画面 — Aquarelle</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/style.css" />
+</head>
+<body class="admin-body">
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <!-- ログイン画面 -->
+  <section class="login-box" id="login-view" hidden>
+    <h1>Aquarelle</h1>
+    <p>管理画面にログイン</p>
+    <form id="login-form">
+      <input type="password" id="password" placeholder="パスワード" autocomplete="current-password" required />
+      <button type="submit" class="btn btn--primary">ログイン</button>
+    </form>
+    <p class="admin-note" id="login-note"></p>
+  </section>
+
+  <!-- 管理画面本体 -->
+  <div class="admin-wrap" id="app-view" hidden>
+    <header class="admin-header">
+      <div>
+        <h1>Aquarelle 管理画面</h1>
+        <span class="muted">作品のアップロードと、お問い合わせの確認ができます。</span>
+      </div>
+      <div>
+        <a class="btn" href="/" style="margin-right:.5rem;">サイトを見る</a>
+        <button class="btn" id="logout-btn">ログアウト</button>
+      </div>
+    </header>
+
+    <div class="admin-tabs">
+      <button class="admin-tab is-active" data-tab="works">作品の管理</button>
+      <button class="admin-tab" data-tab="messages">お問い合わせ</button>
+    </div>
+
+    <!-- 作品の管理 -->
+    <section class="admin-panel is-active" id="panel-works">
+      <form class="upload-form" id="upload-form">
+        <h2>作品を追加</h2>
+        <div class="field field--full">
+          <label for="image">作品の写真</label>
+          <input type="file" id="image" name="image" accept="image/*" required />
+        </div>
+        <div class="field">
+          <label for="title">作品名</label>
+          <input type="text" id="title" name="title" placeholder="例：朝靄の湖" required />
+        </div>
+        <div class="field">
+          <label for="category">カテゴリ</label>
+          <select id="category" name="category"></select>
+        </div>
+        <div class="field">
+          <label for="year">制作年（任意）</label>
+          <input type="text" id="year" name="year" placeholder="例：2024" />
+        </div>
+        <div class="field">
+          <label for="medium">技法・サイズ（任意）</label>
+          <input type="text" id="medium" name="medium" placeholder="例：透明水彩 / 300×400mm" />
+        </div>
+        <div class="field field--full">
+          <button type="submit" class="btn btn--primary">アップロード</button>
+          <p class="admin-note" id="upload-note"></p>
+        </div>
+      </form>
+
+      <h2 style="font-size:1.2rem;margin-bottom:1rem;">登録済みの作品</h2>
+      <div class="admin-grid" id="works-grid"></div>
+      <p class="admin-empty" id="works-empty" hidden>まだ作品が登録されていません。</p>
+    </section>
+
+    <!-- お問い合わせ -->
+    <section class="admin-panel" id="panel-messages">
+      <div id="messages-list"></div>
+      <p class="admin-empty" id="messages-empty" hidden>お問い合わせはまだありません。</p>
+    </section>
+  </div>
+
+  <script src="/admin/admin.js"></script>
+</body>
+</html>

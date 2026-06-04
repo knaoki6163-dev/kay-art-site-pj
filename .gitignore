@@ -1,0 +1,18 @@
+# 依存パッケージ
+node_modules/
+
+# 環境変数
+.env
+
+# アップロードされた画像（実データはGitに含めない。フォルダは .gitkeep で保持）
+public/uploads/*
+!public/uploads/.gitkeep
+
+# 収集したデータ（実データはGitに含めない。空の雛形のみ追跡）
+# ※ローカル/サーバーで実際に溜まるデータはコミットしません
+data/works.json
+data/messages.json
+
+# OS / エディタ
+.DS_Store
+*.log

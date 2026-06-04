@@ -1,0 +1,19 @@
+{
+  "name": "aquarelle-portfolio",
+  "version": "1.0.0",
+  "description": "水彩画ポートフォリオ（動的版）— ギャラリー・管理画面・お問い合わせ収集",
+  "main": "server.js",
+  "type": "commonjs",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "node server.js"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "dependencies": {
+    "express": "^4.19.2",
+    "express-session": "^1.18.0",
+    "multer": "^2.0.0"
+  }
+}
