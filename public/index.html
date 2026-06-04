@@ -32,7 +32,7 @@
   <header class="site-header" id="top">
     <a class="brand" href="#top">
       <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name">Aquarelle</span>
+      <span class="brand__name" data-content="siteName">Aquarelle</span>
     </a>
     <nav class="nav" aria-label="メインナビゲーション">
       <a href="#works">作品</a>
@@ -47,13 +47,13 @@
   <!-- ヒーロー -->
   <section class="hero">
     <div class="hero__inner">
-      <p class="hero__eyebrow">Watercolor Portfolio</p>
-      <h1 class="hero__title">にじみのなかに、<br />静かな景色を。</h1>
-      <p class="hero__lead">
+      <p class="hero__eyebrow" data-content="heroEyebrow">Watercolor Portfolio</p>
+      <h1 class="hero__title" data-content="heroTitle">にじみのなかに、<br />静かな景色を。</h1>
+      <p class="hero__lead" data-content="heroLead">
         透明水彩でとらえた、光と水の移ろい。<br />
         滲み、ぼかし、余白が描く一枚一枚をご覧ください。
       </p>
-      <a class="btn btn--primary" href="#works">作品を見る</a>
+      <a class="btn btn--primary" href="#works" data-content="heroButton">作品を見る</a>
     </div>
     <div class="hero__scroll" aria-hidden="true">
       <span>Scroll</span>
@@ -65,9 +65,9 @@
   <main>
     <section class="works" id="works">
       <div class="section-head">
-        <p class="section-head__eyebrow">Works</p>
-        <h2 class="section-head__title">作品集</h2>
-        <p class="section-head__desc">カテゴリで絞り込んで、気になる作品を拡大してご覧いただけます。</p>
+        <p class="section-head__eyebrow" data-content="worksEyebrow">Works</p>
+        <h2 class="section-head__title" data-content="worksTitle">作品集</h2>
+        <p class="section-head__desc" data-content="worksDesc">カテゴリで絞り込んで、気になる作品を拡大してご覧いただけます。</p>
       </div>
 
       <!-- フィルター（カテゴリはサーバーから取得してJSが生成） -->
@@ -83,21 +83,21 @@
         <div class="about__portrait" role="img" aria-label="アーティストの作業風景"></div>
       </div>
       <div class="about__body">
-        <p class="section-head__eyebrow">About the Artist</p>
-        <h2 class="about__title">水と紙のあいだで</h2>
-        <p>
+        <p class="section-head__eyebrow" data-content="aboutEyebrow">About the Artist</p>
+        <h2 class="about__title" data-content="aboutTitle">水と紙のあいだで</h2>
+        <p data-content="aboutBody1">
           風景や花、何気ない街角を、透明水彩で描いています。
           コントロールしきれない水のにじみや、紙のうえで偶然生まれる色の重なりこそ、
           水彩のいちばんの魅力だと感じています。
         </p>
-        <p>
+        <p data-content="aboutBody2">
           完成された形よりも、描いている時間に流れた空気や光を、
           見る方にそっと手渡せるような一枚を目指しています。
         </p>
         <dl class="about__meta">
-          <div><dt>技法</dt><dd>透明水彩 / 顔彩</dd></div>
-          <div><dt>主な題材</dt><dd>風景・花・街並み・静物</dd></div>
-          <div><dt>拠点</dt><dd>日本</dd></div>
+          <div><dt>技法</dt><dd data-content="aboutTechnique">透明水彩 / 顔彩</dd></div>
+          <div><dt>主な題材</dt><dd data-content="aboutSubjects">風景・花・街並み・静物</dd></div>
+          <div><dt>拠点</dt><dd data-content="aboutBase">日本</dd></div>
         </dl>
       </div>
     </section>
@@ -105,9 +105,9 @@
     <!-- お問い合わせ -->
     <section class="contact" id="contact">
       <div class="section-head">
-        <p class="section-head__eyebrow">Contact</p>
-        <h2 class="section-head__title">お問い合わせ</h2>
-        <p class="section-head__desc">作品のご依頼・展示・ご質問など、お気軽にどうぞ。</p>
+        <p class="section-head__eyebrow" data-content="contactEyebrow">Contact</p>
+        <h2 class="section-head__title" data-content="contactTitle">お問い合わせ</h2>
+        <p class="section-head__desc" data-content="contactDesc">作品のご依頼・展示・ご質問など、お気軽にどうぞ。</p>
       </div>
 
       <form class="contact-form" id="contact-form" novalidate>
@@ -135,18 +135,18 @@
   <footer class="site-footer">
     <div class="brand brand--footer">
       <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name">Aquarelle</span>
+      <span class="brand__name" data-content="siteName">Aquarelle</span>
     </div>
     <nav class="footer-social" aria-label="SNS">
-      <a href="#" aria-label="Instagram">Instagram</a>
-      <a href="#" aria-label="X">X</a>
-      <a href="#" aria-label="Email">Email</a>
+      <a href="#" data-content-href="instagramUrl" aria-label="Instagram">Instagram</a>
+      <a href="#" data-content-href="xUrl" aria-label="X">X</a>
+      <a href="#" data-content-href="emailUrl" aria-label="Email">Email</a>
     </nav>
     <nav class="footer-links" aria-label="その他">
       <a href="privacy.html">プライバシーポリシー</a>
       <a href="/admin/">管理画面</a>
     </nav>
-    <p class="copyright">© <span id="year"></span> Aquarelle. All works are original watercolor paintings.</p>
+    <p class="copyright">© <span id="year"></span> <span data-content="siteName">Aquarelle</span>. <span data-content="copyrightSuffix">All works are original watercolor paintings.</span></p>
   </footer>
 
   <!-- ライトボックス -->

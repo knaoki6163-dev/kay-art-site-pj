@@ -15,6 +15,44 @@
   const uploadNote = $("upload-note");
   let categories = [];
 
+  /* サイト文章の編集項目（キーは server.js の DEFAULT_CONTENT と一致） */
+  const CONTENT_GROUPS = [
+    { group: "基本", fields: [
+      { key: "siteName", label: "サイト名", type: "text" },
+    ]},
+    { group: "トップ（ヒーロー）", fields: [
+      { key: "heroEyebrow", label: "小見出し（英字）", type: "text" },
+      { key: "heroTitle", label: "大見出し（改行可）", type: "textarea" },
+      { key: "heroLead", label: "リード文（改行可）", type: "textarea" },
+      { key: "heroButton", label: "ボタンの文言", type: "text" },
+    ]},
+    { group: "作品集セクション", fields: [
+      { key: "worksEyebrow", label: "小見出し（英字）", type: "text" },
+      { key: "worksTitle", label: "見出し", type: "text" },
+      { key: "worksDesc", label: "説明文", type: "textarea" },
+    ]},
+    { group: "アーティスト紹介", fields: [
+      { key: "aboutEyebrow", label: "小見出し（英字）", type: "text" },
+      { key: "aboutTitle", label: "見出し", type: "text" },
+      { key: "aboutBody1", label: "本文（1段落目）", type: "textarea" },
+      { key: "aboutBody2", label: "本文（2段落目）", type: "textarea" },
+      { key: "aboutTechnique", label: "技法", type: "text" },
+      { key: "aboutSubjects", label: "主な題材", type: "text" },
+      { key: "aboutBase", label: "拠点", type: "text" },
+    ]},
+    { group: "お問い合わせセクション", fields: [
+      { key: "contactEyebrow", label: "小見出し（英字）", type: "text" },
+      { key: "contactTitle", label: "見出し", type: "text" },
+      { key: "contactDesc", label: "説明文", type: "textarea" },
+    ]},
+    { group: "フッター・SNS", fields: [
+      { key: "instagramUrl", label: "Instagram のURL", type: "text" },
+      { key: "xUrl", label: "X（旧Twitter）のURL", type: "text" },
+      { key: "emailUrl", label: "メールリンク（例：mailto:you@example.com）", type: "text" },
+      { key: "copyrightSuffix", label: "コピーライト表記（年・サイト名のあと）", type: "text" },
+    ]},
+  ];
+
   function esc(s) {
     return (s == null ? "" : String(s)).replace(/[&<>"']/g, (c) =>
       ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
@@ -73,7 +111,72 @@
       tab.classList.add("is-active");
       $("panel-" + tab.dataset.tab).classList.add("is-active");
       if (tab.dataset.tab === "messages") loadMessages();
+      if (tab.dataset.tab === "content") loadContent();
     });
+  });
+
+  /* ---------- サイトの文章：フォーム生成・読み込み・保存 ---------- */
+  let contentBuilt = false;
+  function buildContentForm() {
+    if (contentBuilt) return;
+    const wrap = $("content-fields");
+    wrap.innerHTML = "";
+    CONTENT_GROUPS.forEach((g) => {
+      const group = document.createElement("div");
+      group.className = "content-group";
+      const h = document.createElement("h3");
+      h.textContent = g.group;
+      group.appendChild(h);
+      g.fields.forEach((f) => {
+        const field = document.createElement("div");
+        field.className = "content-field";
+        const id = "c_" + f.key;
+        const label = document.createElement("label");
+        label.setAttribute("for", id);
+        label.textContent = f.label;
+        field.appendChild(label);
+        const input = f.type === "textarea" ? document.createElement("textarea") : document.createElement("input");
+        if (f.type === "textarea") input.rows = 3; else input.type = "text";
+        input.id = id;
+        input.dataset.key = f.key;
+        field.appendChild(input);
+        group.appendChild(field);
+      });
+      wrap.appendChild(group);
+    });
+    contentBuilt = true;
+  }
+
+  async function loadContent() {
+    buildContentForm();
+    let content = {};
+    try { content = await (await fetch("/api/content")).json(); } catch (e) { content = {}; }
+    document.querySelectorAll("#content-fields [data-key]").forEach((input) => {
+      input.value = content[input.dataset.key] != null ? content[input.dataset.key] : "";
+    });
+  }
+
+  $("content-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const note = $("content-note");
+    note.textContent = "保存中…";
+    note.classList.remove("is-error");
+    const payload = {};
+    document.querySelectorAll("#content-fields [data-key]").forEach((input) => {
+      payload[input.dataset.key] = input.value;
+    });
+    try {
+      const res = await fetch("/api/admin/content", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(payload),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) note.textContent = "保存しました。公開サイトに反映されています。";
+      else { note.textContent = data.error || "保存に失敗しました。"; note.classList.add("is-error"); }
+    } catch (err) {
+      note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error");
+    }
   });
 
   /* ---------- カテゴリ読み込み（アップロードの選択肢） ---------- */
