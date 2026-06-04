@@ -102,7 +102,8 @@
     });
   });
 
-  /* ---------- ライトボックス ---------- */
+  /* ---------- ライトボックス & ギャラリー操作（ギャラリーがあるページのみ） ---------- */
+  if (gallery) {
   const lightbox     = document.getElementById("lightbox");
   const lbImage      = document.getElementById("lightbox-image");
   const lbTitle      = document.getElementById("lightbox-title");
@@ -173,6 +174,7 @@
     if (e.key === "ArrowLeft") step(-1);
     if (e.key === "ArrowRight") step(1);
   });
+  } /* end if (gallery) */
 
   /* ---------- ヘッダー：スクロールで境界線 ---------- */
   const header = document.querySelector(".site-header");
@@ -198,20 +200,23 @@
   /* ---------- お問い合わせフォーム（デモ：送信を模擬） ---------- */
   const form = document.getElementById("contact-form");
   const note = document.getElementById("form-note");
-  form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (!form.checkValidity()) {
-      note.textContent = "すべての項目をご入力ください。";
-      form.reportValidity();
-      return;
-    }
-    note.textContent = "メッセージをありがとうございます。折り返しご連絡いたします。";
-    form.reset();
-  });
+  if (form) {
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      if (!form.checkValidity()) {
+        note.textContent = "すべての項目をご入力ください。";
+        form.reportValidity();
+        return;
+      }
+      note.textContent = "メッセージをありがとうございます。折り返しご連絡いたします。";
+      form.reset();
+    });
+  }
 
   /* ---------- フッターの年号 ---------- */
-  document.getElementById("year").textContent = new Date().getFullYear();
+  const yearEl = document.getElementById("year");
+  if (yearEl) yearEl.textContent = new Date().getFullYear();
 
-  /* ---------- 初期描画 ---------- */
-  render(works.slice());
+  /* ---------- 初期描画（ギャラリーがあるページのみ） ---------- */
+  if (gallery) render(works.slice());
 })();

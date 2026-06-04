@@ -340,7 +340,33 @@ main { position: relative; }
 .footer-social { display: flex; gap: 1.8rem; }
 .footer-social a { font-family: var(--serif-en); font-style: italic; letter-spacing: 0.08em; color: var(--ink-soft); }
 .footer-social a:hover { color: var(--accent); }
+.footer-links a { font-size: 0.9rem; letter-spacing: 0.06em; color: var(--ink-soft); }
+.footer-links a:hover { color: var(--accent); }
 .copyright { font-size: 0.85rem; color: var(--ink-soft); margin: 0; }
+
+/* ---------- プライバシーポリシー等の文章ページ ---------- */
+.legal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: clamp(3rem, 7vw, 6rem) clamp(1.25rem, 5vw, 3rem) clamp(4rem, 8vw, 7rem);
+}
+.legal__head { text-align: center; margin-bottom: clamp(2.5rem, 5vw, 4rem); }
+.legal__title { font-size: clamp(1.9rem, 4.5vw, 3rem); letter-spacing: 0.04em; margin: 0.3rem 0 0.6rem; }
+.legal__updated { font-family: var(--serif-en); font-style: italic; color: var(--ink-soft); margin: 0; }
+.legal__section { margin-bottom: 2.4rem; }
+.legal__section h2 {
+  font-size: 1.25rem;
+  letter-spacing: 0.04em;
+  margin-bottom: 0.8rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 1px solid var(--line);
+}
+.legal__section p { color: var(--ink-soft); }
+.legal__section ul { color: var(--ink-soft); padding-left: 1.3em; margin: 0 0 1em; }
+.legal__section li { margin-bottom: 0.4em; }
+.legal__section a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.legal__section a:hover { opacity: 0.75; }
+.legal__back { text-align: center; margin-top: 3rem; }
 
 /* ---------- ライトボックス ---------- */
 .lightbox {

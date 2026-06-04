@@ -66,6 +66,16 @@ const works = [
 - **サイト名** — `index.html` の `Aquarelle` を任意の名前・屋号に置き換え
 - **SNSリンク** — フッターの `.footer-social` の `href` を実際のURLに
 
+## アクセス解析（Google Analytics 4）
+
+訪問者の傾向を把握するため、GA4 を導入しています。
+
+- 測定タグは **`js/analytics.js` の1ファイルに集約**し、各HTMLの `<head>` からは
+  `<script src="js/analytics.js"></script>` の1行で読み込んでいます（測定IDの重複記述を回避）。
+- 測定IDを変更する場合は、`js/analytics.js` 内の `GA_MEASUREMENT_ID` を書き換えるだけです。
+- プライバシー配慮として、IP匿名化・Google広告シグナルの無効化を設定しています。
+- アクセス解析の内容は `privacy.html`（プライバシーポリシー）に明記し、フッターからリンクしています。
+
 ## ライセンス
 
 サイトのコードは自由に利用・改変いただけます。掲載する水彩画作品の著作権は制作者に帰属します。
