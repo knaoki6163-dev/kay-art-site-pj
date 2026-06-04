@@ -12,6 +12,7 @@ public/uploads/*
 # ※ローカル/サーバーで実際に溜まるデータはコミットしません
 data/works.json
 data/messages.json
+data/content.json
 
 # OS / エディタ
 .DS_Store

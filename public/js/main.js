@@ -17,6 +17,22 @@
   /* ---------- 小さなユーティリティ ---------- */
   function el(tag, cls) { const e = document.createElement(tag); if (cls) e.className = cls; return e; }
   function esc(s) { return (s == null ? "" : String(s)).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+  function escBr(s) { return esc(s).replace(/\n/g, "<br>"); }
+
+  /* ---------- サイトの文章を反映（全ページ共通） ---------- */
+  async function applyContent() {
+    let c;
+    try { c = await (await fetch("/api/content")).json(); } catch (e) { return; }
+    document.querySelectorAll("[data-content]").forEach((node) => {
+      const key = node.dataset.content;
+      if (c[key] != null) node.innerHTML = escBr(c[key]);
+    });
+    document.querySelectorAll("[data-content-href]").forEach((node) => {
+      const key = node.dataset.contentHref;
+      if (c[key]) node.setAttribute("href", c[key]);
+    });
+  }
+  applyContent();
 
   function categoryLabel(key) {
     const c = categories.find((x) => x.key === key);

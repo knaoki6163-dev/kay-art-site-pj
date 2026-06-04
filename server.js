@@ -40,6 +40,40 @@ const CATEGORIES = [
 ];
 const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 
+/* ----- サイトの文章（管理画面から編集可能）の既定値 -----
+   ここがサイト各所に表示される文章の初期値です。
+   管理画面で編集すると data/content.json に上書き保存され、未編集の項目は既定値が使われます。 */
+const DEFAULT_CONTENT = {
+  siteName: "Aquarelle",
+
+  heroEyebrow: "Watercolor Portfolio",
+  heroTitle: "にじみのなかに、\n静かな景色を。",
+  heroLead: "透明水彩でとらえた、光と水の移ろい。\n滲み、ぼかし、余白が描く一枚一枚をご覧ください。",
+  heroButton: "作品を見る",
+
+  worksEyebrow: "Works",
+  worksTitle: "作品集",
+  worksDesc: "カテゴリで絞り込んで、気になる作品を拡大してご覧いただけます。",
+
+  aboutEyebrow: "About the Artist",
+  aboutTitle: "水と紙のあいだで",
+  aboutBody1: "風景や花、何気ない街角を、透明水彩で描いています。コントロールしきれない水のにじみや、紙のうえで偶然生まれる色の重なりこそ、水彩のいちばんの魅力だと感じています。",
+  aboutBody2: "完成された形よりも、描いている時間に流れた空気や光を、見る方にそっと手渡せるような一枚を目指しています。",
+  aboutTechnique: "透明水彩 / 顔彩",
+  aboutSubjects: "風景・花・街並み・静物",
+  aboutBase: "日本",
+
+  contactEyebrow: "Contact",
+  contactTitle: "お問い合わせ",
+  contactDesc: "作品のご依頼・展示・ご質問など、お気軽にどうぞ。",
+
+  instagramUrl: "#",
+  xUrl: "#",
+  emailUrl: "#",
+  copyrightSuffix: "All works are original watercolor paintings.",
+};
+const CONTENT_KEYS = Object.keys(DEFAULT_CONTENT);
+
 /* ----- データ保存用ファイルの準備 -----
    DATA_DIR / UPLOAD_DIR は環境変数で変更できます。
    永続ディスク（Renderの有料プラン等）を使う場合は、これらをディスクのパスに向ければ
@@ -48,12 +82,25 @@ const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
 const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "public", "uploads");
 const WORKS_FILE = path.join(DATA_DIR, "works.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
+const CONTENT_FILE = path.join(DATA_DIR, "content.json");
 
 for (const dir of [DATA_DIR, UPLOAD_DIR]) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
 for (const file of [WORKS_FILE, MESSAGES_FILE]) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
+}
+if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
+
+// 保存済みの文章（content.json）を既定値にマージして返す
+function getContent() {
+  let saved = {};
+  try { saved = JSON.parse(fs.readFileSync(CONTENT_FILE, "utf8")); } catch (e) { saved = {}; }
+  const out = {};
+  for (const key of CONTENT_KEYS) {
+    out[key] = (saved[key] != null && saved[key] !== "") ? String(saved[key]) : DEFAULT_CONTENT[key];
+  }
+  return out;
 }
 
 function readJson(file) {
@@ -110,6 +157,9 @@ function requireAuth(req, res, next) {
 
 // カテゴリ一覧
 app.get("/api/categories", (req, res) => res.json(CATEGORIES));
+
+// サイトの文章（公開：表示に使う）
+app.get("/api/content", (req, res) => res.json(getContent()));
 
 // 作品一覧（?category=landscape で絞り込み。未指定/all は全件）
 app.get("/api/works", (req, res) => {
@@ -172,6 +222,17 @@ app.post("/api/admin/login", (req, res) => {
 // ログアウト
 app.post("/api/admin/logout", (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
+});
+
+// サイトの文章を保存（既知のキーのみ受け付ける）
+app.put("/api/admin/content", requireAuth, (req, res) => {
+  const body = req.body || {};
+  const saved = {};
+  for (const key of CONTENT_KEYS) {
+    if (body[key] != null) saved[key] = String(body[key]).slice(0, 4000);
+  }
+  writeJson(CONTENT_FILE, saved);
+  res.json({ ok: true, content: getContent() });
 });
 
 // 作品アップロード

@@ -40,6 +40,7 @@
 
     <div class="admin-tabs">
       <button class="admin-tab is-active" data-tab="works">作品の管理</button>
+      <button class="admin-tab" data-tab="content">サイトの文章</button>
       <button class="admin-tab" data-tab="messages">お問い合わせ</button>
     </div>
 
@@ -76,6 +77,21 @@
       <h2 style="font-size:1.2rem;margin-bottom:1rem;">登録済みの作品</h2>
       <div class="admin-grid" id="works-grid"></div>
       <p class="admin-empty" id="works-empty" hidden>まだ作品が登録されていません。</p>
+    </section>
+
+    <!-- サイトの文章 -->
+    <section class="admin-panel" id="panel-content">
+      <form class="content-form" id="content-form">
+        <p class="muted" style="margin-bottom:1.5rem;">
+          サイトに表示される見出し・キャッチコピー・プロフィール・SNSリンクなどを編集できます。
+          編集して「保存する」を押すと、公開サイトにすぐ反映されます。
+        </p>
+        <div id="content-fields"></div>
+        <div style="margin-top:1.5rem;">
+          <button type="submit" class="btn btn--primary">保存する</button>
+          <p class="admin-note" id="content-note"></p>
+        </div>
+      </form>
     </section>
 
     <!-- お問い合わせ -->
