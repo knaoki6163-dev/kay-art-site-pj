@@ -40,9 +40,12 @@ const CATEGORIES = [
 ];
 const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 
-/* ----- データ保存用ファイルの準備 ----- */
-const DATA_DIR = path.join(__dirname, "data");
-const UPLOAD_DIR = path.join(__dirname, "public", "uploads");
+/* ----- データ保存用ファイルの準備 -----
+   DATA_DIR / UPLOAD_DIR は環境変数で変更できます。
+   永続ディスク（Renderの有料プラン等）を使う場合は、これらをディスクのパスに向ければ
+   再デプロイしてもデータが消えません。未指定ならプロジェクト内の既定の場所を使います。 */
+const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
+const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "public", "uploads");
 const WORKS_FILE = path.join(DATA_DIR, "works.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 
@@ -70,6 +73,9 @@ app.use(session({
   saveUninitialized: false,
   cookie: { httpOnly: true, sameSite: "lax", maxAge: 1000 * 60 * 60 * 8 }, // 8時間
 }));
+
+// アップロード画像の配信（UPLOAD_DIR が public 外でも /uploads で見えるように）
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 // 静的ファイル（公開サイト）の配信
 app.use(express.static(path.join(__dirname, "public")));

@@ -1,0 +1,41 @@
+# =========================================================
+# Render デプロイ設定（Blueprint）
+# https://render.com/docs/blueprint-spec
+#
+# ・無料プラン(free)で動きます。ただし無料枠は「再デプロイ/再起動で
+#   アップロード画像・お問い合わせが消える」点にご注意ください。
+# ・データを永続化したい場合は、下部のコメント(disk:)を有効にし、
+#   plan を有料(starter 等)に変更してください。
+# =========================================================
+services:
+  - type: web
+    name: aquarelle-portfolio
+    runtime: node
+    plan: free
+    buildCommand: npm install
+    startCommand: npm start
+    autoDeploy: true
+    envVars:
+      # 管理画面のパスワード。Renderのダッシュボードで値を入力してください（公開されません）。
+      - key: ADMIN_PASSWORD
+        sync: false
+      # セッション用の秘密鍵は自動生成させます。
+      - key: SESSION_SECRET
+        generateValue: true
+      - key: NODE_VERSION
+        value: "20"
+
+    # ▼▼ データを永続化したい場合（有料プランが必要）▼▼
+    # 1) 上の plan: free を plan: starter に変更
+    # 2) 下の disk と、その下の DATA_DIR / UPLOAD_DIR の envVars を有効化
+    #
+    # disk:
+    #   name: aquarelle-data
+    #   mountPath: /var/data
+    #   sizeGB: 1
+    #
+    # （envVars に追記）
+    #   - key: DATA_DIR
+    #     value: /var/data/data
+    #   - key: UPLOAD_DIR
+    #     value: /var/data/uploads
