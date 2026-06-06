@@ -2,16 +2,17 @@
 # Render デプロイ設定（Blueprint）
 # https://render.com/docs/blueprint-spec
 #
-# ・無料プラン(free)で動きます。ただし無料枠は「再デプロイ/再起動で
-#   アップロード画像・お問い合わせが消える」点にご注意ください。
-# ・データを永続化したい場合は、下部のコメント(disk:)を有効にし、
-#   plan を有料(starter 等)に変更してください。
+# ・Starterプラン + 永続ディスクの構成です。
+#   アップロード画像・お問い合わせ・編集した文章は /var/data に保存され、
+#   再デプロイ・再起動しても消えません。
+# ・無料(free)に戻したい場合は plan を free にし、disk と
+#   DATA_DIR / UPLOAD_DIR の3項目を削除（コメントアウト）してください。
 # =========================================================
 services:
   - type: web
     name: aquarelle-portfolio
     runtime: node
-    plan: free
+    plan: starter
     buildCommand: npm install
     startCommand: npm start
     autoDeploy: true
@@ -24,18 +25,14 @@ services:
         generateValue: true
       - key: NODE_VERSION
         value: "20"
+      # データの保存先を永続ディスク上に指定（これで再デプロイしても消えない）
+      - key: DATA_DIR
+        value: /var/data/data
+      - key: UPLOAD_DIR
+        value: /var/data/uploads
 
-    # ▼▼ データを永続化したい場合（有料プランが必要）▼▼
-    # 1) 上の plan: free を plan: starter に変更
-    # 2) 下の disk と、その下の DATA_DIR / UPLOAD_DIR の envVars を有効化
-    #
-    # disk:
-    #   name: aquarelle-data
-    #   mountPath: /var/data
-    #   sizeGB: 1
-    #
-    # （envVars に追記）
-    #   - key: DATA_DIR
-    #     value: /var/data/data
-    #   - key: UPLOAD_DIR
-    #     value: /var/data/uploads
+    # 永続ディスク（作品画像・お問い合わせ・文章の保存先）
+    disk:
+      name: aquarelle-data
+      mountPath: /var/data
+      sizeGB: 1
