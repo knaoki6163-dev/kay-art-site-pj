@@ -172,7 +172,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* ---------- ヒーロー ---------- */
 .hero {
   position: relative;
-  min-height: 100vh;
+  min-height: 100vh;       /* 古いブラウザ用フォールバック */
+  min-height: 100svh;      /* モバイルのツールバー分の余白を防ぐ（iOS等） */
   display: flex; align-items: center;
   padding: 0 clamp(1.5rem, 7vw, 7rem);
   overflow: hidden;
