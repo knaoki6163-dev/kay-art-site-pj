@@ -91,11 +91,25 @@
       document.querySelectorAll(".admin-panel").forEach((p) => p.classList.remove("is-active"));
       tab.classList.add("is-active");
       $("panel-" + tab.dataset.tab).classList.add("is-active");
-      if (tab.dataset.tab === "messages") loadMessages();
+      if (tab.dataset.tab === "messages") { loadMessages(); markMessagesRead(); }
       if (tab.dataset.tab === "content") loadContent();
       if (tab.dataset.tab === "news") loadNews();
     });
   });
+
+  /* ---------- お問い合わせ 未読バッジ ---------- */
+  async function refreshMessageBadge() {
+    let count = 0;
+    try { count = (await (await fetch("/api/admin/messages/unread-count")).json()).count || 0; }
+    catch (e) { count = 0; }
+    const badge = $("msg-badge");
+    if (count > 0) { badge.textContent = count > 99 ? "99+" : count; badge.hidden = false; }
+    else { badge.hidden = true; }
+  }
+  async function markMessagesRead() {
+    try { await fetch("/api/admin/messages/read-all", { method: "POST" }); } catch (e) {}
+    $("msg-badge").hidden = true;
+  }
 
   /* ---------- お知らせ：追加・一覧・削除 ---------- */
   $("news-form").addEventListener("submit", async (e) => {
@@ -374,6 +388,7 @@
   async function init() {
     await loadCategories();
     await loadWorks();
+    refreshMessageBadge();
   }
 
   checkAuth();
