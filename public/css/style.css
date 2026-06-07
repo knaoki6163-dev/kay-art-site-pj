@@ -326,8 +326,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 .contact-form input, .contact-form textarea { padding: 0.6em 0.85em; }
 .contact-form .field { gap: 0.35rem; }
 .contact-form .field label { font-size: 0.85rem; }
-.field { display: flex; flex-direction: column; gap: 0.5rem; }
+.field { display: flex; flex-direction: column; gap: 0.5rem; min-width: 0; }
 .field--full { grid-column: 1 / -1; }
+/* グリッド内で入力欄がはみ出さないように */
+.field input, .field textarea, .field select,
+.content-field, .content-field input, .content-field textarea, .content-field select {
+  width: 100%; max-width: 100%; min-width: 0;
+}
 .field label { font-size: 0.9rem; letter-spacing: 0.06em; color: var(--ink-soft); }
 .field input, .field textarea, .field select {
   font-family: var(--serif-jp); font-size: 1rem; color: var(--ink);
@@ -453,6 +458,11 @@ ul { margin: 0; padding: 0; list-style: none; }
 .msg__text { color: var(--ink-soft); white-space: pre-wrap; margin: 0.5rem 0 0.8rem; }
 .msg__del, .news-row__del { font-family: var(--serif-jp); font-size: 0.82rem; background: transparent; border: 1px solid var(--line); border-radius: 999px; padding: 0.3em 1em; color: var(--ink-soft); cursor: pointer; }
 .msg__del:hover, .news-row__del:hover { border-color: #b23b2a; color: #b23b2a; }
+.msg__head-right { display: flex; align-items: center; gap: 0.7rem; }
+.msg__star { background: transparent; border: none; cursor: pointer; padding: 0; line-height: 1; font-size: 1.2rem; color: var(--ink-soft); transition: color .2s var(--ease), transform .2s var(--ease); }
+.msg__star:hover { transform: scale(1.15); }
+.msg__star.is-on { color: #e0a73c; }
+.msg.is-important { border-left: 3px solid #e0a73c; }
 
 .content-form { max-width: 720px; }
 .content-group { border: 1px solid var(--line); border-radius: 4px; background: rgba(255,255,255,0.45); padding: 1.4rem 1.5rem; margin-bottom: 1.4rem; }
@@ -514,6 +524,9 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-body .news-row__date, .admin-body .msg__date { color: #b3a999; }
 .admin-body .admin-empty { color: #b3a999; }
 .admin-body .msg__del, .admin-body .news-row__del { border-color: #4a4339; color: #c0b6a6; }
+.admin-body .msg__star { color: #8a8073; }
+.admin-body .msg__star.is-on { color: #e6b34a; }
+.admin-body .msg.is-important { border-left-color: #e6b34a; }
 
 /* 作品カードの操作ボタン（編集 / 削除） */
 .admin-card__actions { display: flex; border-top: 1px solid var(--line); }
