@@ -18,36 +18,23 @@
   /* サイト文章の編集項目（キーは server.js の DEFAULT_CONTENT と一致） */
   const CONTENT_GROUPS = [
     { group: "基本", fields: [
-      { key: "siteName", label: "サイト名", type: "text" },
+      { key: "siteName", label: "サイト名（ロゴ）", type: "text" },
     ]},
     { group: "トップ（ヒーロー）", fields: [
-      { key: "heroEyebrow", label: "小見出し（英字）", type: "text" },
-      { key: "heroTitle", label: "大見出し（改行可）", type: "textarea" },
+      { key: "heroTitle", label: "キャッチコピー（大見出し・改行可）", type: "textarea" },
       { key: "heroLead", label: "リード文（改行可）", type: "textarea" },
       { key: "heroButton", label: "ボタンの文言", type: "text" },
     ]},
-    { group: "作品集セクション", fields: [
-      { key: "worksEyebrow", label: "小見出し（英字）", type: "text" },
-      { key: "worksTitle", label: "見出し", type: "text" },
-      { key: "worksDesc", label: "説明文", type: "textarea" },
+    { group: "About（アーティスト紹介）", fields: [
+      { key: "aboutBody", label: "本文", type: "textarea" },
+      { key: "aboutButton", label: "ボタンの文言", type: "text" },
+      { key: "aboutSignature", label: "サイン（手書き風の署名）", type: "text" },
     ]},
-    { group: "アーティスト紹介", fields: [
-      { key: "aboutEyebrow", label: "小見出し（英字）", type: "text" },
-      { key: "aboutTitle", label: "見出し", type: "text" },
-      { key: "aboutBody1", label: "本文（1段落目）", type: "textarea" },
-      { key: "aboutBody2", label: "本文（2段落目）", type: "textarea" },
-      { key: "aboutTechnique", label: "技法", type: "text" },
-      { key: "aboutSubjects", label: "主な題材", type: "text" },
-      { key: "aboutBase", label: "拠点", type: "text" },
-    ]},
-    { group: "お問い合わせセクション", fields: [
-      { key: "contactEyebrow", label: "小見出し（英字）", type: "text" },
-      { key: "contactTitle", label: "見出し", type: "text" },
+    { group: "Contact（お問い合わせ）", fields: [
       { key: "contactDesc", label: "説明文", type: "textarea" },
     ]},
     { group: "フッター・SNS", fields: [
       { key: "instagramUrl", label: "Instagram のURL", type: "text" },
-      { key: "xUrl", label: "X（旧Twitter）のURL", type: "text" },
       { key: "emailUrl", label: "メールリンク（例：mailto:you@example.com）", type: "text" },
       { key: "copyrightSuffix", label: "コピーライト表記（年・サイト名のあと）", type: "text" },
     ]},
@@ -112,8 +99,50 @@
       $("panel-" + tab.dataset.tab).classList.add("is-active");
       if (tab.dataset.tab === "messages") loadMessages();
       if (tab.dataset.tab === "content") loadContent();
+      if (tab.dataset.tab === "news") loadNews();
     });
   });
+
+  /* ---------- お知らせ：追加・一覧・削除 ---------- */
+  $("news-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const note = $("news-note");
+    note.textContent = "追加中…";
+    note.classList.remove("is-error");
+    try {
+      const res = await fetch("/api/admin/news", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: $("news-date").value.trim(), title: $("news-title").value.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); loadNews(); }
+      else { note.textContent = data.error || "追加に失敗しました。"; note.classList.add("is-error"); }
+    } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
+  });
+
+  async function loadNews() {
+    let news = [];
+    try { news = await (await fetch("/api/news")).json(); } catch (e) { news = []; }
+    const rows = $("news-rows");
+    rows.innerHTML = "";
+    $("news-empty-admin").hidden = news.length > 0;
+    news.forEach((n) => {
+      const row = document.createElement("div");
+      row.className = "news-row";
+      row.innerHTML =
+        '<div class="news-row__head">' +
+          '<span class="news-row__date">' + esc(n.date || "（日付なし）") + "</span>" +
+          '<button class="news-row__del" data-id="' + esc(n.id) + '">削除</button>' +
+        "</div>" +
+        "<div>" + esc(n.title) + "</div>";
+      row.querySelector(".news-row__del").addEventListener("click", async () => {
+        if (!confirm("このお知らせを削除しますか？")) return;
+        const res = await fetch("/api/admin/news/" + encodeURIComponent(n.id), { method: "DELETE" });
+        if (res.ok) loadNews(); else alert("削除に失敗しました。");
+      });
+      rows.appendChild(row);
+    });
+  }
 
   /* ---------- サイトの文章：フォーム生成・読み込み・保存 ---------- */
   let contentBuilt = false;

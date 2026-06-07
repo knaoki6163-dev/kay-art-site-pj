@@ -13,6 +13,7 @@ public/uploads/*
 data/works.json
 data/messages.json
 data/content.json
+data/news.json
 
 # OS / エディタ
 .DS_Store

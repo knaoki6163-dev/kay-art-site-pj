@@ -7,33 +7,29 @@
   <!-- Google Analytics 4（共通ファイルで全ページ統一） -->
   <script src="js/analytics.js"></script>
 
-  <title>プライバシーポリシー — Aquarelle</title>
-  <meta name="description" content="Aquarelle のプライバシーポリシー。アクセス解析（Google Analytics）と収集する情報、Cookie、オプトアウト方法について。" />
+  <title>プライバシーポリシー — A. Kato</title>
+  <meta name="description" content="A. Kato のプライバシーポリシー。アクセス解析（Google Analytics）と収集する情報、Cookie、オプトアウト方法について。" />
   <meta name="robots" content="noindex" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&family=Yellowtail&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- 紙テクスチャ・水彩のにじみ背景 -->
   <div class="paper-grain" aria-hidden="true"></div>
-  <div class="wash wash--1" aria-hidden="true"></div>
-  <div class="wash wash--2" aria-hidden="true"></div>
-  <div class="wash wash--3" aria-hidden="true"></div>
 
   <!-- ヘッダー -->
-  <header class="site-header" id="top">
+  <header class="site-header is-scrolled" id="top">
     <a class="brand" href="index.html">
-      <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name" data-content="siteName">Aquarelle</span>
+      <span class="brand__name" data-content="siteName">A. Kato</span>
     </a>
     <nav class="nav" aria-label="メインナビゲーション">
-      <a href="index.html#works">作品</a>
-      <a href="index.html#about">アーティスト</a>
-      <a href="index.html#contact">お問い合わせ</a>
+      <a href="index.html#works">Works</a>
+      <a href="index.html#about">About</a>
+      <a href="index.html#news">News</a>
+      <a href="index.html#contact">Contact</a>
     </nav>
     <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -44,14 +40,13 @@
   <main>
     <article class="legal">
       <header class="legal__head">
-        <p class="section-head__eyebrow">Privacy Policy</p>
-        <h1 class="legal__title">プライバシーポリシー</h1>
-        <p class="legal__updated">最終更新日：2026年6月4日</p>
+        <h1 class="legal__title">Privacy Policy</h1>
+        <p class="legal__updated">最終更新日：2026年6月7日</p>
       </header>
 
       <section class="legal__section">
         <p>
-          当サイト「Aquarelle」（以下「当サイト」）では、サイトの改善や、どの作品・ページがよく見られているかを把握する目的で、
+          当サイト（以下「当サイト」）では、サイトの改善や、どの作品・ページがよく見られているかを把握する目的で、
           アクセス解析ツール「Google Analytics（GA4）」を利用しています。
           このページでは、当サイトが取得する情報とその取り扱いについてご説明します。
         </p>
@@ -109,13 +104,10 @@
         <h2>5. オプトアウト（収集を拒否する方法）</h2>
         <p>アクセス解析によるデータ収集を望まない場合は、次のいずれかの方法で停止できます。</p>
         <ul>
-          <li>
-            <strong>ブラウザの設定</strong>：Cookie を無効にする、またはプライバシー保護機能を有効にする。
-          </li>
+          <li><strong>ブラウザの設定</strong>：Cookie を無効にする、またはプライバシー保護機能を有効にする。</li>
           <li>
             <strong>オプトアウト アドオンの利用</strong>：Google が提供する
-            <a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener noreferrer">
-              Google アナリティクス オプトアウト アドオン</a>
+            <a href="https://tools.google.com/dlpage/gaoptout?hl=ja" target="_blank" rel="noopener noreferrer">Google アナリティクス オプトアウト アドオン</a>
             をインストールすると、Google Analytics へのデータ送信を無効にできます。
           </li>
         </ul>
@@ -142,20 +134,23 @@
 
   <!-- フッター -->
   <footer class="site-footer">
-    <div class="brand brand--footer">
-      <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name" data-content="siteName">Aquarelle</span>
+    <a class="brand" href="index.html"><span class="brand__name" data-content="siteName">A. Kato</span></a>
+    <nav class="footer-nav" aria-label="フッターナビ">
+      <a href="index.html#about">About</a>
+      <a href="index.html#news">News</a>
+      <a href="index.html#contact">Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="/admin/">Admin</a>
+    </nav>
+    <div class="footer-social">
+      <a href="#" data-content-href="instagramUrl" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" data-content-href="emailUrl" aria-label="Email" title="Email">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
     </div>
-    <nav class="footer-social" aria-label="SNS">
-      <a href="#" data-content-href="instagramUrl" aria-label="Instagram">Instagram</a>
-      <a href="#" data-content-href="xUrl" aria-label="X">X</a>
-      <a href="#" data-content-href="emailUrl" aria-label="Email">Email</a>
-    </nav>
-    <nav class="footer-links" aria-label="その他">
-      <a href="privacy.html">プライバシーポリシー</a>
-      <a href="/admin/">管理画面</a>
-    </nav>
-    <p class="copyright">© <span id="year"></span> <span data-content="siteName">Aquarelle</span>. <span data-content="copyrightSuffix">All works are original watercolor paintings.</span></p>
+    <p class="copyright">© <span id="year"></span> <span data-content="siteName">A. Kato</span>. <span data-content="copyrightSuffix">All Rights Reserved.</span></p>
   </footer>
 
   <script src="js/main.js"></script>

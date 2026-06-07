@@ -44,33 +44,21 @@ const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
    ここがサイト各所に表示される文章の初期値です。
    管理画面で編集すると data/content.json に上書き保存され、未編集の項目は既定値が使われます。 */
 const DEFAULT_CONTENT = {
-  siteName: "Aquarelle",
+  siteName: "A. Kato",
 
-  heroEyebrow: "Watercolor Portfolio",
-  heroTitle: "にじみのなかに、\n静かな景色を。",
-  heroLead: "透明水彩でとらえた、光と水の移ろい。\n滲み、ぼかし、余白が描く一枚一枚をご覧ください。",
-  heroButton: "作品を見る",
+  heroTitle: "静けさの中の、\nかすかな光。",
+  heroLead: "心の奥にある風景を、\n絵にしています。",
+  heroButton: "VIEW WORKS",
 
-  worksEyebrow: "Works",
-  worksTitle: "作品集",
-  worksDesc: "カテゴリで絞り込んで、気になる作品を拡大してご覧いただけます。",
+  aboutBody: "自然や日常の中で感じた、静かな感情や風景を描いています。アクリル絵の具を中心に、重ねることで生まれる質感や、色の奥行きを大切にしています。",
+  aboutButton: "MORE ABOUT",
+  aboutSignature: "A. Kato",
 
-  aboutEyebrow: "About the Artist",
-  aboutTitle: "水と紙のあいだで",
-  aboutBody1: "風景や花、何気ない街角を、透明水彩で描いています。コントロールしきれない水のにじみや、紙のうえで偶然生まれる色の重なりこそ、水彩のいちばんの魅力だと感じています。",
-  aboutBody2: "完成された形よりも、描いている時間に流れた空気や光を、見る方にそっと手渡せるような一枚を目指しています。",
-  aboutTechnique: "透明水彩 / 顔彩",
-  aboutSubjects: "風景・花・街並み・静物",
-  aboutBase: "日本",
-
-  contactEyebrow: "Contact",
-  contactTitle: "お問い合わせ",
   contactDesc: "作品のご依頼・展示・ご質問など、お気軽にどうぞ。",
 
   instagramUrl: "#",
-  xUrl: "#",
   emailUrl: "#",
-  copyrightSuffix: "All works are original watercolor paintings.",
+  copyrightSuffix: "All Rights Reserved.",
 };
 const CONTENT_KEYS = Object.keys(DEFAULT_CONTENT);
 
@@ -83,11 +71,12 @@ const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "public", "upl
 const WORKS_FILE = path.join(DATA_DIR, "works.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
+const NEWS_FILE = path.join(DATA_DIR, "news.json");
 
 for (const dir of [DATA_DIR, UPLOAD_DIR]) {
   if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
 }
-for (const file of [WORKS_FILE, MESSAGES_FILE]) {
+for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE]) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
 }
 if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
@@ -161,6 +150,13 @@ app.get("/api/categories", (req, res) => res.json(CATEGORIES));
 // サイトの文章（公開：表示に使う）
 app.get("/api/content", (req, res) => res.json(getContent()));
 
+// お知らせ（公開）
+app.get("/api/news", (req, res) => {
+  const news = readJson(NEWS_FILE);
+  news.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  res.json(news);
+});
+
 // 作品一覧（?category=landscape で絞り込み。未指定/all は全件）
 app.get("/api/works", (req, res) => {
   const { category } = req.query;
@@ -222,6 +218,28 @@ app.post("/api/admin/login", (req, res) => {
 // ログアウト
 app.post("/api/admin/logout", (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
+});
+
+// お知らせの追加
+app.post("/api/admin/news", requireAuth, (req, res) => {
+  const date = (req.body.date || "").toString().trim();
+  const title = (req.body.title || "").toString().trim();
+  if (!title) return res.status(400).json({ error: "タイトルを入力してください。" });
+  const news = readJson(NEWS_FILE);
+  const item = { id: crypto.randomBytes(8).toString("hex"), date, title, createdAt: Date.now() };
+  news.push(item);
+  writeJson(NEWS_FILE, news);
+  res.json({ ok: true, item });
+});
+
+// お知らせの削除
+app.delete("/api/admin/news/:id", requireAuth, (req, res) => {
+  let news = readJson(NEWS_FILE);
+  const before = news.length;
+  news = news.filter((n) => n.id !== req.params.id);
+  if (news.length === before) return res.status(404).json({ error: "見つかりません。" });
+  writeJson(NEWS_FILE, news);
+  res.json({ ok: true });
 });
 
 // サイトの文章を保存（既知のキーのみ受け付ける）

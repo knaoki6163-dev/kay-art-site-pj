@@ -40,6 +40,7 @@
 
     <div class="admin-tabs">
       <button class="admin-tab is-active" data-tab="works">作品の管理</button>
+      <button class="admin-tab" data-tab="news">お知らせ</button>
       <button class="admin-tab" data-tab="content">サイトの文章</button>
       <button class="admin-tab" data-tab="messages">お問い合わせ</button>
     </div>
@@ -77,6 +78,27 @@
       <h2 style="font-size:1.2rem;margin-bottom:1rem;">登録済みの作品</h2>
       <div class="admin-grid" id="works-grid"></div>
       <p class="admin-empty" id="works-empty" hidden>まだ作品が登録されていません。</p>
+    </section>
+
+    <!-- お知らせ -->
+    <section class="admin-panel" id="panel-news">
+      <form class="news-form" id="news-form">
+        <h2>お知らせを追加</h2>
+        <div class="field">
+          <label for="news-date">日付（例：2024.05.12）</label>
+          <input type="text" id="news-date" name="date" placeholder="2024.05.12" />
+        </div>
+        <div class="field">
+          <label for="news-title">タイトル</label>
+          <input type="text" id="news-title" name="title" placeholder="展覧会「光の気配」開催のお知らせ" required />
+        </div>
+        <div class="field field--full">
+          <button type="submit" class="btn">追加する</button>
+          <p class="admin-note" id="news-note"></p>
+        </div>
+      </form>
+      <div id="news-rows"></div>
+      <p class="admin-empty" id="news-empty-admin" hidden>お知らせはまだありません。</p>
     </section>
 
     <!-- サイトの文章 -->

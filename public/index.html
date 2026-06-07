@@ -7,37 +7,33 @@
   <!-- Google Analytics 4（共通ファイルで全ページ統一） -->
   <script src="js/analytics.js"></script>
 
-  <title>Aquarelle — 水彩画ポートフォリオ</title>
-  <meta name="description" content="透明水彩による作品集。にじみと余白を大切にした水彩画のポートフォリオサイト。" />
-
-  <!-- Open Graph -->
-  <meta property="og:title" content="Aquarelle — 水彩画ポートフォリオ" />
-  <meta property="og:description" content="透明水彩による作品集。" />
+  <title>A. Kato — 絵画作品集</title>
+  <meta name="description" content="心の奥にある風景を絵にしています。A. Kato の絵画ポートフォリオ。" />
+  <meta property="og:title" content="A. Kato — 絵画作品集" />
+  <meta property="og:description" content="心の奥にある風景を絵にしています。" />
   <meta property="og:type" content="website" />
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Yellowtail&display=swap" rel="stylesheet" />
 
   <link rel="stylesheet" href="css/style.css" />
 </head>
 <body>
-  <!-- 紙テクスチャ・水彩のにじみ背景 -->
+  <!-- 紙テクスチャ背景 -->
   <div class="paper-grain" aria-hidden="true"></div>
-  <div class="wash wash--1" aria-hidden="true"></div>
-  <div class="wash wash--2" aria-hidden="true"></div>
-  <div class="wash wash--3" aria-hidden="true"></div>
 
   <!-- ヘッダー -->
-  <header class="site-header" id="top">
+  <header class="site-header is-over-hero" id="top">
     <a class="brand" href="#top">
-      <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name" data-content="siteName">Aquarelle</span>
+      <span class="brand__name" data-content="siteName">A. Kato</span>
     </a>
     <nav class="nav" aria-label="メインナビゲーション">
-      <a href="#works">作品</a>
-      <a href="#about">アーティスト</a>
-      <a href="#contact">お問い合わせ</a>
+      <a href="#top">Home</a>
+      <a href="#works">Works</a>
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
     </nav>
     <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
       <span></span><span></span><span></span>
@@ -45,71 +41,76 @@
   </header>
 
   <!-- ヒーロー -->
-  <section class="hero">
-    <div class="hero__inner">
-      <p class="hero__eyebrow" data-content="heroEyebrow">Watercolor Portfolio</p>
-      <h1 class="hero__title" data-content="heroTitle">にじみのなかに、<br />静かな景色を。</h1>
-      <p class="hero__lead" data-content="heroLead">
-        透明水彩でとらえた、光と水の移ろい。<br />
-        滲み、ぼかし、余白が描く一枚一枚をご覧ください。
-      </p>
-      <a class="btn btn--primary" href="#works" data-content="heroButton">作品を見る</a>
+  <section class="hero" id="hero">
+    <div class="hero__carousel" id="hero-carousel" aria-hidden="true"></div>
+    <div class="hero__scrim" aria-hidden="true"></div>
+    <div class="hero__content">
+      <h1 class="hero__title" data-content="heroTitle">静けさの中の、<br />かすかな光。</h1>
+      <p class="hero__lead" data-content="heroLead">心の奥にある風景を、<br />絵にしています。</p>
+      <a class="link-arrow link-arrow--light" href="#works" data-content="heroButton">VIEW WORKS</a>
     </div>
-    <div class="hero__scroll" aria-hidden="true">
-      <span>Scroll</span>
-      <span class="hero__scroll-line"></span>
+    <div class="hero__dots" id="hero-dots" role="tablist" aria-label="スライド切り替え"></div>
+
+    <!-- ちぎり和紙の境界（下） -->
+    <div class="edge edge--bottom" aria-hidden="true">
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0,38 L40,28 L96,44 L150,26 L210,46 L280,30 L350,48 L420,28 L500,42 L560,30 L640,50 L710,30 L780,46 L860,28 L940,48 L1010,30 L1090,46 L1160,28 L1240,44 L1310,30 L1380,46 L1440,32 L1440,70 L0,70 Z" fill="#f3efe6"/></svg>
     </div>
   </section>
 
-  <!-- 作品ギャラリー -->
   <main>
-    <section class="works" id="works">
-      <div class="section-head">
-        <p class="section-head__eyebrow" data-content="worksEyebrow">Works</p>
-        <h2 class="section-head__title" data-content="worksTitle">作品集</h2>
-        <p class="section-head__desc" data-content="worksDesc">カテゴリで絞り込んで、気になる作品を拡大してご覧いただけます。</p>
-      </div>
+    <!-- News / Works 2カラム -->
+    <div class="feature">
+      <!-- News -->
+      <section class="news" id="news">
+        <div class="block-head">
+          <h2 class="script-h">News</h2>
+          <a class="view-all" href="#news">VIEW ALL <span aria-hidden="true">&rarr;</span></a>
+        </div>
+        <ul class="news-list" id="news-list"></ul>
+        <p class="news-empty" id="news-empty" hidden>お知らせはまだありません。</p>
+      </section>
 
-      <!-- フィルター（カテゴリはサーバーから取得してJSが生成） -->
-      <div class="filters" role="tablist" aria-label="カテゴリで絞り込み"></div>
+      <!-- Works -->
+      <section class="works" id="works">
+        <div class="block-head">
+          <h2 class="script-h">Works</h2>
+          <a class="view-all" href="#works">VIEW ALL <span aria-hidden="true">&rarr;</span></a>
+        </div>
+        <div class="filters" role="tablist" aria-label="カテゴリで絞り込み"></div>
+        <div class="works-grid" id="gallery" aria-live="polite"></div>
+      </section>
+    </div>
 
-      <!-- メーソンリーギャラリー（JSが生成） -->
-      <div class="gallery" id="gallery" aria-live="polite"></div>
-    </section>
-
-    <!-- アーティスト紹介 -->
+    <!-- About（深緑） -->
     <section class="about" id="about">
-      <div class="about__media">
-        <div class="about__portrait" role="img" aria-label="アーティストの作業風景"></div>
+      <div class="edge edge--top" aria-hidden="true">
+        <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0,38 L40,28 L96,44 L150,26 L210,46 L280,30 L350,48 L420,28 L500,42 L560,30 L640,50 L710,30 L780,46 L860,28 L940,48 L1010,30 L1090,46 L1160,28 L1240,44 L1310,30 L1380,46 L1440,32 L1440,70 L0,70 Z" fill="#434d3c"/></svg>
       </div>
-      <div class="about__body">
-        <p class="section-head__eyebrow" data-content="aboutEyebrow">About the Artist</p>
-        <h2 class="about__title" data-content="aboutTitle">水と紙のあいだで</h2>
-        <p data-content="aboutBody1">
-          風景や花、何気ない街角を、透明水彩で描いています。
-          コントロールしきれない水のにじみや、紙のうえで偶然生まれる色の重なりこそ、
-          水彩のいちばんの魅力だと感じています。
-        </p>
-        <p data-content="aboutBody2">
-          完成された形よりも、描いている時間に流れた空気や光を、
-          見る方にそっと手渡せるような一枚を目指しています。
-        </p>
-        <dl class="about__meta">
-          <div><dt>技法</dt><dd data-content="aboutTechnique">透明水彩 / 顔彩</dd></div>
-          <div><dt>主な題材</dt><dd data-content="aboutSubjects">風景・花・街並み・静物</dd></div>
-          <div><dt>拠点</dt><dd data-content="aboutBase">日本</dd></div>
-        </dl>
+
+      <div class="about__inner">
+        <div class="about__text">
+          <h2 class="script-h script-h--light">About</h2>
+          <p data-content="aboutBody">自然や日常の中で感じた、静かな感情や風景を描いています。アクリル絵の具を中心に、重ねることで生まれる質感や、色の奥行きを大切にしています。</p>
+          <a class="link-arrow link-arrow--light" href="#contact" data-content="aboutButton">MORE ABOUT</a>
+        </div>
+        <div class="about__art" aria-hidden="true">
+          <span class="blot blot--blue"></span>
+          <span class="blot blot--peach"></span>
+          <span class="signature" data-content="aboutSignature">A. Kato</span>
+        </div>
+      </div>
+
+      <div class="edge edge--bottom" aria-hidden="true">
+        <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0,40 L50,28 L120,46 L190,28 L260,46 L340,30 L410,48 L490,28 L560,44 L640,30 L710,48 L790,28 L870,46 L950,30 L1030,48 L1100,28 L1180,44 L1260,30 L1330,46 L1400,30 L1440,42 L1440,70 L0,70 Z" fill="#f3efe6"/></svg>
       </div>
     </section>
 
-    <!-- お問い合わせ -->
+    <!-- Contact -->
     <section class="contact" id="contact">
-      <div class="section-head">
-        <p class="section-head__eyebrow" data-content="contactEyebrow">Contact</p>
-        <h2 class="section-head__title" data-content="contactTitle">お問い合わせ</h2>
-        <p class="section-head__desc" data-content="contactDesc">作品のご依頼・展示・ご質問など、お気軽にどうぞ。</p>
+      <div class="block-head block-head--center">
+        <h2 class="script-h">Contact</h2>
       </div>
-
+      <p class="contact__desc" data-content="contactDesc">作品のご依頼・展示・ご質問など、お気軽にどうぞ。</p>
       <form class="contact-form" id="contact-form" novalidate>
         <div class="field">
           <label for="name">お名前</label>
@@ -124,7 +125,7 @@
           <textarea id="message" name="message" rows="5" required></textarea>
         </div>
         <div class="field field--full">
-          <button type="submit" class="btn btn--primary">送信する</button>
+          <button type="submit" class="btn">送信する</button>
           <p class="form-note" id="form-note" role="status"></p>
         </div>
       </form>
@@ -133,20 +134,23 @@
 
   <!-- フッター -->
   <footer class="site-footer">
-    <div class="brand brand--footer">
-      <span class="brand__mark" aria-hidden="true"></span>
-      <span class="brand__name" data-content="siteName">Aquarelle</span>
+    <a class="brand" href="#top"><span class="brand__name" data-content="siteName">A. Kato</span></a>
+    <nav class="footer-nav" aria-label="フッターナビ">
+      <a href="#about">About</a>
+      <a href="#news">News</a>
+      <a href="#contact">Contact</a>
+      <a href="privacy.html">Privacy</a>
+      <a href="/admin/">Admin</a>
+    </nav>
+    <div class="footer-social">
+      <a href="#" data-content-href="instagramUrl" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" data-content-href="emailUrl" aria-label="Email" title="Email">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
     </div>
-    <nav class="footer-social" aria-label="SNS">
-      <a href="#" data-content-href="instagramUrl" aria-label="Instagram">Instagram</a>
-      <a href="#" data-content-href="xUrl" aria-label="X">X</a>
-      <a href="#" data-content-href="emailUrl" aria-label="Email">Email</a>
-    </nav>
-    <nav class="footer-links" aria-label="その他">
-      <a href="privacy.html">プライバシーポリシー</a>
-      <a href="/admin/">管理画面</a>
-    </nav>
-    <p class="copyright">© <span id="year"></span> <span data-content="siteName">Aquarelle</span>. <span data-content="copyrightSuffix">All works are original watercolor paintings.</span></p>
+    <p class="copyright">© <span id="year"></span> <span data-content="siteName">A. Kato</span>. <span data-content="copyrightSuffix">All Rights Reserved.</span></p>
   </footer>
 
   <!-- ライトボックス -->
@@ -154,7 +158,7 @@
     <button class="lightbox__close" aria-label="閉じる">&times;</button>
     <button class="lightbox__nav lightbox__nav--prev" aria-label="前の作品">&#8249;</button>
     <figure class="lightbox__figure">
-      <div class="lightbox__image" id="lightbox-image"></div>
+      <img class="lightbox__image" id="lightbox-image" alt="" />
       <figcaption class="lightbox__caption">
         <h3 id="lightbox-title"></h3>
         <p id="lightbox-meta"></p>
