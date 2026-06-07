@@ -47,8 +47,8 @@
   }
 
   /* ---------- 画面の切り替え ---------- */
-  function showLogin() { loginView.hidden = false; appView.hidden = true; }
-  function showApp() { loginView.hidden = true; appView.hidden = false; init(); }
+  function showLogin() { loginView.hidden = false; appView.hidden = true; document.body.classList.remove("is-authed"); }
+  function showApp() { loginView.hidden = true; appView.hidden = false; document.body.classList.add("is-authed"); init(); }
 
   /* ---------- 起動時：ログイン状態を確認 ---------- */
   async function checkAuth() {
@@ -278,7 +278,11 @@
           '<div class="admin-card__title">' + esc(w.title) + "</div>" +
           '<div class="admin-card__meta">' + esc([categoryLabel(w.category), w.year].filter(Boolean).join(" · ")) + "</div>" +
         "</div>" +
-        '<button class="admin-card__del" data-id="' + esc(w.id) + '">削除</button>';
+        '<div class="admin-card__actions">' +
+          '<button class="admin-card__edit">編集</button>' +
+          '<button class="admin-card__del">削除</button>' +
+        "</div>";
+      card.querySelector(".admin-card__edit").addEventListener("click", () => openEditWork(w));
       card.querySelector(".admin-card__del").addEventListener("click", async () => {
         if (!confirm("「" + w.title + "」を削除しますか？")) return;
         const res = await fetch("/api/admin/works/" + encodeURIComponent(w.id), { method: "DELETE" });
@@ -288,6 +292,52 @@
       grid.appendChild(card);
     });
   }
+
+  /* ---------- 作品の編集モーダル ---------- */
+  function fillEditCategories(selected) {
+    const sel = $("edit-category");
+    sel.innerHTML = "";
+    categories.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c.key; o.textContent = c.label;
+      if (c.key === selected) o.selected = true;
+      sel.appendChild(o);
+    });
+  }
+  function openEditWork(w) {
+    fillEditCategories(w.category);
+    $("edit-id").value = w.id;
+    $("edit-title").value = w.title || "";
+    $("edit-year").value = w.year || "";
+    $("edit-medium").value = w.medium || "";
+    $("edit-note").textContent = "";
+    $("edit-modal").hidden = false;
+  }
+  function closeEditModal() { $("edit-modal").hidden = true; }
+  $("edit-cancel").addEventListener("click", closeEditModal);
+  $("edit-modal").addEventListener("click", (e) => { if (e.target.id === "edit-modal") closeEditModal(); });
+  document.addEventListener("keydown", (e) => { if (e.key === "Escape" && !$("edit-modal").hidden) closeEditModal(); });
+  $("edit-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const note = $("edit-note");
+    note.textContent = "保存中…"; note.classList.remove("is-error");
+    const id = $("edit-id").value;
+    try {
+      const res = await fetch("/api/admin/works/" + encodeURIComponent(id), {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          title: $("edit-title").value,
+          category: $("edit-category").value,
+          year: $("edit-year").value,
+          medium: $("edit-medium").value,
+        }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) { closeEditModal(); loadWorks(); }
+      else { note.textContent = data.error || "保存に失敗しました。"; note.classList.add("is-error"); }
+    } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
+  });
 
   /* ---------- お問い合わせ一覧の表示 ---------- */
   async function loadMessages() {

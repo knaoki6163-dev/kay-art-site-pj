@@ -454,6 +454,85 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-note.is-error { color: #b23b2a; }
 .admin-empty { color: var(--ink-soft); text-align: center; padding: 2rem; }
 
+/* =========================================================
+   管理画面：ダークテーマ
+   ・ログイン画面：少し暗く / ログイン後：さらに暗く
+   ========================================================= */
+.admin-body { background: #3a352e; color: #ece7dd; }
+.admin-body.is-authed { background: #1e1b17; }
+.admin-body .paper-grain { display: none; }
+
+.admin-body .login-box { background: rgba(30,27,23,0.92); border-color: #4a4339; }
+.admin-body .login-box h1 { color: #f3efe6; }
+.admin-body .login-box p { color: #b3a999; }
+.admin-body .login-box input { background: #2c2824; border-color: #4a4339; color: #ece7dd; }
+
+.admin-body .admin-header { border-color: #463f35; }
+.admin-body .admin-header h1 { color: #f3efe6; }
+.admin-body .admin-header .muted { color: #b3a999; }
+
+.admin-body .admin-tab { border-color: #4a4339; color: #c0b6a6; }
+.admin-body .admin-tab.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.admin-body .muted { color: #b3a999; }
+.admin-body h2, .admin-body h3 { color: #f3efe6; }
+.admin-body .upload-form, .admin-body .news-form, .admin-body .content-group { background: #2a2622; border-color: #463f35; }
+.admin-body .content-group h3 { border-color: #463f35; }
+.admin-body label, .admin-body .field label, .admin-body .content-field label { color: #b3a999; }
+.admin-body input, .admin-body textarea, .admin-body select,
+.admin-body .field input, .admin-body .field textarea, .admin-body .field select,
+.admin-body .content-field input, .admin-body .content-field textarea {
+  background: #332e29; border-color: #4a4339; color: #ece7dd;
+}
+.admin-body input:focus, .admin-body textarea:focus, .admin-body select:focus { border-color: var(--accent); background: #3a342e; }
+.admin-body select option { color: #1f1b19; }
+
+.admin-body .btn { background: var(--accent); border-color: var(--accent); color: #fff; }
+.admin-body .btn:hover { background: var(--accent-deep); border-color: var(--accent-deep); }
+
+.admin-body .admin-card { background: #2a2622; border-color: #463f35; }
+.admin-body .admin-card__title { color: #ece7dd; }
+.admin-body .admin-card__meta { color: #b3a999; }
+
+.admin-body .msg, .admin-body .news-row { background: #2a2622; border-color: #463f35; }
+.admin-body .msg__name { color: #ece7dd; }
+.admin-body .msg__text { color: #c8bfb1; }
+.admin-body .news-row > div { color: #ece7dd; }
+.admin-body .news-row__date, .admin-body .msg__date { color: #b3a999; }
+.admin-body .admin-empty { color: #b3a999; }
+.admin-body .msg__del, .admin-body .news-row__del { border-color: #4a4339; color: #c0b6a6; }
+
+/* 作品カードの操作ボタン（編集 / 削除） */
+.admin-card__actions { display: flex; border-top: 1px solid var(--line); }
+.admin-body .admin-card__actions { border-color: #463f35; }
+.admin-card__edit, .admin-card__del {
+  flex: 1; width: auto; border: none; border-top: none;
+  font-family: var(--serif-jp); font-size: 0.85rem; padding: 0.55em; cursor: pointer;
+  background: transparent;
+}
+.admin-card__edit { color: var(--accent); border-right: 1px solid var(--line); }
+.admin-body .admin-card__edit { border-color: #463f35; }
+.admin-card__edit:hover { background: rgba(194,118,78,0.14); }
+
+/* 編集モーダル */
+.modal {
+  position: fixed; inset: 0; z-index: 200;
+  display: flex; align-items: center; justify-content: center; padding: 1.5rem;
+  background: rgba(8,6,4,0.72); backdrop-filter: blur(4px);
+}
+.modal[hidden] { display: none; }
+.modal__box {
+  width: min(460px, 100%); background: #2a2622; border: 1px solid #463f35;
+  border-radius: 6px; padding: 1.8rem; color: #ece7dd;
+  box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+}
+.modal__box h2 { color: #f3efe6; margin-bottom: 1.2rem; font-size: 1.2rem; }
+.modal__box .content-field { margin-bottom: 1rem; }
+.modal__actions { display: flex; gap: 0.8rem; justify-content: flex-end; margin-top: 1.2rem; }
+.btn--ghost { background: transparent; border: 1px solid #4a4339; color: #ece7dd; }
+.admin-body .btn--ghost { background: transparent; color: #ece7dd; }
+.admin-body .btn--ghost:hover { background: rgba(255,255,255,0.06); border-color: #5a5346; }
+
 /* ---------- レスポンシブ ---------- */
 @media (max-width: 860px) {
   .feature { grid-template-columns: 1fr; }

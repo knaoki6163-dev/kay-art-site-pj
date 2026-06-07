@@ -349,6 +349,24 @@ app.post("/api/admin/works", requireAuth, upload.single("image"), (req, res) => 
   res.json({ ok: true, work });
 });
 
+// 作品の編集（タイトル・カテゴリ・制作年・技法。画像は変更しない）
+app.put("/api/admin/works/:id", requireAuth, (req, res) => {
+  const works = readJson(WORKS_FILE);
+  const work = works.find((w) => w.id === req.params.id);
+  if (!work) return res.status(404).json({ error: "見つかりません。" });
+
+  if (req.body.title != null) work.title = String(req.body.title).trim() || work.title;
+  if (req.body.category != null) {
+    const c = String(req.body.category);
+    if (CATEGORY_KEYS.includes(c)) work.category = c;
+  }
+  if (req.body.year != null) work.year = String(req.body.year).trim();
+  if (req.body.medium != null) work.medium = String(req.body.medium).trim();
+
+  writeJson(WORKS_FILE, works);
+  res.json({ ok: true, work });
+});
+
 // 作品削除（画像ファイルも消す）
 app.delete("/api/admin/works/:id", requireAuth, (req, res) => {
   const works = readJson(WORKS_FILE);
