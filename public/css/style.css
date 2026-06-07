@@ -314,14 +314,18 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 /* ---------- Contact ---------- */
 .contact {
-  max-width: 680px; margin: 0 auto;
-  padding: clamp(3.5rem, 8vw, 6rem) clamp(1.5rem, 5vw, 2rem);
+  max-width: 560px; margin: 0 auto;
+  padding: clamp(2.25rem, 5vw, 3.75rem) clamp(1.5rem, 5vw, 2rem);
   text-align: center;
 }
-.contact__desc { color: var(--ink-soft); margin-bottom: 2.4rem; }
+.contact .block-head--center { margin-bottom: 0.8rem; }
+.contact__desc { color: var(--ink-soft); margin-bottom: 1.5rem; font-size: 0.95rem; }
 .contact-form {
-  display: grid; grid-template-columns: 1fr 1fr; gap: 1.3rem; text-align: left;
+  display: grid; grid-template-columns: 1fr 1fr; gap: 0.9rem; text-align: left;
 }
+.contact-form input, .contact-form textarea { padding: 0.6em 0.85em; }
+.contact-form .field { gap: 0.35rem; }
+.contact-form .field label { font-size: 0.85rem; }
 .field { display: flex; flex-direction: column; gap: 0.5rem; }
 .field--full { grid-column: 1 / -1; }
 .field label { font-size: 0.9rem; letter-spacing: 0.06em; color: var(--ink-soft); }
