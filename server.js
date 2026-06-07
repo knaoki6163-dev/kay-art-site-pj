@@ -86,19 +86,36 @@ const SHARED_KEYS = Object.keys(DEFAULT_SHARED);
 const LOCALIZED_KEYS = Object.keys(DEFAULT_LOCALIZED.ja);
 
 /* ----- データ保存用ファイルの準備 -----
-   DATA_DIR / UPLOAD_DIR は環境変数で変更できます。
-   永続ディスク（Renderの有料プラン等）を使う場合は、これらをディスクのパスに向ければ
-   再デプロイしてもデータが消えません。未指定ならプロジェクト内の既定の場所を使います。 */
-const DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
-const UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "public", "uploads");
+   DATA_DIR / UPLOAD_DIR は環境変数で変更できます（永続ディスク用）。
+   万一そのパスに書き込めない場合は、サーバーを落とさずローカルに退避します
+   （その場合は永続化されないので、ディスク設定の見直しが必要です）。 */
+let DATA_DIR = process.env.DATA_DIR || path.join(__dirname, "data");
+let UPLOAD_DIR = process.env.UPLOAD_DIR || path.join(__dirname, "public", "uploads");
+
+// 作成・書き込みできるか確認（できなければ false）
+function usableDir(dir) {
+  try {
+    fs.mkdirSync(dir, { recursive: true });
+    fs.accessSync(dir, fs.constants.W_OK);
+    return true;
+  } catch (e) { return false; }
+}
+if (!usableDir(DATA_DIR)) {
+  const fb = path.join(__dirname, "data");
+  console.error(`⚠ DATA_DIR (${DATA_DIR}) に書き込めません。${fb} を使用します（※永続化されません。Renderのディスク設定を確認してください）。`);
+  DATA_DIR = fb; usableDir(DATA_DIR);
+}
+if (!usableDir(UPLOAD_DIR)) {
+  const fb = path.join(__dirname, "public", "uploads");
+  console.error(`⚠ UPLOAD_DIR (${UPLOAD_DIR}) に書き込めません。${fb} を使用します（※永続化されません。Renderのディスク設定を確認してください）。`);
+  UPLOAD_DIR = fb; usableDir(UPLOAD_DIR);
+}
+
 const WORKS_FILE = path.join(DATA_DIR, "works.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
 const NEWS_FILE = path.join(DATA_DIR, "news.json");
 
-for (const dir of [DATA_DIR, UPLOAD_DIR]) {
-  if (!fs.existsSync(dir)) fs.mkdirSync(dir, { recursive: true });
-}
 for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE]) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
 }
