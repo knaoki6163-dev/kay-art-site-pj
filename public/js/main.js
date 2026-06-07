@@ -8,6 +8,21 @@
 (function () {
   "use strict";
 
+  /* ---------- 実ビューポート高さをCSS変数に（iOSのフッター下余白対策） ----------
+     iOSの 100vh はツールバーを除いた大きいビューポート基準のため、ページ高さが
+     過大になり下端に余白が出る。実際の innerHeight をヒーローの高さに使う。
+     スクロールでツールバーが伸縮する分（高さのみの変化）では更新せず、
+     幅が変わったとき（回転やPCのリサイズ）だけ更新してガタつきを防ぐ。 */
+  function setAppHeight() {
+    document.documentElement.style.setProperty("--app-height", window.innerHeight + "px");
+  }
+  setAppHeight();
+  let lastVW = window.innerWidth;
+  window.addEventListener("resize", () => {
+    if (window.innerWidth !== lastVW) { lastVW = window.innerWidth; setAppHeight(); }
+  });
+  window.addEventListener("orientationchange", () => setTimeout(setAppHeight, 200));
+
   const LANGS = ["ja", "en"];
   const TRANSPARENT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 
