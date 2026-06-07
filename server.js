@@ -20,6 +20,14 @@ const crypto = require("crypto");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
+app.set("trust proxy", true); // Render等のリバースプロキシ配下で https/host を正しく判定
+
+// 実際の公開URL（プロトコル+ホスト）を求める
+function siteOrigin(req) {
+  const proto = (req.headers["x-forwarded-proto"] || req.protocol || "https").split(",")[0].trim();
+  const host = req.headers["x-forwarded-host"] || req.get("host");
+  return proto + "://" + host;
+}
 
 /* ----- 管理者パスワード（本番では必ず環境変数で設定してください） ----- */
 const ADMIN_PASSWORD = process.env.ADMIN_PASSWORD || "change-me";
@@ -111,6 +119,8 @@ for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE]) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
 }
 if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
+const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
+if (!fs.existsSync(SETTINGS_FILE)) fs.writeFileSync(SETTINGS_FILE, "{}");
 
 // 保存済みの文章を読み込む（旧フラット形式は自動で ja として移行）
 function readSavedContent() {
@@ -176,6 +186,40 @@ app.use(session({
 
 // アップロード画像の配信（UPLOAD_DIR が public 外でも /uploads で見えるように）
 app.use("/uploads", express.static(UPLOAD_DIR));
+
+/* ----- SEO: robots.txt / sitemap.xml / トップページ（静的配信より前に） ----- */
+app.get("/robots.txt", (req, res) => {
+  const origin = siteOrigin(req);
+  res.type("text/plain").send(
+    "User-agent: *\n" +
+    "Allow: /\n" +
+    "Disallow: /admin\n" +
+    "Disallow: /api\n" +
+    "Sitemap: " + origin + "/sitemap.xml\n"
+  );
+});
+
+app.get("/sitemap.xml", (req, res) => {
+  const origin = siteOrigin(req);
+  const today = new Date().toISOString().slice(0, 10);
+  res.type("application/xml").send(
+    '<?xml version="1.0" encoding="UTF-8"?>\n' +
+    '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+    "  <url><loc>" + origin + "/</loc><lastmod>" + today + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n" +
+    "</urlset>\n"
+  );
+});
+
+// トップページは実URLを埋め込んで配信（canonical / OGP / 構造化データ用）
+const INDEX_HTML = path.join(__dirname, "public", "index.html");
+function serveIndex(req, res) {
+  fs.readFile(INDEX_HTML, "utf8", (err, html) => {
+    if (err) return res.status(500).send("index not found");
+    res.type("html").send(html.split("__SITE_URL__").join(siteOrigin(req)));
+  });
+}
+app.get("/", serveIndex);
+app.get("/index.html", serveIndex);
 
 // 静的ファイル（公開サイト）の配信
 app.use(express.static(path.join(__dirname, "public")));
@@ -324,6 +368,22 @@ app.put("/api/admin/content", requireAuth, (req, res) => {
     }
   }
   writeJson(CONTENT_FILE, out);
+  res.json({ ok: true });
+});
+
+// 管理設定（Looker Studio の埋め込みURLなど・管理者のみ）
+app.get("/api/admin/settings", requireAuth, (req, res) => {
+  let s = {};
+  try { s = JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf8")); } catch (e) { s = {}; }
+  res.json({ lookerUrl: typeof s.lookerUrl === "string" ? s.lookerUrl : "" });
+});
+
+app.put("/api/admin/settings", requireAuth, (req, res) => {
+  const url = (req.body.lookerUrl || "").toString().trim();
+  if (url && !/^https:\/\//i.test(url)) {
+    return res.status(400).json({ error: "https:// で始まるURLを入力してください。" });
+  }
+  writeJson(SETTINGS_FILE, { lookerUrl: url.slice(0, 1000) });
   res.json({ ok: true });
 });
 
