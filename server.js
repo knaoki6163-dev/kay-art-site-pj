@@ -44,7 +44,7 @@ const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
    ・SHARED   : 言語に依存しない項目（サイト名・SNS・サイン）
    ・LOCALIZED: 言語ごとに切り替わる項目（日本語/英語/中国語）
    管理画面で編集すると data/content.json に { shared, ja, en, zh } の形で保存されます。 */
-const LANGS = ["ja", "en", "zh"];
+const LANGS = ["ja", "en"];
 
 const DEFAULT_SHARED = {
   siteName: "A. Kato",
@@ -70,15 +70,6 @@ const DEFAULT_LOCALIZED = {
     aboutBody: "I paint the quiet emotions and scenes I sense in nature and everyday life. Working mainly in acrylics, I cherish the texture and depth of color that emerge through layering.",
     aboutButton: "MORE ABOUT",
     contactDesc: "For commissions, exhibitions, or any inquiries, please feel free to get in touch.",
-    copyrightSuffix: "All Rights Reserved.",
-  },
-  zh: {
-    heroTitle: "静谧之中，\n微光浮现。",
-    heroLead: "描绘心底深处的\n风景。",
-    heroButton: "VIEW WORKS",
-    aboutBody: "我描绘在自然与日常中感受到的静谧情感与风景。以丙烯颜料为主，珍视层层叠加所生的质感与色彩的深邃。",
-    aboutButton: "MORE ABOUT",
-    contactDesc: "关于作品委托、展览或任何疑问，欢迎随时与我联系。",
     copyrightSuffix: "All Rights Reserved.",
   },
 };

@@ -32,7 +32,7 @@
     { key: "contactDesc", label: "Contact 説明文", type: "textarea" },
     { key: "copyrightSuffix", label: "コピーライト表記（年・サイト名のあと）", type: "text" },
   ];
-  const LANGS = ["ja", "en", "zh"];
+  const LANGS = ["ja", "en"];
 
   function esc(s) {
     return (s == null ? "" : String(s)).replace(/[&<>"']/g, (c) =>
