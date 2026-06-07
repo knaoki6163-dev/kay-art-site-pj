@@ -105,12 +105,31 @@
     <section class="admin-panel" id="panel-content">
       <form class="content-form" id="content-form">
         <p class="muted" style="margin-bottom:1.5rem;">
-          サイトに表示される見出し・キャッチコピー・プロフィール・SNSリンクなどを編集できます。
-          編集して「保存する」を押すと、公開サイトにすぐ反映されます。
+          サイトに表示される文章を編集できます。「共通」はすべての言語で共通の項目、
+          その下は選んだ言語（日本語 / English / 中文）ごとの文章です。
+          「保存する」を押すと、3言語分すべての変更が保存され、公開サイトにすぐ反映されます。
         </p>
-        <div id="content-fields"></div>
+
+        <div class="content-group">
+          <h3>共通（全言語で共通）</h3>
+          <div id="content-shared"></div>
+        </div>
+
+        <div class="content-group">
+          <h3>言語別の文章</h3>
+          <div class="content-field">
+            <label for="content-lang">編集する言語</label>
+            <select id="content-lang">
+              <option value="ja">日本語</option>
+              <option value="en">English</option>
+              <option value="zh">中文</option>
+            </select>
+          </div>
+          <div id="content-localized"></div>
+        </div>
+
         <div style="margin-top:1.5rem;">
-          <button type="submit" class="btn btn--primary">保存する</button>
+          <button type="submit" class="btn">保存する</button>
           <p class="admin-note" id="content-note"></p>
         </div>
       </form>

@@ -28,16 +28,25 @@
     <a class="brand" href="#top">
       <span class="brand__name" data-content="siteName">A. Kato</span>
     </a>
-    <nav class="nav" aria-label="メインナビゲーション">
-      <a href="#top">Home</a>
-      <a href="#works">Works</a>
-      <a href="#about">About</a>
-      <a href="#news">News</a>
-      <a href="#contact">Contact</a>
-    </nav>
-    <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
-      <span></span><span></span><span></span>
-    </button>
+    <div class="header-right">
+      <nav class="nav" aria-label="メインナビゲーション">
+        <a href="#top" data-i18n="nav.home">Home</a>
+        <a href="#works" data-i18n="nav.works">Works</a>
+        <a href="#about" data-i18n="nav.about">About</a>
+        <a href="#news" data-i18n="nav.news">News</a>
+        <a href="#contact" data-i18n="nav.contact">Contact</a>
+      </nav>
+      <div class="lang-switch">
+        <select id="lang-select" aria-label="Language / 言語">
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+          <option value="zh">中文</option>
+        </select>
+      </div>
+      <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
   </header>
 
   <!-- ヒーロー -->
@@ -113,19 +122,19 @@
       <p class="contact__desc" data-content="contactDesc">作品のご依頼・展示・ご質問など、お気軽にどうぞ。</p>
       <form class="contact-form" id="contact-form" novalidate>
         <div class="field">
-          <label for="name">お名前</label>
+          <label for="name" data-i18n="form.name">お名前</label>
           <input type="text" id="name" name="name" autocomplete="name" required />
         </div>
         <div class="field">
-          <label for="email">メールアドレス</label>
+          <label for="email" data-i18n="form.email">メールアドレス</label>
           <input type="email" id="email" name="email" autocomplete="email" required />
         </div>
         <div class="field field--full">
-          <label for="message">メッセージ</label>
+          <label for="message" data-i18n="form.message">メッセージ</label>
           <textarea id="message" name="message" rows="5" required></textarea>
         </div>
         <div class="field field--full">
-          <button type="submit" class="btn">送信する</button>
+          <button type="submit" class="btn" data-i18n="form.send">送信する</button>
           <p class="form-note" id="form-note" role="status"></p>
         </div>
       </form>
