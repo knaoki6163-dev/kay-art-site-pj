@@ -68,7 +68,10 @@
     const c = categoriesCache.list.find((x) => x.key === key);
     return c ? c.label : key;
   }
-  function workMeta(w) { return [w.year, w.medium].filter(Boolean).join(" / "); }
+  function workMeta(w) {
+    const technique = w.technique || w.medium || ""; // 旧データ(medium)へのフォールバック
+    return [w.year, technique, w.size].filter(Boolean).join(" / ");
+  }
 
   const categoriesCache = { list: [] };
 

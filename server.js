@@ -335,12 +335,13 @@ app.post("/api/admin/works", requireAuth, upload.single("image"), (req, res) => 
   let category = (req.body.category || "other").toString();
   if (!CATEGORY_KEYS.includes(category)) category = "other";
   const year = (req.body.year || "").toString().trim();
-  const medium = (req.body.medium || "").toString().trim();
+  const technique = (req.body.technique || "").toString().trim();
+  const size = (req.body.size || "").toString().trim();
 
   const works = readJson(WORKS_FILE);
   const work = {
     id: crypto.randomBytes(8).toString("hex"),
-    title, category, year, medium,
+    title, category, year, technique, size,
     image: "/uploads/" + req.file.filename,
     createdAt: Date.now(),
   };
@@ -349,7 +350,7 @@ app.post("/api/admin/works", requireAuth, upload.single("image"), (req, res) => 
   res.json({ ok: true, work });
 });
 
-// 作品の編集（タイトル・カテゴリ・制作年・技法。画像は変更しない）
+// 作品の編集（タイトル・カテゴリ・制作年・技法・サイズ。画像は変更しない）
 app.put("/api/admin/works/:id", requireAuth, (req, res) => {
   const works = readJson(WORKS_FILE);
   const work = works.find((w) => w.id === req.params.id);
@@ -361,7 +362,10 @@ app.put("/api/admin/works/:id", requireAuth, (req, res) => {
     if (CATEGORY_KEYS.includes(c)) work.category = c;
   }
   if (req.body.year != null) work.year = String(req.body.year).trim();
-  if (req.body.medium != null) work.medium = String(req.body.medium).trim();
+  if (req.body.technique != null) work.technique = String(req.body.technique).trim();
+  if (req.body.size != null) work.size = String(req.body.size).trim();
+  // 旧データの medium は編集後は使わない
+  if ((req.body.technique != null || req.body.size != null) && work.medium != null) delete work.medium;
 
   writeJson(WORKS_FILE, works);
   res.json({ ok: true, work });
