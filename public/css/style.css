@@ -134,7 +134,29 @@ ul { margin: 0; padding: 0; list-style: none; }
 .site-header.is-scrolled .brand__name,
 .site-header.is-scrolled .nav a { color: var(--ink); }
 
+.header-right { display: flex; align-items: center; gap: clamp(1rem, 2.6vw, 2.2rem); }
 .nav { display: flex; gap: clamp(1.2rem, 2.6vw, 2.4rem); }
+
+/* 言語切替プルダウン */
+.lang-switch { position: relative; display: inline-flex; }
+.lang-switch::after {
+  content: "▾"; position: absolute; right: 0.7em; top: 50%; transform: translateY(-50%);
+  pointer-events: none; font-size: 0.7em; color: inherit; opacity: 0.8;
+}
+.lang-switch select {
+  font-family: var(--serif-en); font-size: 0.82rem; letter-spacing: 0.08em;
+  color: inherit; background: transparent;
+  border: 1px solid currentColor; border-radius: 999px;
+  padding: 0.4em 1.9em 0.4em 0.9em;
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+  transition: border-color .3s var(--ease), opacity .3s var(--ease);
+}
+.lang-switch select:hover { opacity: 0.78; }
+.lang-switch select option { color: #1f1b19; }
+.site-header.is-over-hero .lang-switch { color: #f5f1e9; }
+.site-header.is-over-hero .lang-switch select { border-color: rgba(245,241,233,0.55); }
+.site-header.is-scrolled .lang-switch { color: var(--ink); }
+.site-header.is-scrolled .lang-switch select { border-color: var(--line); }
 .nav a {
   font-family: var(--serif-en);
   font-size: 1.02rem; letter-spacing: 0.08em;

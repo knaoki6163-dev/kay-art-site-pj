@@ -40,27 +40,50 @@ const CATEGORIES = [
 ];
 const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 
-/* ----- サイトの文章（管理画面から編集可能）の既定値 -----
-   ここがサイト各所に表示される文章の初期値です。
-   管理画面で編集すると data/content.json に上書き保存され、未編集の項目は既定値が使われます。 */
-const DEFAULT_CONTENT = {
+/* ----- サイトの文章（管理画面から編集可能・多言語対応）の既定値 -----
+   ・SHARED   : 言語に依存しない項目（サイト名・SNS・サイン）
+   ・LOCALIZED: 言語ごとに切り替わる項目（日本語/英語/中国語）
+   管理画面で編集すると data/content.json に { shared, ja, en, zh } の形で保存されます。 */
+const LANGS = ["ja", "en", "zh"];
+
+const DEFAULT_SHARED = {
   siteName: "A. Kato",
-
-  heroTitle: "静けさの中の、\nかすかな光。",
-  heroLead: "心の奥にある風景を、\n絵にしています。",
-  heroButton: "VIEW WORKS",
-
-  aboutBody: "自然や日常の中で感じた、静かな感情や風景を描いています。アクリル絵の具を中心に、重ねることで生まれる質感や、色の奥行きを大切にしています。",
-  aboutButton: "MORE ABOUT",
   aboutSignature: "A. Kato",
-
-  contactDesc: "作品のご依頼・展示・ご質問など、お気軽にどうぞ。",
-
   instagramUrl: "#",
   emailUrl: "#",
-  copyrightSuffix: "All Rights Reserved.",
 };
-const CONTENT_KEYS = Object.keys(DEFAULT_CONTENT);
+
+const DEFAULT_LOCALIZED = {
+  ja: {
+    heroTitle: "静けさの中の、\nかすかな光。",
+    heroLead: "心の奥にある風景を、\n絵にしています。",
+    heroButton: "VIEW WORKS",
+    aboutBody: "自然や日常の中で感じた、静かな感情や風景を描いています。アクリル絵の具を中心に、重ねることで生まれる質感や、色の奥行きを大切にしています。",
+    aboutButton: "MORE ABOUT",
+    contactDesc: "作品のご依頼・展示・ご質問など、お気軽にどうぞ。",
+    copyrightSuffix: "All Rights Reserved.",
+  },
+  en: {
+    heroTitle: "Quiet light,\nwithin the stillness.",
+    heroLead: "Painting the landscapes\nthat dwell deep in the heart.",
+    heroButton: "VIEW WORKS",
+    aboutBody: "I paint the quiet emotions and scenes I sense in nature and everyday life. Working mainly in acrylics, I cherish the texture and depth of color that emerge through layering.",
+    aboutButton: "MORE ABOUT",
+    contactDesc: "For commissions, exhibitions, or any inquiries, please feel free to get in touch.",
+    copyrightSuffix: "All Rights Reserved.",
+  },
+  zh: {
+    heroTitle: "静谧之中，\n微光浮现。",
+    heroLead: "描绘心底深处的\n风景。",
+    heroButton: "VIEW WORKS",
+    aboutBody: "我描绘在自然与日常中感受到的静谧情感与风景。以丙烯颜料为主，珍视层层叠加所生的质感与色彩的深邃。",
+    aboutButton: "MORE ABOUT",
+    contactDesc: "关于作品委托、展览或任何疑问，欢迎随时与我联系。",
+    copyrightSuffix: "All Rights Reserved.",
+  },
+};
+const SHARED_KEYS = Object.keys(DEFAULT_SHARED);
+const LOCALIZED_KEYS = Object.keys(DEFAULT_LOCALIZED.ja);
 
 /* ----- データ保存用ファイルの準備 -----
    DATA_DIR / UPLOAD_DIR は環境変数で変更できます。
@@ -81,13 +104,46 @@ for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE]) {
 }
 if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
 
-// 保存済みの文章（content.json）を既定値にマージして返す
-function getContent() {
+// 保存済みの文章を読み込む（旧フラット形式は自動で ja として移行）
+function readSavedContent() {
   let saved = {};
   try { saved = JSON.parse(fs.readFileSync(CONTENT_FILE, "utf8")); } catch (e) { saved = {}; }
+  if (saved && !saved.shared && !saved.ja && (saved.siteName != null || saved.heroTitle != null)) {
+    saved = {
+      shared: { siteName: saved.siteName, aboutSignature: saved.aboutSignature, instagramUrl: saved.instagramUrl, emailUrl: saved.emailUrl },
+      ja: saved,
+    };
+  }
+  return saved || {};
+}
+
+function nonEmpty(v) { return v != null && v !== ""; }
+
+// 指定言語の文章（共通＋言語別）を既定値にマージして返す（公開表示用・フラット）
+function getContent(lang) {
+  lang = LANGS.includes(lang) ? lang : "ja";
+  const saved = readSavedContent();
+  const savedShared = saved.shared || {};
+  const savedLoc = saved[lang] || {};
   const out = {};
-  for (const key of CONTENT_KEYS) {
-    out[key] = (saved[key] != null && saved[key] !== "") ? String(saved[key]) : DEFAULT_CONTENT[key];
+  for (const k of SHARED_KEYS) out[k] = nonEmpty(savedShared[k]) ? String(savedShared[k]) : DEFAULT_SHARED[k];
+  for (const k of LOCALIZED_KEYS) {
+    let v = nonEmpty(savedLoc[k]) ? savedLoc[k] : DEFAULT_LOCALIZED[lang][k];
+    if (!nonEmpty(v)) v = DEFAULT_LOCALIZED.ja[k]; // 念のため日本語にフォールバック
+    out[k] = String(v);
+  }
+  return out;
+}
+
+// 管理画面の編集用：共通＋各言語の現在値（フォールバックなし）を返す
+function getContentRaw() {
+  const saved = readSavedContent();
+  const out = { shared: {} };
+  for (const k of SHARED_KEYS) out.shared[k] = nonEmpty((saved.shared || {})[k]) ? saved.shared[k] : DEFAULT_SHARED[k];
+  for (const lang of LANGS) {
+    out[lang] = {};
+    const sv = saved[lang] || {};
+    for (const k of LOCALIZED_KEYS) out[lang][k] = nonEmpty(sv[k]) ? sv[k] : DEFAULT_LOCALIZED[lang][k];
   }
   return out;
 }
@@ -148,7 +204,7 @@ function requireAuth(req, res, next) {
 app.get("/api/categories", (req, res) => res.json(CATEGORIES));
 
 // サイトの文章（公開：表示に使う）
-app.get("/api/content", (req, res) => res.json(getContent()));
+app.get("/api/content", (req, res) => res.json(getContent(req.query.lang)));
 
 // お知らせ（公開）
 app.get("/api/news", (req, res) => {
@@ -242,15 +298,25 @@ app.delete("/api/admin/news/:id", requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// サイトの文章を保存（既知のキーのみ受け付ける）
+// 管理画面の編集用：共通＋各言語の現在値を返す
+app.get("/api/admin/content", requireAuth, (req, res) => res.json(getContentRaw()));
+
+// サイトの文章を保存（多言語：{ shared, ja, en, zh } の既知キーのみ受け付ける）
 app.put("/api/admin/content", requireAuth, (req, res) => {
   const body = req.body || {};
-  const saved = {};
-  for (const key of CONTENT_KEYS) {
-    if (body[key] != null) saved[key] = String(body[key]).slice(0, 4000);
+  const out = { shared: {} };
+  for (const k of SHARED_KEYS) {
+    if (body.shared && body.shared[k] != null) out.shared[k] = String(body.shared[k]).slice(0, 4000);
   }
-  writeJson(CONTENT_FILE, saved);
-  res.json({ ok: true, content: getContent() });
+  for (const lang of LANGS) {
+    out[lang] = {};
+    const src = body[lang] || {};
+    for (const k of LOCALIZED_KEYS) {
+      if (src[k] != null) out[lang][k] = String(src[k]).slice(0, 4000);
+    }
+  }
+  writeJson(CONTENT_FILE, out);
+  res.json({ ok: true });
 });
 
 // 作品アップロード

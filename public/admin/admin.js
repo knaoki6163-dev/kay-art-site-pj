@@ -15,30 +15,24 @@
   const uploadNote = $("upload-note");
   let categories = [];
 
-  /* サイト文章の編集項目（キーは server.js の DEFAULT_CONTENT と一致） */
-  const CONTENT_GROUPS = [
-    { group: "基本", fields: [
-      { key: "siteName", label: "サイト名（ロゴ）", type: "text" },
-    ]},
-    { group: "トップ（ヒーロー）", fields: [
-      { key: "heroTitle", label: "キャッチコピー（大見出し・改行可）", type: "textarea" },
-      { key: "heroLead", label: "リード文（改行可）", type: "textarea" },
-      { key: "heroButton", label: "ボタンの文言", type: "text" },
-    ]},
-    { group: "About（アーティスト紹介）", fields: [
-      { key: "aboutBody", label: "本文", type: "textarea" },
-      { key: "aboutButton", label: "ボタンの文言", type: "text" },
-      { key: "aboutSignature", label: "サイン（手書き風の署名）", type: "text" },
-    ]},
-    { group: "Contact（お問い合わせ）", fields: [
-      { key: "contactDesc", label: "説明文", type: "textarea" },
-    ]},
-    { group: "フッター・SNS", fields: [
-      { key: "instagramUrl", label: "Instagram のURL", type: "text" },
-      { key: "emailUrl", label: "メールリンク（例：mailto:you@example.com）", type: "text" },
-      { key: "copyrightSuffix", label: "コピーライト表記（年・サイト名のあと）", type: "text" },
-    ]},
+  /* サイト文章の編集項目（キーは server.js の既定値と一致）
+     SHARED=全言語共通 / LOCALIZED=言語ごとに切替 */
+  const SHARED_FIELDS = [
+    { key: "siteName", label: "サイト名（ロゴ）", type: "text" },
+    { key: "aboutSignature", label: "サイン（手書き風の署名）", type: "text" },
+    { key: "instagramUrl", label: "Instagram のURL", type: "text" },
+    { key: "emailUrl", label: "メールリンク（例：mailto:you@example.com）", type: "text" },
   ];
+  const LOCALIZED_FIELDS = [
+    { key: "heroTitle", label: "キャッチコピー（大見出し・改行可）", type: "textarea" },
+    { key: "heroLead", label: "リード文（改行可）", type: "textarea" },
+    { key: "heroButton", label: "ヒーローのボタン文言", type: "text" },
+    { key: "aboutBody", label: "About 本文", type: "textarea" },
+    { key: "aboutButton", label: "About のボタン文言", type: "text" },
+    { key: "contactDesc", label: "Contact 説明文", type: "textarea" },
+    { key: "copyrightSuffix", label: "コピーライト表記（年・サイト名のあと）", type: "text" },
+  ];
+  const LANGS = ["ja", "en", "zh"];
 
   function esc(s) {
     return (s == null ? "" : String(s)).replace(/[&<>"']/g, (c) =>
@@ -144,45 +138,68 @@
     });
   }
 
-  /* ---------- サイトの文章：フォーム生成・読み込み・保存 ---------- */
+  /* ---------- サイトの文章（多言語）：生成・読み込み・保存 ---------- */
   let contentBuilt = false;
+  let contentModel = null;     // { shared:{}, ja:{}, en:{}, zh:{} }
+  let contentLang = "ja";
+
+  function makeField(f, idPrefix) {
+    const field = document.createElement("div");
+    field.className = "content-field";
+    const id = idPrefix + f.key;
+    const label = document.createElement("label");
+    label.setAttribute("for", id);
+    label.textContent = f.label;
+    const input = f.type === "textarea" ? document.createElement("textarea") : document.createElement("input");
+    if (f.type === "textarea") input.rows = 3; else input.type = "text";
+    input.id = id;
+    input.dataset.key = f.key;
+    field.appendChild(label);
+    field.appendChild(input);
+    return field;
+  }
+
   function buildContentForm() {
     if (contentBuilt) return;
-    const wrap = $("content-fields");
-    wrap.innerHTML = "";
-    CONTENT_GROUPS.forEach((g) => {
-      const group = document.createElement("div");
-      group.className = "content-group";
-      const h = document.createElement("h3");
-      h.textContent = g.group;
-      group.appendChild(h);
-      g.fields.forEach((f) => {
-        const field = document.createElement("div");
-        field.className = "content-field";
-        const id = "c_" + f.key;
-        const label = document.createElement("label");
-        label.setAttribute("for", id);
-        label.textContent = f.label;
-        field.appendChild(label);
-        const input = f.type === "textarea" ? document.createElement("textarea") : document.createElement("input");
-        if (f.type === "textarea") input.rows = 3; else input.type = "text";
-        input.id = id;
-        input.dataset.key = f.key;
-        field.appendChild(input);
-        group.appendChild(field);
-      });
-      wrap.appendChild(group);
+    const sw = $("content-shared");
+    sw.innerHTML = "";
+    SHARED_FIELDS.forEach((f) => sw.appendChild(makeField(f, "cs_")));
+    const lw = $("content-localized");
+    lw.innerHTML = "";
+    LOCALIZED_FIELDS.forEach((f) => lw.appendChild(makeField(f, "cl_")));
+    $("content-lang").addEventListener("change", (e) => {
+      saveLocalizedToModel();
+      contentLang = e.target.value;
+      loadLocalizedFromModel();
     });
     contentBuilt = true;
   }
 
+  function saveSharedToModel() {
+    SHARED_FIELDS.forEach((f) => { const i = $("cs_" + f.key); if (i) contentModel.shared[f.key] = i.value; });
+  }
+  function saveLocalizedToModel() {
+    if (!contentModel) return;
+    const m = contentModel[contentLang] || (contentModel[contentLang] = {});
+    LOCALIZED_FIELDS.forEach((f) => { const i = $("cl_" + f.key); if (i) m[f.key] = i.value; });
+  }
+  function loadSharedFromModel() {
+    SHARED_FIELDS.forEach((f) => { const i = $("cs_" + f.key); if (i) i.value = (contentModel.shared && contentModel.shared[f.key] != null) ? contentModel.shared[f.key] : ""; });
+  }
+  function loadLocalizedFromModel() {
+    const m = contentModel[contentLang] || {};
+    LOCALIZED_FIELDS.forEach((f) => { const i = $("cl_" + f.key); if (i) i.value = (m[f.key] != null) ? m[f.key] : ""; });
+  }
+
   async function loadContent() {
     buildContentForm();
-    let content = {};
-    try { content = await (await fetch("/api/content")).json(); } catch (e) { content = {}; }
-    document.querySelectorAll("#content-fields [data-key]").forEach((input) => {
-      input.value = content[input.dataset.key] != null ? content[input.dataset.key] : "";
-    });
+    try { contentModel = await (await fetch("/api/admin/content")).json(); }
+    catch (e) { contentModel = { shared: {} }; }
+    if (!contentModel.shared) contentModel.shared = {};
+    LANGS.forEach((l) => { if (!contentModel[l]) contentModel[l] = {}; });
+    contentLang = $("content-lang").value || "ja";
+    loadSharedFromModel();
+    loadLocalizedFromModel();
   }
 
   $("content-form").addEventListener("submit", async (e) => {
@@ -190,15 +207,13 @@
     const note = $("content-note");
     note.textContent = "保存中…";
     note.classList.remove("is-error");
-    const payload = {};
-    document.querySelectorAll("#content-fields [data-key]").forEach((input) => {
-      payload[input.dataset.key] = input.value;
-    });
+    saveSharedToModel();
+    saveLocalizedToModel();
     try {
       const res = await fetch("/api/admin/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(payload),
+        body: JSON.stringify(contentModel),
       });
       const data = await res.json();
       if (res.ok && data.ok) note.textContent = "保存しました。公開サイトに反映されています。";
