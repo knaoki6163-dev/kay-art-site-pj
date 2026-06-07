@@ -37,6 +37,9 @@ const CATEGORIES = [
 ];
 const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 
+/* ----- 作品のステータス（表示は常に英語） ----- */
+const WORK_STATUSES = ["Available", "Reserved", "Sold", "Not for Sale"];
+
 /* ----- サイトの文章（管理画面から編集可能・多言語対応）の既定値 -----
    ・SHARED   : 言語に依存しない項目（サイト名・SNS・サイン）
    ・LOCALIZED: 言語ごとに切り替わる項目（日本語/英語/中国語）
@@ -334,11 +337,13 @@ app.post("/api/admin/works", requireAuth, upload.single("image"), (req, res) => 
   const year = (req.body.year || "").toString().trim();
   const technique = (req.body.technique || "").toString().trim();
   const size = (req.body.size || "").toString().trim();
+  let status = (req.body.status || "Available").toString();
+  if (!WORK_STATUSES.includes(status)) status = "Available";
 
   const works = readJson(WORKS_FILE);
   const work = {
     id: crypto.randomBytes(8).toString("hex"),
-    title, category, year, technique, size,
+    title, category, year, technique, size, status,
     image: "/uploads/" + req.file.filename,
     createdAt: Date.now(),
   };
@@ -361,6 +366,10 @@ app.put("/api/admin/works/:id", requireAuth, (req, res) => {
   if (req.body.year != null) work.year = String(req.body.year).trim();
   if (req.body.technique != null) work.technique = String(req.body.technique).trim();
   if (req.body.size != null) work.size = String(req.body.size).trim();
+  if (req.body.status != null) {
+    const s = String(req.body.status);
+    if (WORK_STATUSES.includes(s)) work.status = s;
+  }
   // 旧データの medium は編集後は使わない
   if ((req.body.technique != null || req.body.size != null) && work.medium != null) delete work.medium;
 

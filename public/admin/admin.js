@@ -326,6 +326,7 @@
     // 旧データ（medium）は技法欄に入れて移行しやすくする
     $("edit-technique").value = w.technique || w.medium || "";
     $("edit-size").value = w.size || "";
+    $("edit-status").value = w.status || "Available";
     $("edit-note").textContent = "";
     $("edit-modal").hidden = false;
   }
@@ -348,6 +349,7 @@
           year: $("edit-year").value,
           technique: $("edit-technique").value,
           size: $("edit-size").value,
+          status: $("edit-status").value,
         }),
       });
       const data = await res.json();

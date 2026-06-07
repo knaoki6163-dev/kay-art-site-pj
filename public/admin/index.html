@@ -74,6 +74,15 @@
           <label for="size">サイズ（任意）</label>
           <input type="text" id="size" name="size" placeholder="例：300×400mm" />
         </div>
+        <div class="field">
+          <label for="status">ステータス</label>
+          <select id="status" name="status">
+            <option value="Available">Available</option>
+            <option value="Reserved">Reserved</option>
+            <option value="Sold">Sold</option>
+            <option value="Not for Sale">Not for Sale</option>
+          </select>
+        </div>
         <div class="field field--full">
           <button type="submit" class="btn btn--primary">アップロード</button>
           <p class="admin-note" id="upload-note"></p>
@@ -171,6 +180,15 @@
         <div class="content-field">
           <label for="edit-size">サイズ</label>
           <input type="text" id="edit-size" />
+        </div>
+        <div class="content-field">
+          <label for="edit-status">ステータス</label>
+          <select id="edit-status">
+            <option value="Available">Available</option>
+            <option value="Reserved">Reserved</option>
+            <option value="Sold">Sold</option>
+            <option value="Not for Sale">Not for Sale</option>
+          </select>
         </div>
         <div class="modal__actions">
           <button type="button" class="btn btn--ghost" id="edit-cancel">キャンセル</button>
