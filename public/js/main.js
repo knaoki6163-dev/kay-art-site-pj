@@ -1,6 +1,6 @@
 /* =========================================================
    A. Kato — 公開サイトの動作（多言語対応）
-   ・言語切替（日本語 / English / 中文）
+   ・言語切替（日本語 / English）
    ・サイト文章の反映（言語別）
    ・ヒーローのスライド / News / Works / ライトボックス / お問い合わせ
    ========================================================= */
@@ -8,7 +8,7 @@
 (function () {
   "use strict";
 
-  const LANGS = ["ja", "en", "zh"];
+  const LANGS = ["ja", "en"];
   const TRANSPARENT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 
   /* ---------- UIラベルの翻訳辞書 ---------- */
@@ -30,15 +30,6 @@
       "form.thanks": "Thank you for your message. I'll get back to you soon.",
       "form.fail": "Failed to send. Please try again later.", "form.neterr": "A network error occurred. Please try again later.",
       "cat.landscape": "Landscape", "cat.flower": "Flowers", "cat.still": "Still life", "cat.portrait": "Portrait", "cat.abstract": "Abstract", "cat.other": "Other",
-    },
-    zh: {
-      "nav.home": "首页", "nav.works": "作品", "nav.about": "关于", "nav.news": "消息", "nav.contact": "联系",
-      "form.name": "姓名", "form.email": "电子邮箱", "form.message": "留言", "form.send": "发送",
-      "filter.all": "全部", "news.empty": "暂无消息。", "works.empty": "尚未添加作品。",
-      "form.required": "请填写所有项目。", "form.sending": "发送中…",
-      "form.thanks": "感谢您的留言，我会尽快与您联系。",
-      "form.fail": "发送失败，请稍后再试。", "form.neterr": "发生通信错误，请稍后再试。",
-      "cat.landscape": "风景", "cat.flower": "花", "cat.still": "静物", "cat.portrait": "人物", "cat.abstract": "抽象", "cat.other": "其他",
     },
   };
 
