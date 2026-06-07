@@ -394,10 +394,13 @@ app.delete("/api/admin/works/:id", requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// お問い合わせ一覧
+// お問い合わせ一覧（重要なものを先頭に、その後は新しい順）
 app.get("/api/admin/messages", requireAuth, (req, res) => {
   const messages = readJson(MESSAGES_FILE);
-  messages.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  messages.sort((a, b) =>
+    (b.important ? 1 : 0) - (a.important ? 1 : 0) ||
+    (b.createdAt || 0) - (a.createdAt || 0)
+  );
   res.json(messages);
 });
 
@@ -416,14 +419,14 @@ app.post("/api/admin/messages/read-all", requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// お問い合わせ削除
-app.delete("/api/admin/messages/:id", requireAuth, (req, res) => {
-  let messages = readJson(MESSAGES_FILE);
-  const before = messages.length;
-  messages = messages.filter((m) => m.id !== req.params.id);
-  if (messages.length === before) return res.status(404).json({ error: "見つかりません。" });
+// 重要フラグの切り替え（お問い合わせの削除は不可）
+app.put("/api/admin/messages/:id", requireAuth, (req, res) => {
+  const messages = readJson(MESSAGES_FILE);
+  const m = messages.find((x) => x.id === req.params.id);
+  if (!m) return res.status(404).json({ error: "見つかりません。" });
+  if (req.body.important != null) m.important = !!req.body.important;
   writeJson(MESSAGES_FILE, messages);
-  res.json({ ok: true });
+  res.json({ ok: true, message: m });
 });
 
 /* ----- multer等のエラーハンドリング ----- */

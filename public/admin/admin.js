@@ -368,22 +368,29 @@
 
     messages.forEach((m) => {
       const item = document.createElement("article");
-      item.className = "msg";
+      item.className = "msg" + (m.important ? " is-important" : "");
       item.innerHTML =
         '<div class="msg__head">' +
           "<div>" +
             '<span class="msg__name">' + esc(m.name) + "</span> " +
             '<a class="msg__email" href="mailto:' + esc(m.email) + '">' + esc(m.email) + "</a>" +
           "</div>" +
-          '<span class="msg__date">' + esc(fmtDate(m.createdAt)) + "</span>" +
+          '<div class="msg__head-right">' +
+            '<button class="msg__star' + (m.important ? " is-on" : "") + '" title="重要" aria-label="重要マーク">' +
+              (m.important ? "★" : "☆") + "</button>" +
+            '<span class="msg__date">' + esc(fmtDate(m.createdAt)) + "</span>" +
+          "</div>" +
         "</div>" +
-        '<p class="msg__text">' + esc(m.message) + "</p>" +
-        '<button class="msg__del" data-id="' + esc(m.id) + '">削除</button>';
-      item.querySelector(".msg__del").addEventListener("click", async () => {
-        if (!confirm("このお問い合わせを削除しますか？")) return;
-        const res = await fetch("/api/admin/messages/" + encodeURIComponent(m.id), { method: "DELETE" });
-        if (res.ok) loadMessages();
-        else alert("削除に失敗しました。");
+        '<p class="msg__text">' + esc(m.message) + "</p>";
+      item.querySelector(".msg__star").addEventListener("click", async () => {
+        try {
+          const res = await fetch("/api/admin/messages/" + encodeURIComponent(m.id), {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ important: !m.important }),
+          });
+          if (res.ok) loadMessages();
+        } catch (e) {}
       });
       list.appendChild(item);
     });
