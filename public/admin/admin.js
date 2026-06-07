@@ -323,7 +323,9 @@
     $("edit-id").value = w.id;
     $("edit-title").value = w.title || "";
     $("edit-year").value = w.year || "";
-    $("edit-medium").value = w.medium || "";
+    // 旧データ（medium）は技法欄に入れて移行しやすくする
+    $("edit-technique").value = w.technique || w.medium || "";
+    $("edit-size").value = w.size || "";
     $("edit-note").textContent = "";
     $("edit-modal").hidden = false;
   }
@@ -344,7 +346,8 @@
           title: $("edit-title").value,
           category: $("edit-category").value,
           year: $("edit-year").value,
-          medium: $("edit-medium").value,
+          technique: $("edit-technique").value,
+          size: $("edit-size").value,
         }),
       });
       const data = await res.json();
