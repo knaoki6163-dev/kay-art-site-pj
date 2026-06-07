@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
-  <title>管理画面 — Aquarelle</title>
+  <title>管理画面 — A. Kato</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -16,7 +16,7 @@
 
   <!-- ログイン画面 -->
   <section class="login-box" id="login-view" hidden>
-    <h1>Aquarelle</h1>
+    <h1>A. Kato</h1>
     <p>管理画面にログイン</p>
     <form id="login-form">
       <input type="password" id="password" placeholder="パスワード" autocomplete="current-password" required />
@@ -29,7 +29,7 @@
   <div class="admin-wrap" id="app-view" hidden>
     <header class="admin-header">
       <div>
-        <h1>Aquarelle 管理画面</h1>
+        <h1>A. Kato 管理画面</h1>
         <span class="muted">作品のアップロードと、お問い合わせの確認ができます。</span>
       </div>
       <div>
@@ -139,6 +139,37 @@
       <div id="messages-list"></div>
       <p class="admin-empty" id="messages-empty" hidden>お問い合わせはまだありません。</p>
     </section>
+  </div>
+
+  <!-- 作品の編集モーダル -->
+  <div class="modal" id="edit-modal" hidden>
+    <div class="modal__box">
+      <h2>作品を編集</h2>
+      <form id="edit-form">
+        <input type="hidden" id="edit-id" />
+        <div class="content-field">
+          <label for="edit-title">作品名</label>
+          <input type="text" id="edit-title" required />
+        </div>
+        <div class="content-field">
+          <label for="edit-category">カテゴリ</label>
+          <select id="edit-category"></select>
+        </div>
+        <div class="content-field">
+          <label for="edit-year">制作年</label>
+          <input type="text" id="edit-year" />
+        </div>
+        <div class="content-field">
+          <label for="edit-medium">技法・サイズ</label>
+          <input type="text" id="edit-medium" />
+        </div>
+        <div class="modal__actions">
+          <button type="button" class="btn btn--ghost" id="edit-cancel">キャンセル</button>
+          <button type="submit" class="btn">保存</button>
+        </div>
+        <p class="admin-note" id="edit-note"></p>
+      </form>
+    </div>
   </div>
 
   <script src="/admin/admin.js"></script>
