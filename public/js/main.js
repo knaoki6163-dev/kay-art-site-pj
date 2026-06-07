@@ -70,9 +70,8 @@
   }
   function workMeta(w) {
     const technique = w.technique || w.medium || ""; // 旧データ(medium)へのフォールバック
-    return [w.year, technique, w.size].filter(Boolean).join(" / ");
+    return [w.year, technique, w.size, w.status].filter(Boolean).join(" / ");
   }
-  function statusClass(s) { return "status--" + String(s).toLowerCase().replace(/[^a-z]/g, ""); }
 
   const categoriesCache = { list: [] };
 
@@ -185,11 +184,6 @@
     if (work.image) {
       const img = el("img"); img.src = work.image; img.alt = esc(work.title); img.loading = "lazy"; frame.appendChild(img);
     } else { frame.appendChild(el("div", "work-card__ph hero__slide--placeholder")); }
-    if (work.status) {
-      const badge = el("span", "work-card__status " + statusClass(work.status));
-      badge.textContent = work.status;
-      frame.appendChild(badge);
-    }
     const title = el("h3", "work-card__title"); title.textContent = work.title;
     const meta = el("p", "work-card__meta"); meta.textContent = workMeta(work);
     card.appendChild(frame); card.appendChild(title); card.appendChild(meta);
@@ -212,7 +206,7 @@
       if (work.image) { lbImage.src = work.image; lbImage.alt = esc(work.title); lbImage.classList.remove("lightbox__image--ph"); }
       else { lbImage.src = TRANSPARENT; lbImage.alt = ""; lbImage.classList.add("lightbox__image--ph"); }
       lbTitle.textContent = work.title;
-      lbMeta.textContent = [categoryLabel(work.category), workMeta(work), work.status].filter(Boolean).join(" · ");
+      lbMeta.textContent = [categoryLabel(work.category), workMeta(work)].filter(Boolean).join(" · ");
     }
     function openLightbox(index) {
       lastFocused = document.activeElement; showLightbox(index);
