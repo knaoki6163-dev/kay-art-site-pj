@@ -391,6 +391,21 @@ app.get("/api/admin/messages", requireAuth, (req, res) => {
   res.json(messages);
 });
 
+// 未読件数
+app.get("/api/admin/messages/unread-count", requireAuth, (req, res) => {
+  const messages = readJson(MESSAGES_FILE);
+  res.json({ count: messages.filter((m) => !m.read).length });
+});
+
+// すべて既読にする
+app.post("/api/admin/messages/read-all", requireAuth, (req, res) => {
+  const messages = readJson(MESSAGES_FILE);
+  let changed = false;
+  messages.forEach((m) => { if (!m.read) { m.read = true; changed = true; } });
+  if (changed) writeJson(MESSAGES_FILE, messages);
+  res.json({ ok: true });
+});
+
 // お問い合わせ削除
 app.delete("/api/admin/messages/:id", requireAuth, (req, res) => {
   let messages = readJson(MESSAGES_FILE);
