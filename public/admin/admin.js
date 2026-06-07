@@ -94,7 +94,48 @@
       if (tab.dataset.tab === "messages") { loadMessages(); markMessagesRead(); }
       if (tab.dataset.tab === "content") loadContent();
       if (tab.dataset.tab === "news") loadNews();
+      if (tab.dataset.tab === "analytics") loadAnalytics();
     });
+  });
+
+  /* ---------- アクセス解析（Looker Studio 埋め込み） ---------- */
+  function renderLooker(url) {
+    const embed = $("looker-embed");
+    const empty = $("looker-empty");
+    embed.innerHTML = "";
+    if (url) {
+      empty.hidden = true;
+      const f = document.createElement("iframe");
+      f.src = url;
+      f.className = "looker-frame";
+      f.setAttribute("frameborder", "0");
+      f.setAttribute("allowfullscreen", "");
+      embed.appendChild(f);
+    } else {
+      empty.hidden = false;
+    }
+  }
+  async function loadAnalytics() {
+    let url = "";
+    try { url = (await (await fetch("/api/admin/settings")).json()).lookerUrl || ""; } catch (e) {}
+    $("looker-url").value = url;
+    renderLooker(url);
+  }
+  $("looker-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const note = $("looker-note");
+    note.textContent = "保存中…"; note.classList.remove("is-error");
+    const url = $("looker-url").value.trim();
+    try {
+      const res = await fetch("/api/admin/settings", {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ lookerUrl: url }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) { note.textContent = "保存しました。"; renderLooker(url); }
+      else { note.textContent = data.error || "保存に失敗しました。"; note.classList.add("is-error"); }
+    } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
   });
 
   /* ---------- お問い合わせ 未読バッジ ---------- */

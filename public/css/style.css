@@ -479,6 +479,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-note.is-error { color: #b23b2a; }
 .admin-empty { color: var(--ink-soft); text-align: center; padding: 2rem; }
 
+/* Looker Studio 埋め込み */
+.looker-frame { width: 100%; height: 80vh; min-height: 480px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
+.admin-body .looker-frame { border-color: #463f35; }
+
 /* =========================================================
    管理画面：ダークテーマ
    ・ログイン画面：少し暗く / ログイン後：さらに暗く

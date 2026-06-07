@@ -7,11 +7,44 @@
   <!-- Google Analytics 4（共通ファイルで全ページ統一） -->
   <script src="js/analytics.js"></script>
 
-  <title>A. Kato — 絵画作品集</title>
-  <meta name="description" content="心の奥にある風景を絵にしています。A. Kato の絵画ポートフォリオ。" />
+  <title>A. Kato — 絵画作品集 / Paintings Portfolio</title>
+  <meta name="description" content="心の奥にある風景を、絵にしています。アクリル絵の具を中心に描く A. Kato の絵画ポートフォリオ。風景・静物・抽象の作品をご覧いただけます。" />
+  <link rel="canonical" href="__SITE_URL__/" />
+
+  <!-- Open Graph / Twitter -->
   <meta property="og:title" content="A. Kato — 絵画作品集" />
-  <meta property="og:description" content="心の奥にある風景を絵にしています。" />
+  <meta property="og:description" content="心の奥にある風景を、絵にしています。A. Kato の絵画ポートフォリオ。" />
   <meta property="og:type" content="website" />
+  <meta property="og:url" content="__SITE_URL__/" />
+  <meta property="og:image" content="__SITE_URL__/favicon.png" />
+  <meta property="og:site_name" content="A. Kato" />
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="A. Kato — 絵画作品集" />
+  <meta name="twitter:description" content="心の奥にある風景を、絵にしています。" />
+  <meta name="twitter:image" content="__SITE_URL__/favicon.png" />
+
+  <!-- 構造化データ（検索エンジン向け） -->
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "WebSite",
+    "name": "A. Kato",
+    "url": "__SITE_URL__/",
+    "inLanguage": "ja",
+    "about": { "@type": "Person", "@id": "__SITE_URL__/#artist" }
+  }
+  </script>
+  <script type="application/ld+json">
+  {
+    "@context": "https://schema.org",
+    "@type": "Person",
+    "@id": "__SITE_URL__/#artist",
+    "name": "A. Kato",
+    "url": "__SITE_URL__/",
+    "jobTitle": "画家 / Painter",
+    "description": "自然や日常の中で感じた静かな感情や風景を、アクリル絵の具を中心に描くアーティスト。"
+  }
+  </script>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
