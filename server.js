@@ -32,11 +32,8 @@ if (ADMIN_PASSWORD === "change-me") {
 /* ----- 作品カテゴリ（ここを編集すれば公開側・管理側の両方に反映） ----- */
 const CATEGORIES = [
   { key: "landscape", label: "風景" },
-  { key: "flower",    label: "花" },
   { key: "still",     label: "静物" },
-  { key: "portrait",  label: "人物" },
   { key: "abstract",  label: "抽象" },
-  { key: "other",     label: "その他" },
 ];
 const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 
@@ -332,8 +329,8 @@ app.post("/api/admin/works", requireAuth, upload.single("image"), (req, res) => 
   if (!req.file) return res.status(400).json({ error: "画像を選択してください。" });
 
   const title = (req.body.title || "").toString().trim() || "無題";
-  let category = (req.body.category || "other").toString();
-  if (!CATEGORY_KEYS.includes(category)) category = "other";
+  let category = (req.body.category || CATEGORY_KEYS[0]).toString();
+  if (!CATEGORY_KEYS.includes(category)) category = CATEGORY_KEYS[0];
   const year = (req.body.year || "").toString().trim();
   const technique = (req.body.technique || "").toString().trim();
   const size = (req.body.size || "").toString().trim();
