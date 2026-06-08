@@ -367,7 +367,7 @@
     // 旧データ（medium）は技法欄に入れて移行しやすくする
     $("edit-technique").value = w.technique || w.medium || "";
     $("edit-size").value = w.size || "";
-    $("edit-status").value = w.status || "Available";
+    $("edit-status").value = w.status && w.status !== "Available" ? w.status : ""; // 旧Availableは指定なしへ
     $("edit-note").textContent = "";
     $("edit-modal").hidden = false;
   }

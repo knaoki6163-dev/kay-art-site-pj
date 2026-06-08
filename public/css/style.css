@@ -28,7 +28,7 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; overflow-x: hidden; overscroll-behavior-y: none; }
+html { scroll-behavior: smooth; overflow-x: hidden; }
 body {
   margin: 0;
   font-family: var(--serif-jp);
@@ -173,8 +173,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .hero {
   position: relative;
   min-height: 100vh;                    /* 古いブラウザ用フォールバック */
-  min-height: 100svh;                   /* 対応ブラウザは小さいビューポート基準 */
-  min-height: var(--app-height, 100svh);/* JSで実ビューポート高さを設定（全iOS対応） */
+  min-height: 100svh;                   /* 小さいビューポート基準（iOSの下端余白を防ぐ） */
   display: flex; align-items: center;
   padding: 0 clamp(1.5rem, 7vw, 7rem);
   overflow: hidden;
