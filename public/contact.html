@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="js/analytics.js"></script>
+  <title>Contact — A. Kato</title>
+  <meta name="description" content="A. Kato への作品のご依頼・展示・ご質問はこちらから。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Yellowtail&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="subpage">
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="/"><span class="brand__name" data-content="siteName">A. Kato</span></a>
+    <div class="header-right">
+      <nav class="nav" aria-label="メインナビゲーション">
+        <a href="/">Home</a>
+        <a href="/works.html">Works</a>
+        <a href="/info.html">Info</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/artist.html">Artist</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="lang-switch">
+        <select id="lang-select" aria-label="Language / 言語">
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <section class="contact" id="contact">
+      <div class="block-head block-head--center">
+        <h2 class="script-h">Contact</h2>
+      </div>
+      <p class="contact__desc" data-content="contactDesc">作品のご依頼・展示・ご質問など、お気軽にどうぞ。</p>
+      <form class="contact-form" id="contact-form" novalidate>
+        <div class="field">
+          <label for="name" data-i18n="form.name">お名前</label>
+          <input type="text" id="name" name="name" autocomplete="name" required />
+        </div>
+        <div class="field">
+          <label for="email" data-i18n="form.email">メールアドレス</label>
+          <input type="email" id="email" name="email" autocomplete="email" required />
+        </div>
+        <div class="field field--full">
+          <label for="message" data-i18n="form.message">メッセージ</label>
+          <textarea id="message" name="message" rows="3" required></textarea>
+        </div>
+        <div class="field field--full">
+          <button type="submit" class="btn" data-i18n="form.send">送信する</button>
+          <p class="form-note" id="form-note" role="status"></p>
+        </div>
+      </form>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand" href="/"><span class="brand__name" data-content="siteName">A. Kato</span></a>
+    <nav class="footer-nav" aria-label="フッターナビ">
+      <a href="/works.html">Works</a>
+      <a href="/info.html">Info</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/artist.html">Artist</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/admin/">Admin</a>
+    </nav>
+    <div class="footer-social">
+      <a href="#" data-content-href="instagramUrl" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" data-content-href="emailUrl" aria-label="Email" title="Email">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
+    </div>
+    <p class="copyright">© <span id="year"></span> <span data-content="siteName">A. Kato</span>. <span data-content="copyrightSuffix">All Rights Reserved.</span></p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <script src="js/analytics.js"></script>
+  <title>Artist — A. Kato</title>
+  <meta name="description" content="画家 A. Kato について。自然や日常の中で感じた静かな感情や風景を、アクリル絵の具で描いています。" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Yellowtail&display=swap" rel="stylesheet" />
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body class="subpage">
+  <div class="paper-grain" aria-hidden="true"></div>
+
+  <header class="site-header" id="top">
+    <a class="brand" href="/"><span class="brand__name" data-content="siteName">A. Kato</span></a>
+    <div class="header-right">
+      <nav class="nav" aria-label="メインナビゲーション">
+        <a href="/">Home</a>
+        <a href="/works.html">Works</a>
+        <a href="/info.html">Info</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/artist.html">Artist</a>
+        <a href="/contact.html">Contact</a>
+      </nav>
+      <div class="lang-switch">
+        <select id="lang-select" aria-label="Language / 言語">
+          <option value="ja">日本語</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+      <button class="nav-toggle" aria-label="メニューを開く" aria-expanded="false">
+        <span></span><span></span><span></span>
+      </button>
+    </div>
+  </header>
+
+  <main class="page-wrap">
+    <!-- About（深緑） -->
+    <section class="about" id="about">
+      <div class="edge edge--top" aria-hidden="true">
+        <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+          <defs>
+            <filter id="brush-b" x="-3%" y="-90%" width="106%" height="280%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.008 0.1" numOctaves="3" seed="11" stitchTiles="stitch" result="t"/>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+          </defs>
+          <path filter="url(#brush-b)" d="M-30,40 C 220,30 400,46 580,36 C 760,28 940,44 1120,34 C 1300,28 1420,42 1470,37 L1470,200 L-30,200 Z" fill="#434d3c"/>
+        </svg>
+      </div>
+
+      <div class="about__inner">
+        <div class="about__text">
+          <h2 class="script-h script-h--light">About</h2>
+          <p data-content="aboutBody">自然や日常の中で感じた、静かな感情や風景を描いています。アクリル絵の具を中心に、重ねることで生まれる質感や、色の奥行きを大切にしています。</p>
+          <a class="link-arrow link-arrow--light" href="/contact.html" data-content="aboutButton">MORE ABOUT</a>
+        </div>
+        <div class="about__art" aria-hidden="true">
+          <svg class="about__paint" viewBox="0 0 440 240" preserveAspectRatio="xMidYMid meet">
+            <defs>
+              <filter id="paint-brush" x="-25%" y="-60%" width="150%" height="220%">
+                <feTurbulence type="fractalNoise" baseFrequency="0.013 0.16" numOctaves="2" seed="6" result="n"/>
+                <feDisplacementMap in="SourceGraphic" in2="n" scale="20" xChannelSelector="R" yChannelSelector="G"/>
+              </filter>
+              <filter id="paint-soft" x="-40%" y="-40%" width="180%" height="180%">
+                <feGaussianBlur stdDeviation="5"/>
+              </filter>
+            </defs>
+            <rect filter="url(#paint-brush)" x="26" y="94" width="196" height="72" rx="6" fill="#586f88" />
+            <rect filter="url(#paint-brush)" x="42" y="104" width="150" height="30" rx="4" fill="#7e98ad" opacity="0.55" />
+            <rect filter="url(#paint-soft)" x="292" y="56" width="54" height="54" fill="#989c92" opacity="0.85" />
+            <ellipse filter="url(#paint-soft)" cx="340" cy="150" rx="80" ry="50" fill="#d8927a" opacity="0.92" />
+          </svg>
+          <span class="signature" data-content="aboutSignature">A. Kato</span>
+        </div>
+      </div>
+
+      <div class="edge edge--bottom" aria-hidden="true">
+        <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+          <defs>
+            <filter id="brush-c" x="-3%" y="-90%" width="106%" height="280%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.0085 0.12" numOctaves="3" seed="19" stitchTiles="stitch" result="t"/>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+          </defs>
+          <path filter="url(#brush-c)" d="M-30,38 C 210,30 390,45 570,35 C 760,27 940,43 1120,34 C 1300,28 1410,40 1470,36 L1470,200 L-30,200 Z" fill="#f3efe6"/>
+        </svg>
+      </div>
+    </section>
+  </main>
+
+  <footer class="site-footer">
+    <a class="brand" href="/"><span class="brand__name" data-content="siteName">A. Kato</span></a>
+    <nav class="footer-nav" aria-label="フッターナビ">
+      <a href="/works.html">Works</a>
+      <a href="/info.html">Info</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/artist.html">Artist</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy</a>
+      <a href="/admin/">Admin</a>
+    </nav>
+    <div class="footer-social">
+      <a href="#" data-content-href="instagramUrl" aria-label="Instagram" title="Instagram">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+      </a>
+      <a href="#" data-content-href="emailUrl" aria-label="Email" title="Email">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 7l9 6 9-6"/></svg>
+      </a>
+    </div>
+    <p class="copyright">© <span id="year"></span> <span data-content="siteName">A. Kato</span>. <span data-content="copyrightSuffix">All Rights Reserved.</span></p>
+  </footer>
+
+  <script src="js/main.js"></script>
+</body>
+</html>

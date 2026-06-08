@@ -131,7 +131,7 @@
     const empty = document.getElementById("news-empty");
     list.innerHTML = "";
     if (empty) { empty.hidden = news.length > 0; empty.textContent = t("info.empty"); }
-    news.slice(0, 6).forEach((n) => {
+    news.slice(0, 100).forEach((n) => {
       const li = el("li", "news-item reveal");
       li.innerHTML =
         '<span class="news-item__date">' + esc(n.date || "") + "</span>" +
@@ -150,7 +150,7 @@
     const empty = document.getElementById("blog-empty");
     list.innerHTML = "";
     if (empty) { empty.hidden = posts.length > 0; empty.textContent = t("blog.empty"); }
-    posts.slice(0, 10).forEach((p) => {
+    posts.slice(0, 100).forEach((p) => {
       const art = el("article", "blog-post reveal");
       art.innerHTML =
         '<div class="blog-post__head">' +
@@ -191,6 +191,8 @@
     if (!gallery) return;
     let works = [];
     try { works = await (await fetch("/api/works?category=" + encodeURIComponent(currentCategory))).json(); } catch (e) { works = []; }
+    const limit = parseInt(gallery.dataset.preview || "0", 10); // トップのプレビューは件数制限
+    if (limit > 0) works = works.slice(0, limit);
     currentList = works;
     gallery.innerHTML = "";
     if (!works.length) {

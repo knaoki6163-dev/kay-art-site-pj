@@ -585,6 +585,15 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-body .btn--ghost { background: transparent; color: #ece7dd; }
 .admin-body .btn--ghost:hover { background: rgba(255,255,255,0.06); border-color: #5a5346; }
 
+/* ---------- 専用ページ（works / info / blog / artist / contact） ---------- */
+body.subpage .site-header { background: rgba(243, 239, 230, 0.92); backdrop-filter: blur(8px); box-shadow: 0 1px 0 var(--line); }
+body.subpage .brand__name, body.subpage .nav a { color: var(--ink); }
+body.subpage .lang-switch { color: var(--ink); }
+body.subpage .lang-switch select { border-color: var(--line); }
+.page-wrap { padding-top: clamp(90px, 12vh, 130px); padding-bottom: clamp(2rem, 5vw, 4rem); min-height: 56vh; }
+body.subpage .about { margin-top: clamp(1.5rem, 5vw, 4rem); }
+.page-wrap > .feature { padding-top: clamp(1rem, 3vw, 2.5rem); }
+
 /* ---------- レスポンシブ ---------- */
 @media (max-width: 860px) {
   .feature { grid-template-columns: 1fr; }
