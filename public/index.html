@@ -60,17 +60,17 @@
 
   <!-- ヘッダー -->
   <header class="site-header is-over-hero" id="top">
-    <a class="brand" href="#top">
+    <a class="brand" href="/">
       <span class="brand__name" data-content="siteName">A. Kato</span>
     </a>
     <div class="header-right">
       <nav class="nav" aria-label="メインナビゲーション">
-        <a href="#top">Home</a>
-        <a href="#works">Works</a>
-        <a href="#info">Info</a>
-        <a href="#blog">Blog</a>
-        <a href="#about">Artist</a>
-        <a href="#contact">Contact</a>
+        <a href="/">Home</a>
+        <a href="/works.html">Works</a>
+        <a href="/info.html">Info</a>
+        <a href="/blog.html">Blog</a>
+        <a href="/artist.html">Artist</a>
+        <a href="/contact.html">Contact</a>
       </nav>
       <div class="lang-switch">
         <select id="lang-select" aria-label="Language / 言語">
@@ -91,7 +91,7 @@
     <div class="hero__content">
       <h1 class="hero__title" data-content="heroTitle">静けさの中の、<br />かすかな光。</h1>
       <p class="hero__lead" data-content="heroLead">心の奥にある風景を、<br />絵にしています。</p>
-      <a class="link-arrow link-arrow--light" href="#works" data-content="heroButton">VIEW WORKS</a>
+      <a class="link-arrow link-arrow--light" href="/works.html" data-content="heroButton">VIEW WORKS</a>
     </div>
     <div class="hero__dots" id="hero-dots" role="tablist" aria-label="スライド切り替え"></div>
 
@@ -110,132 +110,28 @@
   </section>
 
   <main>
-    <!-- Works -->
+    <!-- Works（トップではプレビュー。全件は専用ページへ） -->
     <div class="feature">
       <section class="works" id="works">
         <div class="block-head">
           <h2 class="script-h">Works</h2>
-          <a class="view-all" href="#works">VIEW ALL <span aria-hidden="true">&rarr;</span></a>
+          <a class="view-all" href="/works.html">VIEW ALL <span aria-hidden="true">&rarr;</span></a>
         </div>
-        <div class="filters" role="tablist" aria-label="カテゴリで絞り込み"></div>
-        <div class="works-grid" id="gallery" aria-live="polite"></div>
+        <div class="works-grid" id="gallery" data-preview="8" aria-live="polite"></div>
       </section>
     </div>
-
-    <!-- Info（お知らせ） -->
-    <div class="feature">
-      <section class="news" id="info">
-        <div class="block-head">
-          <h2 class="script-h">Info</h2>
-        </div>
-        <ul class="news-list" id="news-list"></ul>
-        <p class="news-empty" id="news-empty" hidden>お知らせはまだありません。</p>
-      </section>
-    </div>
-
-    <!-- Blog -->
-    <div class="feature">
-      <section class="blog" id="blog">
-        <div class="block-head">
-          <h2 class="script-h">Blog</h2>
-        </div>
-        <div class="blog-list" id="blog-list"></div>
-        <p class="news-empty" id="blog-empty" hidden>記事はまだありません。</p>
-      </section>
-    </div>
-
-    <!-- About（深緑） -->
-    <section class="about" id="about">
-      <div class="edge edge--top" aria-hidden="true">
-        <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
-          <defs>
-            <filter id="brush-b" x="-3%" y="-90%" width="106%" height="280%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.008 0.1" numOctaves="3" seed="11" stitchTiles="stitch" result="t"/>
-              <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G"/>
-            </filter>
-          </defs>
-          <path filter="url(#brush-b)" d="M-30,40 C 220,30 400,46 580,36 C 760,28 940,44 1120,34 C 1300,28 1420,42 1470,37 L1470,200 L-30,200 Z" fill="#434d3c"/>
-        </svg>
-      </div>
-
-      <div class="about__inner">
-        <div class="about__text">
-          <h2 class="script-h script-h--light">About</h2>
-          <p data-content="aboutBody">自然や日常の中で感じた、静かな感情や風景を描いています。アクリル絵の具を中心に、重ねることで生まれる質感や、色の奥行きを大切にしています。</p>
-          <a class="link-arrow link-arrow--light" href="#contact" data-content="aboutButton">MORE ABOUT</a>
-        </div>
-        <div class="about__art" aria-hidden="true">
-          <svg class="about__paint" viewBox="0 0 440 240" preserveAspectRatio="xMidYMid meet">
-            <defs>
-              <filter id="paint-brush" x="-25%" y="-60%" width="150%" height="220%">
-                <feTurbulence type="fractalNoise" baseFrequency="0.013 0.16" numOctaves="2" seed="6" result="n"/>
-                <feDisplacementMap in="SourceGraphic" in2="n" scale="20" xChannelSelector="R" yChannelSelector="G"/>
-              </filter>
-              <filter id="paint-soft" x="-40%" y="-40%" width="180%" height="180%">
-                <feGaussianBlur stdDeviation="5"/>
-              </filter>
-            </defs>
-            <!-- 青灰の絵の具（筆で擦った塊） -->
-            <rect filter="url(#paint-brush)" x="26" y="94" width="196" height="72" rx="6" fill="#586f88" />
-            <rect filter="url(#paint-brush)" x="42" y="104" width="150" height="30" rx="4" fill="#7e98ad" opacity="0.55" />
-            <!-- 小さな灰色の四角（やわらかい縁） -->
-            <rect filter="url(#paint-soft)" x="292" y="56" width="54" height="54" fill="#989c92" opacity="0.85" />
-            <!-- 桃色のやわらかい楕円 -->
-            <ellipse filter="url(#paint-soft)" cx="340" cy="150" rx="80" ry="50" fill="#d8927a" opacity="0.92" />
-          </svg>
-          <span class="signature" data-content="aboutSignature">A. Kato</span>
-        </div>
-      </div>
-
-      <div class="edge edge--bottom" aria-hidden="true">
-        <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
-          <defs>
-            <filter id="brush-c" x="-3%" y="-90%" width="106%" height="280%">
-              <feTurbulence type="fractalNoise" baseFrequency="0.0085 0.12" numOctaves="3" seed="19" stitchTiles="stitch" result="t"/>
-              <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G"/>
-            </filter>
-          </defs>
-          <path filter="url(#brush-c)" d="M-30,38 C 210,30 390,45 570,35 C 760,27 940,43 1120,34 C 1300,28 1410,40 1470,36 L1470,200 L-30,200 Z" fill="#f3efe6"/>
-        </svg>
-      </div>
-    </section>
-
-    <!-- Contact -->
-    <section class="contact" id="contact">
-      <div class="block-head block-head--center">
-        <h2 class="script-h">Contact</h2>
-      </div>
-      <p class="contact__desc" data-content="contactDesc">作品のご依頼・展示・ご質問など、お気軽にどうぞ。</p>
-      <form class="contact-form" id="contact-form" novalidate>
-        <div class="field">
-          <label for="name" data-i18n="form.name">お名前</label>
-          <input type="text" id="name" name="name" autocomplete="name" required />
-        </div>
-        <div class="field">
-          <label for="email" data-i18n="form.email">メールアドレス</label>
-          <input type="email" id="email" name="email" autocomplete="email" required />
-        </div>
-        <div class="field field--full">
-          <label for="message" data-i18n="form.message">メッセージ</label>
-          <textarea id="message" name="message" rows="3" required></textarea>
-        </div>
-        <div class="field field--full">
-          <button type="submit" class="btn" data-i18n="form.send">送信する</button>
-          <p class="form-note" id="form-note" role="status"></p>
-        </div>
-      </form>
-    </section>
   </main>
 
   <!-- フッター -->
   <footer class="site-footer">
-    <a class="brand" href="#top"><span class="brand__name" data-content="siteName">A. Kato</span></a>
+    <a class="brand" href="/"><span class="brand__name" data-content="siteName">A. Kato</span></a>
     <nav class="footer-nav" aria-label="フッターナビ">
-      <a href="#info">Info</a>
-      <a href="#blog">Blog</a>
-      <a href="#about">About</a>
-      <a href="#contact">Contact</a>
-      <a href="privacy.html">Privacy</a>
+      <a href="/works.html">Works</a>
+      <a href="/info.html">Info</a>
+      <a href="/blog.html">Blog</a>
+      <a href="/artist.html">Artist</a>
+      <a href="/contact.html">Contact</a>
+      <a href="/privacy.html">Privacy</a>
       <a href="/admin/">Admin</a>
     </nav>
     <div class="footer-social">

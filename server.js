@@ -203,10 +203,20 @@ app.get("/robots.txt", (req, res) => {
 app.get("/sitemap.xml", (req, res) => {
   const origin = siteOrigin(req);
   const today = new Date().toISOString().slice(0, 10);
+  const pages = [
+    { loc: "/", pr: "1.0" },
+    { loc: "/works.html", pr: "0.9" },
+    { loc: "/info.html", pr: "0.7" },
+    { loc: "/blog.html", pr: "0.7" },
+    { loc: "/artist.html", pr: "0.7" },
+    { loc: "/contact.html", pr: "0.6" },
+  ];
   res.type("application/xml").send(
     '<?xml version="1.0" encoding="UTF-8"?>\n' +
     '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
-    "  <url><loc>" + origin + "/</loc><lastmod>" + today + "</lastmod><changefreq>weekly</changefreq><priority>1.0</priority></url>\n" +
+    pages.map((p) =>
+      "  <url><loc>" + origin + p.loc + "</loc><lastmod>" + today + "</lastmod><changefreq>weekly</changefreq><priority>" + p.pr + "</priority></url>"
+    ).join("\n") + "\n" +
     "</urlset>\n"
   );
 });
