@@ -497,5 +497,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Aquarelle server running → http://localhost:${PORT}`);
-  console.log(`管理画面 → http://localhost:${PORT}/admin/`);
+  console.log(`ダッシュボード → http://localhost:${PORT}/admin/`);
 });

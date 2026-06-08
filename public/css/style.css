@@ -102,6 +102,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .view-all:hover { color: var(--accent); }
 
 .btn {
+  display: inline-block; text-align: center;
   font-family: var(--serif-jp);
   font-size: 1rem; letter-spacing: 0.12em;
   padding: 0.85em 2.6em; border-radius: 2px;
@@ -409,12 +410,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 .lightbox__nav--next { right: clamp(0.5rem, 3vw, 2rem); }
 
 /* =========================================================
-   管理画面
+   ダッシュボード
    ========================================================= */
 .admin-body { background: var(--paper); }
 .admin-wrap { max-width: 980px; margin: 0 auto; padding: clamp(1.5rem, 4vw, 3rem) clamp(1.25rem, 5vw, 2rem) 5rem; }
 .admin-header { display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 1rem; padding-bottom: 1.5rem; margin-bottom: 2rem; border-bottom: 1px solid var(--line); }
 .admin-header h1 { font-family: var(--serif-en); font-size: 1.8rem; letter-spacing: 0.06em; }
+.admin-actions { display: flex; gap: 0.6rem; flex-wrap: wrap; }
 .admin-header .muted { color: var(--ink-soft); font-size: 0.9rem; }
 
 .login-box { max-width: 380px; margin: 12vh auto 0; background: rgba(255,255,255,0.55); border: 1px solid var(--line); border-radius: 4px; padding: 2.4rem 2rem; text-align: center; }
@@ -484,7 +486,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-body .looker-frame { border-color: #463f35; }
 
 /* =========================================================
-   管理画面：ダークテーマ
+   ダッシュボード：ダークテーマ
    ・ログイン画面：少し暗く / ログイン後：さらに暗く
    ========================================================= */
 .admin-body { background: #3a352e; color: #ece7dd; }
@@ -599,7 +601,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 }
 
 @media (max-width: 560px) {
-  /* 管理画面の作品一覧をスマホでは2列（各カードを画面の約半分）に */
+  /* ダッシュボードの作品一覧をスマホでは2列（各カードを画面の約半分）に */
   .admin-grid { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
   .admin-card__title { font-size: 0.92rem; }
   .admin-card__meta { font-size: 0.74rem; }
