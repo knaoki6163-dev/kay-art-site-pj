@@ -95,9 +95,17 @@
     </div>
     <div class="hero__dots" id="hero-dots" role="tablist" aria-label="スライド切り替え"></div>
 
-    <!-- ちぎり和紙の境界（下） -->
+    <!-- 筆で擦ったような境界（下） -->
     <div class="edge edge--bottom" aria-hidden="true">
-      <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0,38 L40,28 L96,44 L150,26 L210,46 L280,30 L350,48 L420,28 L500,42 L560,30 L640,50 L710,30 L780,46 L860,28 L940,48 L1010,30 L1090,46 L1160,28 L1240,44 L1310,30 L1380,46 L1440,32 L1440,70 L0,70 Z" fill="#f3efe6"/></svg>
+      <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+        <defs>
+          <filter id="brush-a" x="-3%" y="-90%" width="106%" height="280%">
+            <feTurbulence type="fractalNoise" baseFrequency="0.009 0.11" numOctaves="3" seed="4" stitchTiles="stitch" result="t"/>
+            <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+          </filter>
+        </defs>
+        <path filter="url(#brush-a)" d="M-30,40 C 200,31 380,47 560,37 C 740,29 920,45 1100,35 C 1280,29 1410,42 1470,37 L1470,200 L-30,200 Z" fill="#f3efe6"/>
+      </svg>
     </div>
   </section>
 
@@ -139,7 +147,15 @@
     <!-- About（深緑） -->
     <section class="about" id="about">
       <div class="edge edge--top" aria-hidden="true">
-        <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0,38 L40,28 L96,44 L150,26 L210,46 L280,30 L350,48 L420,28 L500,42 L560,30 L640,50 L710,30 L780,46 L860,28 L940,48 L1010,30 L1090,46 L1160,28 L1240,44 L1310,30 L1380,46 L1440,32 L1440,70 L0,70 Z" fill="#434d3c"/></svg>
+        <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+          <defs>
+            <filter id="brush-b" x="-3%" y="-90%" width="106%" height="280%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.008 0.1" numOctaves="3" seed="11" stitchTiles="stitch" result="t"/>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+          </defs>
+          <path filter="url(#brush-b)" d="M-30,40 C 220,30 400,46 580,36 C 760,28 940,44 1120,34 C 1300,28 1420,42 1470,37 L1470,200 L-30,200 Z" fill="#434d3c"/>
+        </svg>
       </div>
 
       <div class="about__inner">
@@ -156,7 +172,15 @@
       </div>
 
       <div class="edge edge--bottom" aria-hidden="true">
-        <svg viewBox="0 0 1440 70" preserveAspectRatio="none"><path d="M0,40 L50,28 L120,46 L190,28 L260,46 L340,30 L410,48 L490,28 L560,44 L640,30 L710,48 L790,28 L870,46 L950,30 L1030,48 L1100,28 L1180,44 L1260,30 L1330,46 L1400,30 L1440,42 L1440,70 L0,70 Z" fill="#f3efe6"/></svg>
+        <svg viewBox="0 0 1440 70" preserveAspectRatio="none">
+          <defs>
+            <filter id="brush-c" x="-3%" y="-90%" width="106%" height="280%">
+              <feTurbulence type="fractalNoise" baseFrequency="0.0085 0.12" numOctaves="3" seed="19" stitchTiles="stitch" result="t"/>
+              <feDisplacementMap in="SourceGraphic" in2="t" scale="30" xChannelSelector="R" yChannelSelector="G"/>
+            </filter>
+          </defs>
+          <path filter="url(#brush-c)" d="M-30,38 C 210,30 390,45 570,35 C 760,27 940,43 1120,34 C 1300,28 1410,40 1470,36 L1470,200 L-30,200 Z" fill="#f3efe6"/>
+        </svg>
       </div>
     </section>
 
