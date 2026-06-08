@@ -433,6 +433,7 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-body .admin-bell { border-color: #4a4339; color: #ece7dd; }
 .admin-body .admin-bell:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); color: var(--accent); }
 .bell-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #e0352b; color: #fff; font-size: 0.68rem; font-family: var(--serif-en); font-weight: 600; display: flex; align-items: center; justify-content: center; line-height: 1; box-shadow: 0 0 0 2px var(--paper); }
+.bell-badge[hidden] { display: none; } /* 未読0のときは非表示（.bell-badgeのdisplay:flexがUA既定を上書きするため明示） */
 .admin-body .bell-badge { box-shadow: 0 0 0 2px #3a352e; }
 .admin-header h1 { font-family: var(--serif-en); font-size: 1.8rem; letter-spacing: 0.06em; }
 .admin-header .muted { color: var(--ink-soft); font-size: 0.9rem; }
