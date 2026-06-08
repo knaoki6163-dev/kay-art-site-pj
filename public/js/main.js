@@ -16,11 +16,11 @@
     ja: {
       "nav.home": "ホーム", "nav.works": "作品", "nav.about": "アーティスト", "nav.news": "お知らせ", "nav.contact": "お問い合わせ",
       "form.name": "お名前", "form.email": "メールアドレス", "form.message": "メッセージ", "form.send": "送信する",
-      "filter.all": "すべて", "news.empty": "お知らせはまだありません。", "works.empty": "作品はまだ登録されていません。",
+      "filter.all": "全て", "news.empty": "お知らせはまだありません。", "works.empty": "作品はまだ登録されていません。",
       "form.required": "すべての項目をご入力ください。", "form.sending": "送信中…",
       "form.thanks": "メッセージをありがとうございます。折り返しご連絡いたします。",
       "form.fail": "送信に失敗しました。時間をおいてお試しください。", "form.neterr": "通信エラーが発生しました。時間をおいてお試しください。",
-      "cat.landscape": "風景", "cat.flower": "花", "cat.still": "静物", "cat.portrait": "人物", "cat.abstract": "抽象", "cat.other": "その他",
+      "cat.nature": "自然", "cat.life": "日常", "cat.concept": "コンセプトアート",
     },
     en: {
       "nav.home": "Home", "nav.works": "Works", "nav.about": "About", "nav.news": "News", "nav.contact": "Contact",
@@ -29,7 +29,7 @@
       "form.required": "Please fill in all fields.", "form.sending": "Sending…",
       "form.thanks": "Thank you for your message. I'll get back to you soon.",
       "form.fail": "Failed to send. Please try again later.", "form.neterr": "A network error occurred. Please try again later.",
-      "cat.landscape": "Landscape", "cat.flower": "Flowers", "cat.still": "Still life", "cat.portrait": "Portrait", "cat.abstract": "Abstract", "cat.other": "Other",
+      "cat.nature": "Nature", "cat.life": "Life", "cat.concept": "Concept",
     },
   };
 

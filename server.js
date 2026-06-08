@@ -39,9 +39,9 @@ if (ADMIN_PASSWORD === "change-me") {
 
 /* ----- 作品カテゴリ（ここを編集すれば公開側・管理側の両方に反映） ----- */
 const CATEGORIES = [
-  { key: "landscape", label: "風景" },
-  { key: "still",     label: "静物" },
-  { key: "abstract",  label: "抽象" },
+  { key: "nature",  label: "自然" },
+  { key: "life",    label: "日常" },
+  { key: "concept", label: "コンセプトアート" },
 ];
 const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 
