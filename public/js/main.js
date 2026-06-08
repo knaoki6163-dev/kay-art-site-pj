@@ -2,7 +2,7 @@
    A. Kato — 公開サイトの動作（多言語対応）
    ・言語切替（日本語 / English）
    ・サイト文章の反映（言語別）
-   ・ヒーローのスライド / News / Works / ライトボックス / お問い合わせ
+   ・ヒーローのスライド / Works / ライトボックス / お問い合わせ
    ========================================================= */
 
 (function () {
@@ -14,18 +14,18 @@
   /* ---------- UIラベルの翻訳辞書 ---------- */
   const I18N = {
     ja: {
-      "nav.home": "ホーム", "nav.works": "作品", "nav.about": "アーティスト", "nav.news": "お知らせ", "nav.contact": "お問い合わせ",
+      "nav.home": "ホーム", "nav.works": "作品", "nav.about": "アーティスト", "nav.contact": "お問い合わせ",
       "form.name": "お名前", "form.email": "メールアドレス", "form.message": "メッセージ", "form.send": "送信する",
-      "filter.all": "全て", "news.empty": "お知らせはまだありません。", "works.empty": "作品はまだ登録されていません。",
+      "filter.all": "全て", "works.empty": "作品はまだ登録されていません。",
       "form.required": "すべての項目をご入力ください。", "form.sending": "送信中…",
       "form.thanks": "メッセージをありがとうございます。折り返しご連絡いたします。",
       "form.fail": "送信に失敗しました。時間をおいてお試しください。", "form.neterr": "通信エラーが発生しました。時間をおいてお試しください。",
       "cat.nature": "自然", "cat.life": "日常", "cat.concept": "コンセプトアート",
     },
     en: {
-      "nav.home": "Home", "nav.works": "Works", "nav.about": "About", "nav.news": "News", "nav.contact": "Contact",
+      "nav.home": "Home", "nav.works": "Works", "nav.about": "About", "nav.contact": "Contact",
       "form.name": "Name", "form.email": "Email", "form.message": "Message", "form.send": "Send",
-      "filter.all": "All", "news.empty": "No news yet.", "works.empty": "No works have been added yet.",
+      "filter.all": "All", "works.empty": "No works have been added yet.",
       "form.required": "Please fill in all fields.", "form.sending": "Sending…",
       "form.thanks": "Thank you for your message. I'll get back to you soon.",
       "form.fail": "Failed to send. Please try again later.", "form.neterr": "A network error occurred. Please try again later.",
@@ -118,26 +118,6 @@
     }
     function restart() { clearInterval(timer); if (slides.length > 1) timer = setInterval(() => go(idx + 1), 5500); }
     restart();
-  }
-
-  /* ---------- News ---------- */
-  async function initNews() {
-    const list = document.getElementById("news-list");
-    if (!list) return;
-    let news = [];
-    try { news = await (await fetch("/api/news")).json(); } catch (e) { news = []; }
-    const empty = document.getElementById("news-empty");
-    list.innerHTML = "";
-    if (empty) { empty.hidden = news.length > 0; empty.textContent = t("news.empty"); }
-    news.slice(0, 6).forEach((n) => {
-      const li = el("li", "news-item reveal");
-      li.innerHTML =
-        '<span class="news-item__date">' + esc(n.date || "") + "</span>" +
-        '<span class="news-item__title">' + esc(n.title || "") + "</span>" +
-        '<span class="news-item__arrow" aria-hidden="true">→</span>';
-      list.appendChild(li);
-    });
-    observeReveals(list);
   }
 
   /* ---------- Works ---------- */
@@ -296,7 +276,6 @@
     applyI18n();
     await applyContent();
     if (gallery) { await loadCategories(); await loadWorks(); }
-    await initNews();
   }
 
   const langSelect = document.getElementById("lang-select");
@@ -314,6 +293,5 @@
   applyContent();
   initHero();
   if (gallery) { (async function () { await loadCategories(); await loadWorks(); })(); }
-  initNews();
   observeReveals(document);
 })();

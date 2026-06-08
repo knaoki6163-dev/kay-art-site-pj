@@ -113,9 +113,8 @@ if (!usableDir(UPLOAD_DIR)) {
 const WORKS_FILE = path.join(DATA_DIR, "works.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
-const NEWS_FILE = path.join(DATA_DIR, "news.json");
 
-for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE]) {
+for (const file of [WORKS_FILE, MESSAGES_FILE]) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
 }
 if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
@@ -258,13 +257,6 @@ app.get("/api/categories", (req, res) => res.json(CATEGORIES));
 // サイトの文章（公開：表示に使う）
 app.get("/api/content", (req, res) => res.json(getContent(req.query.lang)));
 
-// お知らせ（公開）
-app.get("/api/news", (req, res) => {
-  const news = readJson(NEWS_FILE);
-  news.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  res.json(news);
-});
-
 // 作品一覧（?category=landscape で絞り込み。未指定/all は全件）
 app.get("/api/works", (req, res) => {
   const { category } = req.query;
@@ -326,28 +318,6 @@ app.post("/api/admin/login", (req, res) => {
 // ログアウト
 app.post("/api/admin/logout", (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
-});
-
-// お知らせの追加
-app.post("/api/admin/news", requireAuth, (req, res) => {
-  const date = (req.body.date || "").toString().trim();
-  const title = (req.body.title || "").toString().trim();
-  if (!title) return res.status(400).json({ error: "タイトルを入力してください。" });
-  const news = readJson(NEWS_FILE);
-  const item = { id: crypto.randomBytes(8).toString("hex"), date, title, createdAt: Date.now() };
-  news.push(item);
-  writeJson(NEWS_FILE, news);
-  res.json({ ok: true, item });
-});
-
-// お知らせの削除
-app.delete("/api/admin/news/:id", requireAuth, (req, res) => {
-  let news = readJson(NEWS_FILE);
-  const before = news.length;
-  news = news.filter((n) => n.id !== req.params.id);
-  if (news.length === before) return res.status(404).json({ error: "見つかりません。" });
-  writeJson(NEWS_FILE, news);
-  res.json({ ok: true });
 });
 
 // 管理画面の編集用：共通＋各言語の現在値を返す
