@@ -29,18 +29,25 @@
   <!-- ダッシュボード本体 -->
   <div class="admin-wrap" id="app-view" hidden>
     <header class="admin-header">
-      <div>
-        <h1>A. Kato Dashboard</h1>
-        <span class="muted">サイトの管理とアクセス解析の閲覧画面</span>
+      <div class="admin-topbar">
+        <img class="admin-avatar" src="/favicon.png" alt="" />
+        <span class="admin-sitename">A. Kato</span>
+        <div class="admin-actions">
+          <a class="btn btn--sm" href="/">サイトを見る</a>
+          <button class="btn btn--sm" id="logout-btn">ログアウト</button>
+        </div>
       </div>
-      <div class="admin-actions">
-        <a class="btn" href="/">サイトを見る</a>
-        <button class="btn" id="logout-btn">ログアウト</button>
+      <div class="admin-headline">
+        <h1>Dashboard</h1>
+        <span class="muted">サイトの管理とアクセス解析の閲覧画面</span>
       </div>
     </header>
 
+    <p class="admin-shortcuts-label">Shortcuts</p>
     <div class="admin-tabs">
       <button class="admin-tab is-active" data-tab="works">作品の管理</button>
+      <button class="admin-tab" data-tab="news">お知らせ</button>
+      <button class="admin-tab" data-tab="blog">Blog</button>
       <button class="admin-tab" data-tab="content">サイトの文章</button>
       <button class="admin-tab" data-tab="analytics">アクセス解析</button>
       <button class="admin-tab" data-tab="messages">お問い合わせ<span class="tab-badge" id="msg-badge" hidden>0</span></button>
@@ -92,6 +99,52 @@
       <h2 style="font-size:1.2rem;margin-bottom:1rem;">登録済みの作品</h2>
       <div class="admin-grid" id="works-grid"></div>
       <p class="admin-empty" id="works-empty" hidden>まだ作品が登録されていません。</p>
+    </section>
+
+    <!-- お知らせ（公開サイトでは Info） -->
+    <section class="admin-panel" id="panel-news">
+      <form class="news-form" id="news-form">
+        <h2>お知らせ（Info）を追加</h2>
+        <div class="field">
+          <label for="news-date">日付（例：2024.05.12）</label>
+          <input type="text" id="news-date" name="date" placeholder="2024.05.12" />
+        </div>
+        <div class="field">
+          <label for="news-title">タイトル</label>
+          <input type="text" id="news-title" name="title" placeholder="展覧会「光の気配」開催のお知らせ" required />
+        </div>
+        <div class="field field--full">
+          <button type="submit" class="btn">追加する</button>
+          <p class="admin-note" id="news-note"></p>
+        </div>
+      </form>
+      <div id="news-rows"></div>
+      <p class="admin-empty" id="news-empty-admin" hidden>お知らせはまだありません。</p>
+    </section>
+
+    <!-- Blog -->
+    <section class="admin-panel" id="panel-blog">
+      <form class="news-form" id="blog-form">
+        <h2>Blog記事を追加</h2>
+        <div class="field">
+          <label for="blog-date">日付（例：2024.05.12）</label>
+          <input type="text" id="blog-date" name="date" placeholder="2024.05.12" />
+        </div>
+        <div class="field">
+          <label for="blog-title">タイトル</label>
+          <input type="text" id="blog-title" name="title" placeholder="制作日記：新作について" required />
+        </div>
+        <div class="field field--full">
+          <label for="blog-body">本文</label>
+          <textarea id="blog-body" name="body" rows="6" placeholder="本文を入力してください。"></textarea>
+        </div>
+        <div class="field field--full">
+          <button type="submit" class="btn">追加する</button>
+          <p class="admin-note" id="blog-note"></p>
+        </div>
+      </form>
+      <div id="blog-rows"></div>
+      <p class="admin-empty" id="blog-empty-admin" hidden>記事はまだありません。</p>
     </section>
 
     <!-- サイトの文章 -->

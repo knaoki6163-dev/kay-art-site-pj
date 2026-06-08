@@ -94,6 +94,8 @@
       if (tab.dataset.tab === "messages") { loadMessages(); markMessagesRead(); }
       if (tab.dataset.tab === "content") loadContent();
       if (tab.dataset.tab === "analytics") loadAnalytics();
+      if (tab.dataset.tab === "news") loadNews();
+      if (tab.dataset.tab === "blog") loadBlog();
     });
   });
 
@@ -149,6 +151,85 @@
   async function markMessagesRead() {
     try { await fetch("/api/admin/messages/read-all", { method: "POST" }); } catch (e) {}
     $("msg-badge").hidden = true;
+  }
+
+  /* ---------- お知らせ（Info）：追加・一覧・削除 ---------- */
+  $("news-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const note = $("news-note");
+    note.textContent = "追加中…"; note.classList.remove("is-error");
+    try {
+      const res = await fetch("/api/admin/news", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: $("news-date").value.trim(), title: $("news-title").value.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); loadNews(); }
+      else { note.textContent = data.error || "追加に失敗しました。"; note.classList.add("is-error"); }
+    } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
+  });
+  async function loadNews() {
+    let news = [];
+    try { news = await (await fetch("/api/news")).json(); } catch (e) { news = []; }
+    const rows = $("news-rows");
+    rows.innerHTML = "";
+    $("news-empty-admin").hidden = news.length > 0;
+    news.forEach((n) => {
+      const row = document.createElement("div");
+      row.className = "news-row";
+      row.innerHTML =
+        '<div class="news-row__head">' +
+          '<span class="news-row__date">' + esc(n.date || "（日付なし）") + "</span>" +
+          '<button class="news-row__del" data-id="' + esc(n.id) + '">削除</button>' +
+        "</div>" +
+        "<div>" + esc(n.title) + "</div>";
+      row.querySelector(".news-row__del").addEventListener("click", async () => {
+        if (!confirm("このお知らせを削除しますか？")) return;
+        const res = await fetch("/api/admin/news/" + encodeURIComponent(n.id), { method: "DELETE" });
+        if (res.ok) loadNews(); else alert("削除に失敗しました。");
+      });
+      rows.appendChild(row);
+    });
+  }
+
+  /* ---------- Blog：追加・一覧・削除 ---------- */
+  $("blog-form").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    const note = $("blog-note");
+    note.textContent = "追加中…"; note.classList.remove("is-error");
+    try {
+      const res = await fetch("/api/admin/blog", {
+        method: "POST", headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ date: $("blog-date").value.trim(), title: $("blog-title").value.trim(), body: $("blog-body").value.trim() }),
+      });
+      const data = await res.json();
+      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); loadBlog(); }
+      else { note.textContent = data.error || "追加に失敗しました。"; note.classList.add("is-error"); }
+    } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
+  });
+  async function loadBlog() {
+    let posts = [];
+    try { posts = await (await fetch("/api/blog")).json(); } catch (e) { posts = []; }
+    const rows = $("blog-rows");
+    rows.innerHTML = "";
+    $("blog-empty-admin").hidden = posts.length > 0;
+    posts.forEach((p) => {
+      const row = document.createElement("div");
+      row.className = "news-row";
+      row.innerHTML =
+        '<div class="news-row__head">' +
+          '<span class="news-row__date">' + esc(p.date || "（日付なし）") + "</span>" +
+          '<button class="news-row__del" data-id="' + esc(p.id) + '">削除</button>' +
+        "</div>" +
+        "<div><strong>" + esc(p.title) + "</strong></div>" +
+        (p.body ? '<div class="news-row__body">' + esc(p.body) + "</div>" : "");
+      row.querySelector(".news-row__del").addEventListener("click", async () => {
+        if (!confirm("この記事を削除しますか？")) return;
+        const res = await fetch("/api/admin/blog/" + encodeURIComponent(p.id), { method: "DELETE" });
+        if (res.ok) loadBlog(); else alert("削除に失敗しました。");
+      });
+      rows.appendChild(row);
+    });
   }
 
   /* ---------- サイトの文章（多言語）：生成・読み込み・保存 ---------- */
