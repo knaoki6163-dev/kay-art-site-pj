@@ -17,6 +17,7 @@
       "nav.home": "ホーム", "nav.works": "作品", "nav.about": "アーティスト", "nav.contact": "お問い合わせ",
       "form.name": "お名前", "form.email": "メールアドレス", "form.message": "メッセージ", "form.send": "送信する",
       "filter.all": "全て", "works.empty": "作品はまだ登録されていません。",
+      "info.empty": "お知らせはまだありません。", "blog.empty": "記事はまだありません。",
       "form.required": "すべての項目をご入力ください。", "form.sending": "送信中…",
       "form.thanks": "メッセージをありがとうございます。折り返しご連絡いたします。",
       "form.fail": "送信に失敗しました。時間をおいてお試しください。", "form.neterr": "通信エラーが発生しました。時間をおいてお試しください。",
@@ -26,6 +27,7 @@
       "nav.home": "Home", "nav.works": "Works", "nav.about": "About", "nav.contact": "Contact",
       "form.name": "Name", "form.email": "Email", "form.message": "Message", "form.send": "Send",
       "filter.all": "All", "works.empty": "No works have been added yet.",
+      "info.empty": "No updates yet.", "blog.empty": "No posts yet.",
       "form.required": "Please fill in all fields.", "form.sending": "Sending…",
       "form.thanks": "Thank you for your message. I'll get back to you soon.",
       "form.fail": "Failed to send. Please try again later.", "form.neterr": "A network error occurred. Please try again later.",
@@ -118,6 +120,47 @@
     }
     function restart() { clearInterval(timer); if (slides.length > 1) timer = setInterval(() => go(idx + 1), 5500); }
     restart();
+  }
+
+  /* ---------- Info（お知らせ） ---------- */
+  async function initInfo() {
+    const list = document.getElementById("news-list");
+    if (!list) return;
+    let news = [];
+    try { news = await (await fetch("/api/news")).json(); } catch (e) { news = []; }
+    const empty = document.getElementById("news-empty");
+    list.innerHTML = "";
+    if (empty) { empty.hidden = news.length > 0; empty.textContent = t("info.empty"); }
+    news.slice(0, 6).forEach((n) => {
+      const li = el("li", "news-item reveal");
+      li.innerHTML =
+        '<span class="news-item__date">' + esc(n.date || "") + "</span>" +
+        '<span class="news-item__title">' + esc(n.title || "") + "</span>";
+      list.appendChild(li);
+    });
+    observeReveals(list);
+  }
+
+  /* ---------- Blog ---------- */
+  async function initBlog() {
+    const list = document.getElementById("blog-list");
+    if (!list) return;
+    let posts = [];
+    try { posts = await (await fetch("/api/blog")).json(); } catch (e) { posts = []; }
+    const empty = document.getElementById("blog-empty");
+    list.innerHTML = "";
+    if (empty) { empty.hidden = posts.length > 0; empty.textContent = t("blog.empty"); }
+    posts.slice(0, 10).forEach((p) => {
+      const art = el("article", "blog-post reveal");
+      art.innerHTML =
+        '<div class="blog-post__head">' +
+          (p.date ? '<span class="blog-post__date">' + esc(p.date) + "</span>" : "") +
+          '<h3 class="blog-post__title">' + esc(p.title || "") + "</h3>" +
+        "</div>" +
+        (p.body ? '<p class="blog-post__body">' + esc(p.body).replace(/\n/g, "<br />") + "</p>" : "");
+      list.appendChild(art);
+    });
+    observeReveals(list);
   }
 
   /* ---------- Works ---------- */
@@ -276,6 +319,8 @@
     applyI18n();
     await applyContent();
     if (gallery) { await loadCategories(); await loadWorks(); }
+    initInfo();
+    initBlog();
   }
 
   const langSelect = document.getElementById("lang-select");
@@ -293,5 +338,7 @@
   applyContent();
   initHero();
   if (gallery) { (async function () { await loadCategories(); await loadWorks(); })(); }
+  initInfo();
+  initBlog();
   observeReveals(document);
 })();

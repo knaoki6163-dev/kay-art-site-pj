@@ -113,8 +113,10 @@ if (!usableDir(UPLOAD_DIR)) {
 const WORKS_FILE = path.join(DATA_DIR, "works.json");
 const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
+const NEWS_FILE = path.join(DATA_DIR, "news.json");   // 公開サイトでは「Info」として表示
+const BLOG_FILE = path.join(DATA_DIR, "blog.json");
 
-for (const file of [WORKS_FILE, MESSAGES_FILE]) {
+for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE, BLOG_FILE]) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
 }
 if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
@@ -257,6 +259,20 @@ app.get("/api/categories", (req, res) => res.json(CATEGORIES));
 // サイトの文章（公開：表示に使う）
 app.get("/api/content", (req, res) => res.json(getContent(req.query.lang)));
 
+// Info（お知らせ・公開）
+app.get("/api/news", (req, res) => {
+  const news = readJson(NEWS_FILE);
+  news.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  res.json(news);
+});
+
+// Blog（公開）
+app.get("/api/blog", (req, res) => {
+  const posts = readJson(BLOG_FILE);
+  posts.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  res.json(posts);
+});
+
 // 作品一覧（?category=landscape で絞り込み。未指定/all は全件）
 app.get("/api/works", (req, res) => {
   const { category } = req.query;
@@ -318,6 +334,47 @@ app.post("/api/admin/login", (req, res) => {
 // ログアウト
 app.post("/api/admin/logout", (req, res) => {
   req.session.destroy(() => res.json({ ok: true }));
+});
+
+// Info（お知らせ）の追加・削除
+app.post("/api/admin/news", requireAuth, (req, res) => {
+  const date = (req.body.date || "").toString().trim();
+  const title = (req.body.title || "").toString().trim();
+  if (!title) return res.status(400).json({ error: "タイトルを入力してください。" });
+  const news = readJson(NEWS_FILE);
+  const item = { id: crypto.randomBytes(8).toString("hex"), date, title, createdAt: Date.now() };
+  news.push(item);
+  writeJson(NEWS_FILE, news);
+  res.json({ ok: true, item });
+});
+app.delete("/api/admin/news/:id", requireAuth, (req, res) => {
+  let news = readJson(NEWS_FILE);
+  const before = news.length;
+  news = news.filter((n) => n.id !== req.params.id);
+  if (news.length === before) return res.status(404).json({ error: "見つかりません。" });
+  writeJson(NEWS_FILE, news);
+  res.json({ ok: true });
+});
+
+// Blog の追加・削除
+app.post("/api/admin/blog", requireAuth, (req, res) => {
+  const date = (req.body.date || "").toString().trim();
+  const title = (req.body.title || "").toString().trim();
+  const body = (req.body.body || "").toString().trim();
+  if (!title) return res.status(400).json({ error: "タイトルを入力してください。" });
+  const posts = readJson(BLOG_FILE);
+  const item = { id: crypto.randomBytes(8).toString("hex"), date, title, body: body.slice(0, 8000), createdAt: Date.now() };
+  posts.push(item);
+  writeJson(BLOG_FILE, posts);
+  res.json({ ok: true, item });
+});
+app.delete("/api/admin/blog/:id", requireAuth, (req, res) => {
+  let posts = readJson(BLOG_FILE);
+  const before = posts.length;
+  posts = posts.filter((p) => p.id !== req.params.id);
+  if (posts.length === before) return res.status(404).json({ error: "見つかりません。" });
+  writeJson(BLOG_FILE, posts);
+  res.json({ ok: true });
 });
 
 // 管理画面の編集用：共通＋各言語の現在値を返す
