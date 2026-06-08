@@ -597,6 +597,14 @@ ul { margin: 0; padding: 0; list-style: none; }
   .footer-social { justify-content: center; }
 }
 
+@media (max-width: 560px) {
+  /* 管理画面の作品一覧をスマホでは2列（各カードを画面の約半分）に */
+  .admin-grid { grid-template-columns: repeat(2, 1fr); gap: 0.7rem; }
+  .admin-card__title { font-size: 0.92rem; }
+  .admin-card__meta { font-size: 0.74rem; }
+  .admin-card__edit, .admin-card__del { font-size: 0.8rem; padding: 0.55em 0.2em; }
+}
+
 @media (max-width: 420px) {
   .works-grid { grid-template-columns: 1fr 1fr; }
 }
