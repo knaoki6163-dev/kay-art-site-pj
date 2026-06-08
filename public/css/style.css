@@ -427,6 +427,13 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-sitename { flex: 1; text-align: center; font-family: var(--serif-en); font-size: 1.2rem; letter-spacing: 0.08em; color: var(--ink); }
 .admin-body .admin-sitename { color: #f3efe6; }
 .admin-actions { display: flex; gap: 0.5rem; flex-shrink: 0; }
+.admin-bell { position: relative; flex-shrink: 0; width: 40px; height: 40px; display: inline-flex; align-items: center; justify-content: center; border: 1px solid var(--line); border-radius: 50%; background: transparent; color: var(--ink); cursor: pointer; transition: background .3s var(--ease), border-color .3s var(--ease); }
+.admin-bell:hover { background: rgba(0,0,0,0.04); border-color: var(--accent); color: var(--accent); }
+.admin-bell svg { width: 21px; height: 21px; }
+.admin-body .admin-bell { border-color: #4a4339; color: #ece7dd; }
+.admin-body .admin-bell:hover { background: rgba(255,255,255,0.06); border-color: var(--accent); color: var(--accent); }
+.bell-badge { position: absolute; top: -3px; right: -3px; min-width: 18px; height: 18px; padding: 0 5px; border-radius: 999px; background: #e0352b; color: #fff; font-size: 0.68rem; font-family: var(--serif-en); font-weight: 600; display: flex; align-items: center; justify-content: center; line-height: 1; box-shadow: 0 0 0 2px var(--paper); }
+.admin-body .bell-badge { box-shadow: 0 0 0 2px #3a352e; }
 .admin-header h1 { font-family: var(--serif-en); font-size: 1.8rem; letter-spacing: 0.06em; }
 .admin-header .muted { color: var(--ink-soft); font-size: 0.9rem; }
 .admin-shortcuts-label { font-family: var(--serif-en); font-size: 0.78rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); margin: 0 0 0.7rem; }
@@ -627,9 +634,15 @@ ul { margin: 0; padding: 0; list-style: none; }
   .admin-tabs::-webkit-scrollbar { display: none; }
   .admin-tab { flex: 0 0 auto; white-space: nowrap; }
   /* 「サイトを見る」「ログアウト」は隣同士で少し小さく */
-  .admin-actions .btn { font-size: 0.72rem; padding: 0.45em 0.75em; letter-spacing: 0.02em; }
-  .admin-sitename { font-size: 1.05rem; }
+  .admin-actions .btn { font-size: 0.68rem; padding: 0.42em 0.6em; letter-spacing: 0; }
   .admin-header h1 { font-size: 1.55rem; }
+  /* ベルを足しても1行に収まるよう各要素をコンパクトに */
+  .admin-topbar { gap: 0.45rem; }
+  .admin-sitename { font-size: 0.95rem; white-space: nowrap; }
+  .admin-avatar { width: 38px; height: 38px; }
+  .admin-bell { width: 34px; height: 34px; }
+  .admin-bell svg { width: 18px; height: 18px; }
+  .bell-badge { min-width: 16px; height: 16px; font-size: 0.62rem; }
 }
 
 @media (max-width: 420px) {
