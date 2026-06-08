@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <meta name="robots" content="noindex" />
-  <title>管理画面 — A. Kato</title>
+  <title>ダッシュボード — A. Kato</title>
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -17,8 +17,8 @@
 
   <!-- ログイン画面 -->
   <section class="login-box" id="login-view" hidden>
-    <h1>A. Kato</h1>
-    <p>管理画面にログイン</p>
+    <h1><a href="/">A. Kato</a></h1>
+    <p>ダッシュボードにログイン</p>
     <form id="login-form">
       <input type="password" id="password" placeholder="パスワード" autocomplete="current-password" required />
       <button type="submit" class="btn btn--primary">ログイン</button>
@@ -26,15 +26,15 @@
     <p class="admin-note" id="login-note"></p>
   </section>
 
-  <!-- 管理画面本体 -->
+  <!-- ダッシュボード本体 -->
   <div class="admin-wrap" id="app-view" hidden>
     <header class="admin-header">
       <div>
-        <h1>A. Kato 管理画面</h1>
-        <span class="muted">作品のアップロードと、お問い合わせの確認ができます。</span>
+        <h1>A. Kato ダッシュボード</h1>
+        <span class="muted">サイトの管理とアクセス解析の閲覧画面</span>
       </div>
-      <div>
-        <a class="btn" href="/" style="margin-right:.5rem;">サイトを見る</a>
+      <div class="admin-actions">
+        <a class="btn" href="/">サイトを見る</a>
         <button class="btn" id="logout-btn">ログアウト</button>
       </div>
     </header>
