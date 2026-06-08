@@ -388,6 +388,7 @@ ul { margin: 0; padding: 0; list-style: none; }
   background: rgba(18, 22, 27, 0.94); backdrop-filter: blur(6px);
   opacity: 0; visibility: hidden; transition: opacity .45s var(--ease), visibility .45s var(--ease);
 }
+.lightbox[hidden] { display: none; } /* 閉じている間はレイアウトから外す（iOSの下端余白対策） */
 .lightbox.is-open { opacity: 1; visibility: visible; }
 .lightbox__figure { margin: 0; max-width: 880px; width: 100%; transform: scale(0.96); transition: transform .5s var(--ease); }
 .lightbox.is-open .lightbox__figure { transform: scale(1); }

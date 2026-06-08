@@ -200,7 +200,7 @@
     const btnClose = lightbox.querySelector(".lightbox__close");
     const btnPrev = lightbox.querySelector(".lightbox__nav--prev");
     const btnNext = lightbox.querySelector(".lightbox__nav--next");
-    let lbIndex = 0, lastFocused = null;
+    let lbIndex = 0, lastFocused = null, lbHideTimer = null;
 
     function showLightbox(index) {
       const work = currentList[index]; if (!work) return; lbIndex = index;
@@ -211,12 +211,19 @@
     }
     function openLightbox(index) {
       lastFocused = document.activeElement; showLightbox(index);
+      // 閉じている間は display:none（hidden属性）でレイアウトから外しているため、
+      // 先に表示してからリフロー → クラス付与でフェードを効かせる
+      clearTimeout(lbHideTimer);
+      lightbox.hidden = false; void lightbox.offsetWidth;
       lightbox.classList.add("is-open"); lightbox.setAttribute("aria-hidden", "false");
       document.body.style.overflow = "hidden"; btnClose.focus();
     }
     function closeLightbox() {
       lightbox.classList.remove("is-open"); lightbox.setAttribute("aria-hidden", "true");
       document.body.style.overflow = ""; if (lastFocused) lastFocused.focus();
+      // フェードアウト後にレイアウトから外す（iOSでフッター下に余白が出るのを防ぐ）
+      clearTimeout(lbHideTimer);
+      lbHideTimer = setTimeout(() => { lightbox.hidden = true; }, 500);
     }
     function stepLb(dir) { const n = currentList.length; if (n) showLightbox((lbIndex + dir + n) % n); }
 
