@@ -139,18 +139,30 @@
     } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
   });
 
-  /* ---------- お問い合わせ 未読バッジ ---------- */
+  /* ---------- お問い合わせ 未読バッジ（タブ＋ベル） ---------- */
   async function refreshMessageBadge() {
     let count = 0;
     try { count = (await (await fetch("/api/admin/messages/unread-count")).json()).count || 0; }
     catch (e) { count = 0; }
-    const badge = $("msg-badge");
-    if (count > 0) { badge.textContent = count > 99 ? "99+" : count; badge.hidden = false; }
-    else { badge.hidden = true; }
+    const label = count > 99 ? "99+" : String(count);
+    [["msg-badge"], ["bell-badge"]].forEach(([id]) => {
+      const badge = $(id);
+      if (!badge) return;
+      if (count > 0) { badge.textContent = label; badge.hidden = false; }
+      else { badge.hidden = true; }
+    });
   }
   async function markMessagesRead() {
     try { await fetch("/api/admin/messages/read-all", { method: "POST" }); } catch (e) {}
     $("msg-badge").hidden = true;
+    if ($("bell-badge")) $("bell-badge").hidden = true;
+  }
+  // ベルを押したらお問い合わせタブを開く
+  if ($("bell-btn")) {
+    $("bell-btn").addEventListener("click", () => {
+      const tab = document.querySelector('.admin-tab[data-tab="messages"]');
+      if (tab) tab.click();
+    });
   }
 
   /* ---------- お知らせ（Info）：追加・一覧・削除 ---------- */
