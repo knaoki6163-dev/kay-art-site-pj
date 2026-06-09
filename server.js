@@ -221,16 +221,21 @@ app.get("/sitemap.xml", (req, res) => {
   );
 });
 
-// トップページは実URLを埋め込んで配信（canonical / OGP / 構造化データ用）
-const INDEX_HTML = path.join(__dirname, "public", "index.html");
-function serveIndex(req, res) {
-  fs.readFile(INDEX_HTML, "utf8", (err, html) => {
-    if (err) return res.status(500).send("index not found");
-    res.type("html").send(html.split("__SITE_URL__").join(siteOrigin(req)));
-  });
+// 公開HTMLは実URL(__SITE_URL__)を埋め込んで配信（canonical / OGP / 構造化データ用）
+function serveTemplated(file) {
+  const full = path.join(__dirname, "public", file);
+  return (req, res) => {
+    fs.readFile(full, "utf8", (err, html) => {
+      if (err) return res.status(404).send("not found");
+      res.type("html").send(html.split("__SITE_URL__").join(siteOrigin(req)));
+    });
+  };
 }
-app.get("/", serveIndex);
-app.get("/index.html", serveIndex);
+app.get("/", serveTemplated("index.html"));
+app.get("/index.html", serveTemplated("index.html"));
+["works", "info", "blog", "artist", "contact", "privacy"].forEach((p) => {
+  app.get("/" + p + ".html", serveTemplated(p + ".html"));
+});
 
 // 静的ファイル（公開サイト）の配信
 app.use(express.static(path.join(__dirname, "public")));
