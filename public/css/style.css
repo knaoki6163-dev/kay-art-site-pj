@@ -122,13 +122,21 @@ ul { margin: 0; padding: 0; list-style: none; }
   position: fixed; top: 0; left: 0; width: 100%; z-index: 50;
   display: flex; align-items: center; justify-content: space-between;
   padding: 1.1rem clamp(1.25rem, 5vw, 4rem);
-  transition: background .4s var(--ease), box-shadow .4s var(--ease);
+  transition: box-shadow .4s var(--ease);
 }
-.site-header.is-scrolled {
+/* スクロール時の背景は擬似要素に適用する。
+   ヘッダー本体に backdrop-filter / filter を付けると、その要素が
+   position:fixed な子孫（モバイルメニュー .nav）の包含ブロックになり、
+   メニューがビューポートではなくヘッダー内に閉じ込められて潰れてしまうため。 */
+.site-header::before {
+  content: ""; position: absolute; inset: 0; z-index: -1;
   background: rgba(243, 239, 230, 0.9);
   backdrop-filter: blur(8px);
   box-shadow: 0 1px 0 var(--line);
+  opacity: 0; pointer-events: none;
+  transition: opacity .4s var(--ease);
 }
+.site-header.is-scrolled::before { opacity: 1; }
 .brand__name { font-family: var(--serif-en); font-size: 1.6rem; letter-spacing: 0.14em; }
 .site-header.is-over-hero .brand__name,
 .site-header.is-over-hero .nav a { color: #f5f1e9; }
@@ -586,7 +594,8 @@ ul { margin: 0; padding: 0; list-style: none; }
 .admin-body .btn--ghost:hover { background: rgba(255,255,255,0.06); border-color: #5a5346; }
 
 /* ---------- 専用ページ（works / info / blog / artist / contact） ---------- */
-body.subpage .site-header { background: rgba(243, 239, 230, 0.92); backdrop-filter: blur(8px); box-shadow: 0 1px 0 var(--line); }
+/* サブページでも背景は擬似要素側に（上記と同じ包含ブロック問題を避けるため） */
+body.subpage .site-header::before { background: rgba(243, 239, 230, 0.92); opacity: 1; }
 body.subpage .brand__name, body.subpage .nav a { color: var(--ink); }
 body.subpage .lang-switch { color: var(--ink); }
 body.subpage .lang-switch select { border-color: var(--line); }
