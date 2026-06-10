@@ -289,6 +289,15 @@
       navToggle.setAttribute("aria-expanded", String(open));
     });
     nav.addEventListener("click", (e) => { if (e.target.tagName === "A") { nav.classList.remove("is-open"); navToggle.setAttribute("aria-expanded", "false"); } });
+
+    // 現在開いているページのリンクをハイライト
+    const norm = (p) => (p.replace(/index\.html$/, "").replace(/\/$/, "") || "/");
+    const here = norm(location.pathname);
+    nav.querySelectorAll("a").forEach((a) => {
+      if (norm(new URL(a.href, location.origin).pathname) === here) {
+        a.setAttribute("aria-current", "page");
+      }
+    });
   }
 
   /* ---------- お問い合わせ送信 ---------- */
