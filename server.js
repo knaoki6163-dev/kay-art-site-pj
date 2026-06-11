@@ -176,6 +176,19 @@ function writeJson(file, data) {
 }
 
 /* ----- ミドルウェア ----- */
+// 正規ドメインへの集約：Render の *.onrender.com で来たアクセスは
+// カスタムドメイン（既定 akatoart.com）へ 301 リダイレクトする。
+// 重複コンテンツによるSEO分散を防ぎ、常に独自ドメインを見せるため。
+// 別ドメインに変えたい場合は環境変数 CANONICAL_HOST を設定。
+const CANONICAL_HOST = process.env.CANONICAL_HOST || "akatoart.com";
+app.use((req, res, next) => {
+  const host = (req.headers["x-forwarded-host"] || req.get("host") || "").split(",")[0].trim();
+  if (CANONICAL_HOST && /\.onrender\.com$/i.test(host)) {
+    return res.redirect(301, "https://" + CANONICAL_HOST + req.originalUrl);
+  }
+  next();
+});
+
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(session({
