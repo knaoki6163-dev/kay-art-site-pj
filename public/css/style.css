@@ -627,9 +627,10 @@ body.subpage .about { margin-top: clamp(1.5rem, 5vw, 4rem); }
   .brand { position: relative; z-index: 60; }
   .site-header.is-over-hero .nav a, .nav a { color: var(--ink); }
   .nav a { font-size: 1.35rem; padding-bottom: 2px; }
-  /* 開いているページのリンクは差し色でハイライト */
-  .nav a[aria-current="page"] { color: var(--accent); }
-  .site-header.is-over-hero .nav a[aria-current="page"] { color: var(--accent); }
+  /* 開いているページのリンクは差し色でハイライト（ヘッダーの状態に関わらず） */
+  .nav a[aria-current="page"],
+  .site-header.is-over-hero .nav a[aria-current="page"],
+  .site-header.is-scrolled .nav a[aria-current="page"] { color: var(--accent); }
   .nav-toggle { display: flex; flex-direction: column; gap: 5px; width: 30px; background: transparent; border: none; cursor: pointer; z-index: 60; }
   .nav-toggle span { height: 2px; background: currentColor; color: #f5f1e9; transition: transform .35s var(--ease), opacity .35s var(--ease); }
   .site-header.is-scrolled .nav-toggle span { color: var(--ink); }
