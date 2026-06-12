@@ -22,10 +22,25 @@ const app = express();
 const PORT = process.env.PORT || 3000;
 app.set("trust proxy", true); // Render等のリバースプロキシ配下で https/host を正しく判定
 
+// 正規ドメイン（サイトの公開ドメイン）。変更する場合は環境変数 CANONICAL_HOST を設定。
+const CANONICAL_HOST = (process.env.CANONICAL_HOST || "akatoart.com").toLowerCase();
+
 // 実際の公開URL（プロトコル+ホスト）を求める
+// Hostヘッダーは偽装できるため、許可したホスト以外は正規ドメインに置き換える
+// （sitemap / canonical / OGP に偽ホストが混入するのを防ぐ）
+function allowedHost(host) {
+  if (!host) return false;
+  const h = host.toLowerCase().replace(/:\d+$/, "");
+  return (
+    h === CANONICAL_HOST || h === "www." + CANONICAL_HOST ||
+    /\.onrender\.com$/.test(h) ||
+    h === "localhost" || h === "127.0.0.1"
+  );
+}
 function siteOrigin(req) {
   const proto = (req.headers["x-forwarded-proto"] || req.protocol || "https").split(",")[0].trim();
-  const host = req.headers["x-forwarded-host"] || req.get("host");
+  const host = (req.headers["x-forwarded-host"] || req.get("host") || "").split(",")[0].trim();
+  if (!allowedHost(host)) return "https://" + CANONICAL_HOST;
   return proto + "://" + host;
 }
 
@@ -179,12 +194,21 @@ function writeJson(file, data) {
 // 正規ドメインへの集約：Render の *.onrender.com で来たアクセスは
 // カスタムドメイン（既定 akatoart.com）へ 301 リダイレクトする。
 // 重複コンテンツによるSEO分散を防ぎ、常に独自ドメインを見せるため。
-// 別ドメインに変えたい場合は環境変数 CANONICAL_HOST を設定。
-const CANONICAL_HOST = process.env.CANONICAL_HOST || "akatoart.com";
 app.use((req, res, next) => {
   const host = (req.headers["x-forwarded-host"] || req.get("host") || "").split(",")[0].trim();
   if (CANONICAL_HOST && /\.onrender\.com$/i.test(host)) {
     return res.redirect(301, "https://" + CANONICAL_HOST + req.originalUrl);
+  }
+  next();
+});
+
+// セキュリティヘッダー
+app.use((req, res, next) => {
+  res.setHeader("X-Content-Type-Options", "nosniff");       // MIMEスニッフィング禁止
+  res.setHeader("X-Frame-Options", "SAMEORIGIN");           // クリックジャッキング対策
+  res.setHeader("Referrer-Policy", "strict-origin-when-cross-origin");
+  if (req.secure) {
+    res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   }
   next();
 });
@@ -195,7 +219,12 @@ app.use(session({
   secret: SESSION_SECRET,
   resave: false,
   saveUninitialized: false,
-  cookie: { httpOnly: true, sameSite: "lax", maxAge: 1000 * 60 * 60 * 8 }, // 8時間
+  cookie: {
+    httpOnly: true,
+    sameSite: "lax",
+    secure: "auto",            // HTTPS時のみCookie送信（trust proxy 配下で自動判定）
+    maxAge: 1000 * 60 * 60 * 8, // 8時間
+  },
 }));
 
 // アップロード画像の配信（UPLOAD_DIR が public 外でも /uploads で見えるように）
@@ -254,10 +283,16 @@ app.get("/index.html", serveTemplated("index.html"));
 app.use(express.static(path.join(__dirname, "public")));
 
 /* ----- 画像アップロードの設定（multer） ----- */
+// 許可する画像形式（拡張子は元ファイル名を信用せず、この対応表から決める。
+// MIMEタイプも拡張子も送信側が偽装できるため、両方を許可リストで突き合わせる）
+const IMAGE_EXTS = { "image/jpeg": ".jpg", "image/png": ".png", "image/webp": ".webp", "image/gif": ".gif" };
+const SAFE_EXT = /^\.(jpe?g|png|webp|gif)$/;
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => cb(null, UPLOAD_DIR),
   filename: (req, file, cb) => {
-    const ext = path.extname(file.originalname).toLowerCase();
+    let ext = path.extname(file.originalname).toLowerCase();
+    if (!SAFE_EXT.test(ext)) ext = IMAGE_EXTS[file.mimetype] || ".jpg";
     const id = crypto.randomBytes(8).toString("hex");
     cb(null, id + ext);
   },
@@ -266,7 +301,7 @@ const upload = multer({
   storage,
   limits: { fileSize: 8 * 1024 * 1024 }, // 8MBまで
   fileFilter: (req, file, cb) => {
-    const ok = /image\/(jpeg|png|webp|gif)/.test(file.mimetype);
+    const ok = Object.prototype.hasOwnProperty.call(IMAGE_EXTS, file.mimetype);
     cb(ok ? null : new Error("画像ファイル（JPEG/PNG/WebP/GIF）のみアップロードできます。"), ok);
   },
 });
@@ -325,8 +360,8 @@ app.post("/api/contact", (req, res) => {
   if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) {
     return res.status(400).json({ error: "メールアドレスの形式が正しくありません。" });
   }
-  if (message.length > 5000) {
-    return res.status(400).json({ error: "メッセージが長すぎます。" });
+  if (name.length > 200 || email.length > 320 || message.length > 5000) {
+    return res.status(400).json({ error: "入力が長すぎます。" });
   }
 
   const messages = readJson(MESSAGES_FILE);
@@ -350,12 +385,44 @@ app.get("/api/admin/me", (req, res) => {
 });
 
 // ログイン
+// ブルートフォース対策：失敗をIPごとに記録し、15分間に5回失敗でロック。
+// IPは偽装され得るため、全体でも15分間に100回失敗で一時ロックする保険を併用。
+const LOGIN_WINDOW = 15 * 60 * 1000;
+const loginFails = new Map(); // ip -> { count, firstAt }
+let globalFails = { count: 0, firstAt: 0 };
+function pruneFails(now) {
+  for (const [ip, f] of loginFails) { if (now - f.firstAt > LOGIN_WINDOW) loginFails.delete(ip); }
+  if (now - globalFails.firstAt > LOGIN_WINDOW) globalFails = { count: 0, firstAt: 0 };
+}
+// 長さの違いで比較を打ち切らないよう、ハッシュ化してから定数時間で比較する
+function safeEqual(a, b) {
+  const ha = crypto.createHash("sha256").update(String(a)).digest();
+  const hb = crypto.createHash("sha256").update(String(b)).digest();
+  return crypto.timingSafeEqual(ha, hb);
+}
 app.post("/api/admin/login", (req, res) => {
-  const password = (req.body.password || "").toString();
-  if (password && password === ADMIN_PASSWORD) {
-    req.session.isAdmin = true;
-    return res.json({ ok: true });
+  const now = Date.now();
+  pruneFails(now);
+  const ip = req.ip || "unknown";
+  const f = loginFails.get(ip);
+  if ((f && f.count >= 5) || globalFails.count >= 100) {
+    return res.status(429).json({ error: "試行回数が多すぎます。しばらくしてからお試しください。" });
   }
+
+  const password = (req.body.password || "").toString();
+  if (password && safeEqual(password, ADMIN_PASSWORD)) {
+    loginFails.delete(ip);
+    // セッション固定攻撃対策：ログイン成功時にセッションIDを作り直す
+    return req.session.regenerate((err) => {
+      if (err) return res.status(500).json({ error: "ログイン処理に失敗しました。" });
+      req.session.isAdmin = true;
+      res.json({ ok: true });
+    });
+  }
+
+  if (f) { f.count++; } else { loginFails.set(ip, { count: 1, firstAt: now }); }
+  if (!globalFails.count) globalFails.firstAt = now;
+  globalFails.count++;
   res.status(401).json({ error: "パスワードが違います。" });
 });
 
@@ -502,9 +569,11 @@ app.delete("/api/admin/works/:id", requireAuth, (req, res) => {
   writeJson(WORKS_FILE, works);
 
   // 画像ファイルも削除
+  // 実ファイルの場所は UPLOAD_DIR（Renderでは永続ディスク）。public 配下とは限らない。
+  // basename でファイル名のみ取り出し、パストラバーサルも防ぐ。
   if (removed.image) {
-    const filePath = path.join(__dirname, "public", removed.image);
-    fs.existsSync(filePath) && fs.unlink(filePath, () => {});
+    const filePath = path.join(UPLOAD_DIR, path.basename(removed.image));
+    fs.unlink(filePath, () => {});
   }
   res.json({ ok: true });
 });
