@@ -56,7 +56,7 @@ if (ADMIN_PASSWORD === "change-me") {
 const CATEGORIES = [
   { key: "nature",  label: "自然" },
   { key: "life",    label: "日常" },
-  { key: "concept", label: "コンセプトアート" },
+  { key: "concept", label: "抽象" },
 ];
 const CATEGORY_KEYS = CATEGORIES.map((c) => c.key);
 

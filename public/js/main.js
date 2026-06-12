@@ -21,7 +21,7 @@
       "form.required": "すべての項目をご入力ください。", "form.sending": "送信中…",
       "form.thanks": "メッセージをありがとうございます。折り返しご連絡いたします。",
       "form.fail": "送信に失敗しました。時間をおいてお試しください。", "form.neterr": "通信エラーが発生しました。時間をおいてお試しください。",
-      "cat.nature": "自然", "cat.life": "日常", "cat.concept": "コンセプトアート",
+      "cat.nature": "自然", "cat.life": "日常", "cat.concept": "抽象",
     },
     en: {
       "nav.home": "Home", "nav.works": "Works", "nav.about": "About", "nav.contact": "Contact",
