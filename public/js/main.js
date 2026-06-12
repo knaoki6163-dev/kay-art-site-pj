@@ -96,7 +96,8 @@
     const dotsWrap = document.getElementById("hero-dots");
     if (!carousel) return;
     let works = [];
-    try { works = await (await fetch("/api/works")).json(); } catch (e) { works = []; }
+    // ヒーローは「トップに表示」に設定された作品のみ
+    try { works = await (await fetch("/api/works?featured=1")).json(); } catch (e) { works = []; }
     const images = works.filter((w) => w.image).map((w) => w.image).slice(0, 5);
     carousel.innerHTML = "";
     if (dotsWrap) dotsWrap.innerHTML = "";
@@ -190,7 +191,10 @@
   async function loadWorks() {
     if (!gallery) return;
     let works = [];
-    try { works = await (await fetch("/api/works?category=" + encodeURIComponent(currentCategory))).json(); } catch (e) { works = []; }
+    // トップ（data-featured="1"）では「トップに表示」の作品のみを対象にする
+    let url = "/api/works?category=" + encodeURIComponent(currentCategory);
+    if (gallery.dataset.featured === "1") url += "&featured=1";
+    try { works = await (await fetch(url)).json(); } catch (e) { works = []; }
     const limit = parseInt(gallery.dataset.preview || "0", 10); // トップのプレビューは件数制限
     if (limit > 0) works = works.slice(0, limit);
     currentList = works;

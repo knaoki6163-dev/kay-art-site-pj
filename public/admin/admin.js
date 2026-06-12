@@ -351,6 +351,8 @@
     uploadNote.classList.remove("is-error");
     try {
       const fd = new FormData(e.target);
+      // 未チェックのチェックボックスは送信されないため、明示的に true/false を入れる
+      fd.set("featured", $("upload-featured").checked ? "true" : "false");
       const res = await fetch("/api/admin/works", { method: "POST", body: fd });
       const data = await res.json();
       if (res.ok && data.ok) {
@@ -380,6 +382,7 @@
       card.className = "admin-card";
       card.innerHTML =
         '<img src="' + esc(w.image) + '" alt="' + esc(w.title) + '" />' +
+        (w.featured === false ? '<span class="admin-card__badge">トップ非表示</span>' : "") +
         '<div class="admin-card__body">' +
           '<div class="admin-card__title">' + esc(w.title) + "</div>" +
           '<div class="admin-card__meta">' + esc([categoryLabel(w.category), w.year].filter(Boolean).join(" · ")) + "</div>" +
@@ -419,6 +422,7 @@
     $("edit-technique").value = w.technique || w.medium || "";
     $("edit-size").value = w.size || "";
     $("edit-status").value = w.status && w.status !== "Available" ? w.status : ""; // 旧Availableは指定なしへ
+    $("edit-featured").checked = w.featured !== false; // 旧データ（未設定）は表示扱い
     $("edit-note").textContent = "";
     $("edit-modal").hidden = false;
   }
@@ -442,6 +446,7 @@
           technique: $("edit-technique").value,
           size: $("edit-size").value,
           status: $("edit-status").value,
+          featured: $("edit-featured").checked,
         }),
       });
       const data = await res.json();
