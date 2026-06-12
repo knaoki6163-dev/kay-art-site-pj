@@ -298,19 +298,18 @@ ul { margin: 0; padding: 0; list-style: none; }
 .work-card__meta { font-family: var(--serif-en); font-size: 0.85rem; letter-spacing: 0.04em; color: var(--ink-soft); }
 .works-empty { grid-column: 1 / -1; color: var(--ink-soft); text-align: center; padding: 2rem 0; }
 
-/* Works ページ（PC）：中央寄せの箱をやめ、画面幅に合わせて左揃え。
-   作品グリッドは左に「一作品分」の余白を空けて始める。 */
+/* Home / Works（PC）：作品は中央寄せの箱をやめ、画面幅いっぱいに左から並べる。
+   画面が広いほど1行に多く並び、左端から敷き詰める（中央に小さくまとまらない）。 */
 @media (min-width: 861px) {
-  .page-works .page-wrap > .feature {
+  .feature:has(> .works) {
     max-width: none; margin: 0;
     padding-left: clamp(1.5rem, 7vw, 7rem);
     padding-right: clamp(1.5rem, 7vw, 7rem);
   }
-  /* 3カラムのまま左を約1カラム分インデント（カードは画面幅に追従して拡大） */
-  .page-works .works-grid { margin-left: 25%; }
-  /* 見出し・フィルタもグリッドと頭を揃える */
-  .page-works .works .block-head,
-  .page-works .works .filters { margin-left: 25%; }
+  .feature:has(> .works) .works-grid {
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    justify-content: start;
+  }
 }
 
 .reveal { opacity: 0; transform: translateY(22px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
@@ -373,6 +372,17 @@ ul { margin: 0; padding: 0; list-style: none; }
 .form-note.is-error { color: #b23b2a; }
 
 /* ---------- フッター ---------- */
+/* フッターを常に画面の下端へ。コンテンツが短いページ（お問い合わせ等）でも
+   フッターが画面中ほどに浮かず、ビューポート下端に来るようにする（スティッキーフッター）。
+   フッターを持つ公開ページのみ対象（管理画面 .admin-body は対象外）。 */
+body:has(> .site-footer) {
+  min-height: 100vh;
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+}
+body:has(> .site-footer) > .site-footer { margin-top: auto; }
+
 /* ヒーロー（トップ）と同じく画面幅いっぱいに広げ、左右余白だけビューポートに追従させる。
    中央寄せの箱（max-width）にすると広い画面で中央に小さくまとまって見えるため。 */
 .site-footer {
