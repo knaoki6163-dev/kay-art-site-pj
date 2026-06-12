@@ -510,7 +510,17 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 /* チェックボックス付きラベル（トップ表示の切替など）。
    長い文章でも折り返して画面からはみ出さないようにする。 */
 .check { display: flex; flex-direction: row; align-items: flex-start; gap: 0.55em; cursor: pointer; }
-.check input { width: 1.1em; height: 1.1em; margin-top: 0.15em; accent-color: var(--accent); flex: 0 0 auto; }
+/* チェックボックスは .field / .content-field の汎用ルール（width:100% 等）の対象外にし、
+   小さな四角に固定する。高い詳細度で admin-body のルールにも勝たせる。 */
+.check input[type="checkbox"],
+.admin-body .check input[type="checkbox"] {
+  flex: 0 0 auto;
+  width: 1.15em; height: 1.15em; min-width: 0; max-width: none;
+  margin: 0.2em 0 0; padding: 0;
+  border: none; border-radius: 0; background: none;
+  appearance: auto; -webkit-appearance: auto;
+  accent-color: var(--accent);
+}
 .check span { font-size: 0.92rem; min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
 .admin-card__title { font-size: 0.98rem; }
 .admin-card__meta { font-size: 0.8rem; color: var(--ink-soft); }
