@@ -298,6 +298,21 @@ ul { margin: 0; padding: 0; list-style: none; }
 .work-card__meta { font-family: var(--serif-en); font-size: 0.85rem; letter-spacing: 0.04em; color: var(--ink-soft); }
 .works-empty { grid-column: 1 / -1; color: var(--ink-soft); text-align: center; padding: 2rem 0; }
 
+/* Works ページ（PC）：中央寄せの箱をやめ、画面幅に合わせて左揃え。
+   作品グリッドは左に「一作品分」の余白を空けて始める。 */
+@media (min-width: 861px) {
+  .page-works .page-wrap > .feature {
+    max-width: none; margin: 0;
+    padding-left: clamp(1.5rem, 7vw, 7rem);
+    padding-right: clamp(1.5rem, 7vw, 7rem);
+  }
+  /* 3カラムのまま左を約1カラム分インデント（カードは画面幅に追従して拡大） */
+  .page-works .works-grid { margin-left: 25%; }
+  /* 見出し・フィルタもグリッドと頭を揃える */
+  .page-works .works .block-head,
+  .page-works .works .filters { margin-left: 25%; }
+}
+
 .reveal { opacity: 0; transform: translateY(22px); transition: opacity .8s var(--ease), transform .8s var(--ease); }
 .reveal.is-visible { opacity: 1; transform: none; }
 
@@ -358,11 +373,12 @@ ul { margin: 0; padding: 0; list-style: none; }
 .form-note.is-error { color: #b23b2a; }
 
 /* ---------- フッター ---------- */
+/* ヒーロー（トップ）と同じく画面幅いっぱいに広げ、左右余白だけビューポートに追従させる。
+   中央寄せの箱（max-width）にすると広い画面で中央に小さくまとまって見えるため。 */
 .site-footer {
   border-top: 1px solid var(--line);
-  padding: 2.8rem clamp(1.5rem, 5vw, 4rem);
+  padding: 2.8rem clamp(1.5rem, 7vw, 7rem);
   display: grid; grid-template-columns: auto 1fr auto; align-items: center; gap: 1.5rem;
-  max-width: var(--maxw); margin: 0 auto;
 }
 .site-footer .brand__name { color: var(--ink); }
 .footer-nav { display: flex; gap: clamp(1rem, 2.5vw, 2rem); justify-content: center; flex-wrap: wrap; }
