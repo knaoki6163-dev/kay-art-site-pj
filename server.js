@@ -336,12 +336,17 @@ app.get("/api/blog", (req, res) => {
   res.json(posts);
 });
 
-// 作品一覧（?category=landscape で絞り込み。未指定/all は全件）
+// 作品一覧（?category=landscape で絞り込み。未指定/all は全件。
+//   ?featured=1 でトップ表示対象（ヒーロー＆Homeのworks）のみに絞り込み）
 app.get("/api/works", (req, res) => {
-  const { category } = req.query;
+  const { category, featured } = req.query;
   let works = readJson(WORKS_FILE);
   if (category && category !== "all") {
     works = works.filter((w) => w.category === category);
+  }
+  // featured 未設定（旧データ）は「表示する」とみなす（後方互換）
+  if (featured === "1") {
+    works = works.filter((w) => w.featured !== false);
   }
   // 新しい順
   works.sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
@@ -521,11 +526,13 @@ app.post("/api/admin/works", requireAuth, upload.single("image"), (req, res) => 
   const size = (req.body.size || "").toString().trim();
   let status = (req.body.status || "").toString();
   if (status && !WORK_STATUSES.includes(status)) status = "";
+  // トップ表示（ヒーロー＆Homeのworks）。未指定は表示する（true）。
+  const featured = String(req.body.featured) !== "false";
 
   const works = readJson(WORKS_FILE);
   const work = {
     id: crypto.randomBytes(8).toString("hex"),
-    title, category, year, technique, size, status,
+    title, category, year, technique, size, status, featured,
     image: "/uploads/" + req.file.filename,
     createdAt: Date.now(),
   };
@@ -552,6 +559,7 @@ app.put("/api/admin/works/:id", requireAuth, (req, res) => {
     const s = String(req.body.status);
     if (s === "" || WORK_STATUSES.includes(s)) work.status = s;
   }
+  if (req.body.featured != null) work.featured = String(req.body.featured) !== "false";
   // 旧データの medium は編集後は使わない
   if ((req.body.technique != null || req.body.size != null) && work.medium != null) delete work.medium;
 

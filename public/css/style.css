@@ -498,9 +498,19 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .upload-form h2, .news-form h2 { grid-column: 1 / -1; font-size: 1.2rem; }
 
 .admin-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 1rem; }
-.admin-card { border: 1px solid var(--line); border-radius: 3px; overflow: hidden; background: #fff; }
+.admin-card { position: relative; border: 1px solid var(--line); border-radius: 3px; overflow: hidden; background: #fff; }
 .admin-card img { width: 100%; aspect-ratio: 1/1; object-fit: cover; display: block; }
+.admin-card__badge {
+  position: absolute; top: 0.5rem; left: 0.5rem;
+  background: rgba(42,39,34,0.82); color: #f3efe6;
+  font-size: 0.72rem; letter-spacing: 0.04em;
+  padding: 0.2em 0.6em; border-radius: 999px;
+}
 .admin-card__body { padding: 0.7rem 0.8rem; }
+/* チェックボックス付きラベル（トップ表示の切替など） */
+.check { display: flex; flex-direction: row; align-items: center; gap: 0.55em; cursor: pointer; }
+.check input { width: 1.1em; height: 1.1em; accent-color: var(--accent); flex: 0 0 auto; }
+.check span { font-size: 0.92rem; }
 .admin-card__title { font-size: 0.98rem; }
 .admin-card__meta { font-size: 0.8rem; color: var(--ink-soft); }
 .admin-card__del { display: block; width: 100%; font-family: var(--serif-jp); font-size: 0.85rem; padding: 0.5em; border: none; border-top: 1px solid var(--line); background: transparent; color: #b23b2a; cursor: pointer; }
@@ -666,6 +676,25 @@ body.subpage .about { margin-top: clamp(1.5rem, 5vw, 4rem); }
   .nav-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
   .works-grid { grid-template-columns: repeat(2, 1fr); }
+  /* Home の Works（data-preview付き）はスマホで横スクロール。
+     右にスワイプして作品を順に見られるようにする。 */
+  .works-grid[data-preview] {
+    display: flex;
+    grid-template-columns: none;
+    overflow-x: auto;
+    gap: 0.9rem;
+    scroll-snap-type: x mandatory;
+    -webkit-overflow-scrolling: touch;
+    /* 画面端まで使い、左右に少しはみ出させてスクロールを示唆 */
+    margin: 0 calc(-1 * clamp(1.25rem, 5vw, 3rem));
+    padding: 0.2rem clamp(1.25rem, 5vw, 3rem) 0.6rem;
+    scrollbar-width: none;
+  }
+  .works-grid[data-preview]::-webkit-scrollbar { display: none; }
+  .works-grid[data-preview] .work-card {
+    flex: 0 0 66%;
+    scroll-snap-align: start;
+  }
   .contact-form { grid-template-columns: 1fr; }
   .upload-form, .news-form { grid-template-columns: 1fr; }
   .site-footer { grid-template-columns: 1fr; justify-items: center; text-align: center; }
