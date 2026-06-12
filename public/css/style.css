@@ -507,10 +507,11 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
   padding: 0.2em 0.6em; border-radius: 999px;
 }
 .admin-card__body { padding: 0.7rem 0.8rem; }
-/* チェックボックス付きラベル（トップ表示の切替など） */
-.check { display: flex; flex-direction: row; align-items: center; gap: 0.55em; cursor: pointer; }
-.check input { width: 1.1em; height: 1.1em; accent-color: var(--accent); flex: 0 0 auto; }
-.check span { font-size: 0.92rem; }
+/* チェックボックス付きラベル（トップ表示の切替など）。
+   長い文章でも折り返して画面からはみ出さないようにする。 */
+.check { display: flex; flex-direction: row; align-items: flex-start; gap: 0.55em; cursor: pointer; }
+.check input { width: 1.1em; height: 1.1em; margin-top: 0.15em; accent-color: var(--accent); flex: 0 0 auto; }
+.check span { font-size: 0.92rem; min-width: 0; overflow-wrap: anywhere; line-height: 1.5; }
 .admin-card__title { font-size: 0.98rem; }
 .admin-card__meta { font-size: 0.8rem; color: var(--ink-soft); }
 .admin-card__del { display: block; width: 100%; font-family: var(--serif-jp); font-size: 0.85rem; padding: 0.5em; border: none; border-top: 1px solid var(--line); background: transparent; color: #b23b2a; cursor: pointer; }
@@ -621,6 +622,9 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
   width: min(460px, 100%); background: #2a2622; border: 1px solid #463f35;
   border-radius: 6px; padding: 1.8rem; color: #ece7dd;
   box-shadow: 0 30px 80px -20px rgba(0,0,0,0.7);
+  /* 画面より縦に長い場合はモーダル内をスクロール（画面からはみ出さない） */
+  max-height: calc(100svh - 3rem);
+  overflow-y: auto;
 }
 .modal__box h2 { color: #f3efe6; margin-bottom: 1.2rem; font-size: 1.2rem; }
 .modal__box .content-field { margin-bottom: 1rem; }
