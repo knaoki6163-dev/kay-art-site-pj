@@ -204,11 +204,11 @@
           <label for="looker-url">Looker Studio 埋め込みURL</label>
           <input type="text" id="looker-url" placeholder="https://lookerstudio.google.com/embed/reporting/...." />
         </div>
-        <div style="margin-top:1rem;">
+        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.6rem; align-items:center;">
           <button type="submit" class="btn">保存して表示</button>
-          <a class="btn btn--ghost" href="https://lookerstudio.google.com/" target="_blank" rel="noopener" style="margin-left:.5rem;">Looker Studio を開く</a>
-          <p class="admin-note" id="looker-note"></p>
+          <a class="btn btn--ghost" href="https://lookerstudio.google.com/" target="_blank" rel="noopener">Looker Studio を開く</a>
         </div>
+        <p class="admin-note" id="looker-note" style="margin-top:.6rem;"></p>
       </form>
       <div id="looker-embed"></div>
       <p class="admin-empty" id="looker-empty">まだ埋め込みURLが設定されていません。上の欄にURLを貼って保存してください。</p>
