@@ -183,10 +183,20 @@
         body: JSON.stringify({ date: todayDot(), title: $("news-title").value.trim() }),
       });
       const data = await res.json();
-      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); setNewsDateToday(); loadNews(); }
+      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); loadNews(); }
       else { note.textContent = data.error || "追加に失敗しました。"; note.classList.add("is-error"); }
     } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
   });
+  // 管理画面用：投稿日時を「2024.05.12 14:30」のように分まで表示（公開側は日付のみ）
+  function fmtNewsPosted(n) {
+    if (n.createdAt) {
+      const d = new Date(n.createdAt);
+      const p = (x) => String(x).padStart(2, "0");
+      return d.getFullYear() + "." + p(d.getMonth() + 1) + "." + p(d.getDate()) +
+        " " + p(d.getHours()) + ":" + p(d.getMinutes());
+    }
+    return n.date || "（日付なし）";
+  }
   async function loadNews() {
     let news = [];
     try { news = await (await fetch("/api/news")).json(); } catch (e) { news = []; }
@@ -198,7 +208,7 @@
       row.className = "news-row";
       row.innerHTML =
         '<div class="news-row__head">' +
-          '<span class="news-row__date">' + esc(n.date || "（日付なし）") + "</span>" +
+          '<span class="news-row__date">' + esc(fmtNewsPosted(n)) + "</span>" +
           '<button class="news-row__del" data-id="' + esc(n.id) + '">削除</button>' +
         "</div>" +
         "<div>" + esc(n.title) + "</div>";
