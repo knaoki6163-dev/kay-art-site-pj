@@ -166,18 +166,12 @@
   }
 
   /* ---------- お知らせ（Info）：追加・一覧・削除 ---------- */
-  // 今日の日付を「2024.05.12」形式で返す
+  // 今日の日付を「2024.05.12」形式で返す（お知らせの日付として自動付与）
   function todayDot() {
     const d = new Date();
     const p = (n) => String(n).padStart(2, "0");
     return d.getFullYear() + "." + p(d.getMonth() + 1) + "." + p(d.getDate());
   }
-  // お知らせの日付欄を今日の日付で自動入力（未入力時の初期値）
-  function setNewsDateToday() {
-    const el = $("news-date");
-    if (el) el.value = todayDot();
-  }
-  setNewsDateToday();
 
   $("news-form").addEventListener("submit", async (e) => {
     e.preventDefault();
@@ -186,10 +180,10 @@
     try {
       const res = await fetch("/api/admin/news", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date: $("news-date").value.trim(), title: $("news-title").value.trim() }),
+        body: JSON.stringify({ date: todayDot(), title: $("news-title").value.trim() }),
       });
       const data = await res.json();
-      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); setNewsDateToday(); loadNews(); }
+      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); loadNews(); }
       else { note.textContent = data.error || "追加に失敗しました。"; note.classList.add("is-error"); }
     } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
   });
