@@ -388,7 +388,6 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 /* SNSアイコン → コピーライト → Admin を中央寄せで縦に並べる。
    画面幅いっぱいに広げ、左右余白だけビューポートに追従させる。 */
 .site-footer {
-  border-top: 1px solid var(--line);
   padding: 2.8rem clamp(1.5rem, 7vw, 7rem);
   display: flex; flex-direction: column; align-items: center; gap: 1.3rem;
   text-align: center;
