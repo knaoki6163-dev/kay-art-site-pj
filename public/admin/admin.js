@@ -183,7 +183,7 @@
         body: JSON.stringify({ date: todayDot(), title: $("news-title").value.trim() }),
       });
       const data = await res.json();
-      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); loadNews(); }
+      if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); setNewsDateToday(); loadNews(); }
       else { note.textContent = data.error || "追加に失敗しました。"; note.classList.add("is-error"); }
     } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
   });
