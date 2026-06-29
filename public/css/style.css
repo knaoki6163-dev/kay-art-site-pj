@@ -242,6 +242,8 @@ ul { margin: 0; padding: 0; list-style: none; }
   gap: clamp(2.5rem, 6vw, 5rem);
   align-items: start;
 }
+/* セクションが続く場合（例：Home の Works → Info）は上の余白を詰めて重複を防ぐ */
+.feature + .feature { padding-top: 0; }
 .block-head {
   display: flex; align-items: flex-end; justify-content: space-between;
   gap: 1rem; margin-bottom: 2rem;
