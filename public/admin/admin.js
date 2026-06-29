@@ -229,7 +229,7 @@
     try {
       const res = await fetch("/api/admin/blog", {
         method: "POST", headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ date: $("blog-date").value.trim(), title: $("blog-title").value.trim(), body: $("blog-body").value.trim() }),
+        body: JSON.stringify({ date: todayDot(), title: $("blog-title").value.trim(), body: $("blog-body").value.trim() }),
       });
       const data = await res.json();
       if (res.ok && data.ok) { note.textContent = "追加しました。"; e.target.reset(); loadBlog(); }
@@ -247,7 +247,7 @@
       row.className = "news-row";
       row.innerHTML =
         '<div class="news-row__head">' +
-          '<span class="news-row__date">' + esc(p.date || "（日付なし）") + "</span>" +
+          '<span class="news-row__date">' + esc(fmtNewsPosted(p)) + "</span>" +
           '<button class="news-row__del" data-id="' + esc(p.id) + '">削除</button>' +
         "</div>" +
         "<div><strong>" + esc(p.title) + "</strong></div>" +
