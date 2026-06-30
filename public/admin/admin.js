@@ -21,6 +21,7 @@
     { key: "siteName", label: "サイト名（ロゴ）", type: "text" },
     { key: "aboutSignature", label: "サイン（手書き風の署名）", type: "text" },
     { key: "instagramUrl", label: "Instagram のURL", type: "text" },
+    { key: "instagramVisible", label: "フッターに Instagram リンクを表示する", type: "checkbox" },
     { key: "emailUrl", label: "メールリンク（例：mailto:you@example.com）", type: "text" },
   ];
   const LOCALIZED_FIELDS = [
@@ -298,6 +299,21 @@
     const field = document.createElement("div");
     field.className = "content-field";
     const id = idPrefix + f.key;
+    if (f.type === "checkbox") {
+      const label = document.createElement("label");
+      label.className = "check";
+      label.setAttribute("for", id);
+      const input = document.createElement("input");
+      input.type = "checkbox";
+      input.id = id;
+      input.dataset.key = f.key;
+      const span = document.createElement("span");
+      span.textContent = f.label;
+      label.appendChild(input);
+      label.appendChild(span);
+      field.appendChild(label);
+      return field;
+    }
     const label = document.createElement("label");
     label.setAttribute("for", id);
     label.textContent = f.label;
@@ -327,7 +343,10 @@
   }
 
   function saveSharedToModel() {
-    SHARED_FIELDS.forEach((f) => { const i = $("cs_" + f.key); if (i) contentModel.shared[f.key] = i.value; });
+    SHARED_FIELDS.forEach((f) => {
+      const i = $("cs_" + f.key); if (!i) return;
+      contentModel.shared[f.key] = f.type === "checkbox" ? (i.checked ? "true" : "false") : i.value;
+    });
   }
   function saveLocalizedToModel() {
     if (!contentModel) return;
@@ -335,7 +354,12 @@
     LOCALIZED_FIELDS.forEach((f) => { const i = $("cl_" + f.key); if (i) m[f.key] = i.value; });
   }
   function loadSharedFromModel() {
-    SHARED_FIELDS.forEach((f) => { const i = $("cs_" + f.key); if (i) i.value = (contentModel.shared && contentModel.shared[f.key] != null) ? contentModel.shared[f.key] : ""; });
+    SHARED_FIELDS.forEach((f) => {
+      const i = $("cs_" + f.key); if (!i) return;
+      const v = (contentModel.shared && contentModel.shared[f.key] != null) ? contentModel.shared[f.key] : "";
+      if (f.type === "checkbox") i.checked = (v !== "false"); // 既定は表示
+      else i.value = v;
+    });
   }
   function loadLocalizedFromModel() {
     const m = contentModel[contentLang] || {};
