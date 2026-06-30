@@ -378,8 +378,13 @@ ul { margin: 0; padding: 0; list-style: none; }
    フッターが画面中ほどに浮かず、ビューポート下端に来るようにする（スティッキーフッター）。
    フッターを持つ公開ページのみ対象（管理画面 .admin-body は対象外）。 */
 body:has(> .site-footer) {
+  /* ★重要（再発注意）★ ここは必ず dvh を使うこと。
+     svh だと iOS Safari でツールバーが隠れたとき body が実ビューポートより
+     短くなり、フッターの下に余白（空白）が出る。dvh は現在の表示領域に
+     追従するので、ツールバーの表示/非表示に関わらずフッターが常に最下部に来る。
+     100vh は dvh 非対応の古いブラウザ用フォールバック。svh に戻さないこと。 */
   min-height: 100vh;
-  min-height: 100svh;
+  min-height: 100dvh;
   display: flex;
   flex-direction: column;
 }
