@@ -322,8 +322,9 @@ ul { margin: 0; padding: 0; list-style: none; }
   position: relative;
   background: var(--green);
   color: #f0ece1;
-  padding: clamp(5rem, 11vw, 9rem) clamp(1.5rem, 5vw, 3rem);
-  margin-top: clamp(2rem, 5vw, 4rem);
+  /* Aboutの説明をページ内で少し上に。上の余白を控えめにする */
+  padding: clamp(2.5rem, 6vw, 4.5rem) clamp(1.5rem, 5vw, 3rem) clamp(5rem, 11vw, 9rem);
+  margin-top: clamp(0.5rem, 2vw, 1.5rem);
 }
 .about__inner {
   max-width: var(--maxw); margin: 0 auto;
@@ -658,7 +659,7 @@ body.subpage .brand__name, body.subpage .nav a { color: var(--ink); }
 body.subpage .lang-switch { color: var(--ink); }
 body.subpage .lang-switch select { border-color: var(--line); }
 .page-wrap { padding-top: clamp(90px, 12vh, 130px); padding-bottom: clamp(2rem, 5vw, 4rem); min-height: 56vh; }
-body.subpage .about { margin-top: clamp(1.5rem, 5vw, 4rem); }
+body.subpage .about { margin-top: clamp(0.5rem, 2vw, 1.5rem); }
 .page-wrap > .feature { padding-top: clamp(1rem, 3vw, 2.5rem); }
 
 /* ---------- レスポンシブ ---------- */
