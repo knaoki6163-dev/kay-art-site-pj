@@ -120,7 +120,7 @@
         <h2>お知らせ（Info）を追加</h2>
         <p class="muted" style="margin-bottom:1rem;">日付は投稿した日が自動で入ります。</p>
         <div class="field">
-          <label for="news-title">タイトル</label>
+          <label for="news-title">お知らせ内容</label>
           <input type="text" id="news-title" name="title" placeholder="展覧会「光の気配」開催のお知らせ" required />
         </div>
         <div class="field field--full">
@@ -262,6 +262,18 @@
         </div>
         <p class="admin-note" id="edit-note"></p>
       </form>
+    </div>
+  </div>
+
+  <!-- 削除などの確認モーダル（ブラウザに抑制されない確実なポップアップ） -->
+  <div class="modal" id="confirm-modal" hidden>
+    <div class="modal__box">
+      <h2 id="confirm-title">確認</h2>
+      <p id="confirm-message" style="margin-bottom:1.4rem;"></p>
+      <div class="modal__actions">
+        <button type="button" class="btn btn--ghost" id="confirm-cancel">キャンセル</button>
+        <button type="button" class="btn" id="confirm-ok">削除する</button>
+      </div>
     </div>
   </div>
 

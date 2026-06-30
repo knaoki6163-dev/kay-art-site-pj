@@ -46,6 +46,34 @@
     return c ? c.label : key;
   }
 
+  /* ---------- 確認ポップアップ（自前モーダル：ブラウザに抑制されない） ---------- */
+  function askConfirm(message, okLabel) {
+    return new Promise((resolve) => {
+      const modal = $("confirm-modal");
+      const ok = $("confirm-ok");
+      const cancel = $("confirm-cancel");
+      if (!modal) { resolve(window.confirm(message)); return; } // 保険：モーダルが無ければ標準確認
+      $("confirm-message").textContent = message;
+      ok.textContent = okLabel || "削除する";
+      modal.hidden = false;
+      function cleanup() {
+        modal.hidden = true;
+        ok.removeEventListener("click", onOk);
+        cancel.removeEventListener("click", onCancel);
+        modal.removeEventListener("click", onBackdrop);
+        document.removeEventListener("keydown", onKey);
+      }
+      function onOk() { cleanup(); resolve(true); }
+      function onCancel() { cleanup(); resolve(false); }
+      function onBackdrop(e) { if (e.target.id === "confirm-modal") onCancel(); }
+      function onKey(e) { if (e.key === "Escape") onCancel(); }
+      ok.addEventListener("click", onOk);
+      cancel.addEventListener("click", onCancel);
+      modal.addEventListener("click", onBackdrop);
+      document.addEventListener("keydown", onKey);
+    });
+  }
+
   /* ---------- 画面の切り替え ---------- */
   function showLogin() { loginView.hidden = false; appView.hidden = true; document.body.classList.remove("is-authed"); }
   function showApp() { loginView.hidden = true; appView.hidden = false; document.body.classList.add("is-authed"); init(); }
@@ -213,7 +241,7 @@
         "</div>" +
         "<div>" + esc(n.title) + "</div>";
       row.querySelector(".news-row__del").addEventListener("click", async () => {
-        if (!confirm("このお知らせを削除しますか？")) return;
+        if (!(await askConfirm("このお知らせを削除しますか？"))) return;
         const res = await fetch("/api/admin/news/" + encodeURIComponent(n.id), { method: "DELETE" });
         if (res.ok) loadNews(); else alert("削除に失敗しました。");
       });
@@ -253,7 +281,7 @@
         "<div><strong>" + esc(p.title) + "</strong></div>" +
         (p.body ? '<div class="news-row__body">' + esc(p.body) + "</div>" : "");
       row.querySelector(".news-row__del").addEventListener("click", async () => {
-        if (!confirm("この記事を削除しますか？")) return;
+        if (!(await askConfirm("この記事を削除しますか？"))) return;
         const res = await fetch("/api/admin/blog/" + encodeURIComponent(p.id), { method: "DELETE" });
         if (res.ok) loadBlog(); else alert("削除に失敗しました。");
       });
@@ -410,7 +438,7 @@
         "</div>";
       card.querySelector(".admin-card__edit").addEventListener("click", () => openEditWork(w));
       card.querySelector(".admin-card__del").addEventListener("click", async () => {
-        if (!confirm("「" + w.title + "」を削除しますか？")) return;
+        if (!(await askConfirm("「" + w.title + "」を削除しますか？"))) return;
         const res = await fetch("/api/admin/works/" + encodeURIComponent(w.id), { method: "DELETE" });
         if (res.ok) loadWorks();
         else alert("削除に失敗しました。");
