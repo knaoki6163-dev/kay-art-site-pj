@@ -73,7 +73,6 @@ const DEFAULT_SHARED = {
   siteName: "A. Kato",
   aboutSignature: "A. Kato",
   instagramUrl: "#",
-  emailUrl: "#",
   instagramVisible: "true", // フッターのInstagramリンク表示（"true"/"false"）
 };
 
@@ -145,7 +144,7 @@ function readSavedContent() {
   try { saved = JSON.parse(fs.readFileSync(CONTENT_FILE, "utf8")); } catch (e) { saved = {}; }
   if (saved && !saved.shared && !saved.ja && (saved.siteName != null || saved.heroTitle != null)) {
     saved = {
-      shared: { siteName: saved.siteName, aboutSignature: saved.aboutSignature, instagramUrl: saved.instagramUrl, emailUrl: saved.emailUrl },
+      shared: { siteName: saved.siteName, aboutSignature: saved.aboutSignature, instagramUrl: saved.instagramUrl },
       ja: saved,
     };
   }

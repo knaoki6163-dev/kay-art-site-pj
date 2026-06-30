@@ -22,7 +22,6 @@
     { key: "aboutSignature", label: "サイン（手書き風の署名）", type: "text" },
     { key: "instagramUrl", label: "Instagram のURL", type: "text" },
     { key: "instagramVisible", label: "フッターに Instagram リンクを表示する", type: "checkbox" },
-    { key: "emailUrl", label: "メールリンク（例：mailto:you@example.com）", type: "text" },
   ];
   const LOCALIZED_FIELDS = [
     { key: "heroTitle", label: "キャッチコピー（大見出し・改行可）", type: "textarea" },
