@@ -303,7 +303,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 /* Home / Works（PC）：作品は中央寄せの箱をやめ、画面幅いっぱいに左から並べる。
    画面が広いほど1行に多く並び、左端から敷き詰める（中央に小さくまとまらない）。 */
 @media (min-width: 861px) {
-  .feature:has(> .works) {
+  /* Works と、Home の Info は同じ全幅・左揃え（左端を揃える）。
+     Info 専用ページ（body.subpage）の Info は従来の中央寄せのまま。 */
+  .feature:has(> .works),
+  body:not(.subpage) .feature:has(> .news) {
     max-width: none; margin: 0;
     padding-left: clamp(1.5rem, 7vw, 7rem);
     padding-right: clamp(1.5rem, 7vw, 7rem);
