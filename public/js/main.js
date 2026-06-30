@@ -61,6 +61,9 @@
       const key = node.dataset.contentHref;
       if (c[key]) node.setAttribute("href", c[key]);
     });
+    // フッターのInstagramリンクの表示/非表示（管理画面で切替）
+    const ig = document.querySelector('.footer-social [data-content-href="instagramUrl"]');
+    if (ig) ig.style.display = (c.instagramVisible === "false") ? "none" : "";
   }
 
   function categoryLabel(key) {
@@ -308,6 +311,22 @@
   const form = document.getElementById("contact-form");
   const note = document.getElementById("form-note");
   if (form) {
+    // 入力内容の一時保存：別ページへ移動・ページ更新しても消えないようにする
+    const DRAFT_KEY = "contactDraft";
+    const draftFields = ["name", "email", "message"];
+    try {
+      const saved = JSON.parse(localStorage.getItem(DRAFT_KEY) || "{}");
+      draftFields.forEach((k) => { if (form[k] && saved[k] != null) form[k].value = saved[k]; });
+    } catch (e) {}
+    const saveDraft = () => {
+      try {
+        const d = {};
+        draftFields.forEach((k) => { if (form[k]) d[k] = form[k].value; });
+        localStorage.setItem(DRAFT_KEY, JSON.stringify(d));
+      } catch (e) {}
+    };
+    draftFields.forEach((k) => { if (form[k]) form[k].addEventListener("input", saveDraft); });
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       note.classList.remove("is-error");
@@ -319,7 +338,7 @@
           body: JSON.stringify({ name: form.name.value.trim(), email: form.email.value.trim(), message: form.message.value.trim() }),
         });
         const data = await res.json();
-        if (res.ok && data.ok) { note.textContent = t("form.thanks"); form.reset(); }
+        if (res.ok && data.ok) { note.textContent = t("form.thanks"); form.reset(); try { localStorage.removeItem(DRAFT_KEY); } catch (e) {} }
         else { note.textContent = data.error || t("form.fail"); note.classList.add("is-error"); }
       } catch (err) { note.textContent = t("form.neterr"); note.classList.add("is-error"); }
     });

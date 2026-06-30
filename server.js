@@ -74,6 +74,7 @@ const DEFAULT_SHARED = {
   aboutSignature: "A. Kato",
   instagramUrl: "#",
   emailUrl: "#",
+  instagramVisible: "true", // フッターのInstagramリンク表示（"true"/"false"）
 };
 
 const DEFAULT_LOCALIZED = {
