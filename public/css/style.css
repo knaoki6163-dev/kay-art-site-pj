@@ -53,7 +53,10 @@ ul { margin: 0; padding: 0; list-style: none; }
 
 .paper-grain {
   position: fixed; inset: 0; z-index: -3;
-  background-color: var(--paper);
+  /* ★注意★ ここに background-color を戻さないこと。
+     paper色はこのレイヤーではなく body に持たせる。fixed のこのレイヤーが
+     paper色を持つと、iOSで下端を引っ張った（オーバースクロール）とき
+     html のフッター色より手前に paper色 が見えてしまう。テクスチャの点々のみ描く。 */
   background-image:
     radial-gradient(circle at 20% 30%, rgba(0,0,0,0.018) 0, transparent 0.6px),
     radial-gradient(circle at 70% 60%, rgba(0,0,0,0.022) 0, transparent 0.6px),

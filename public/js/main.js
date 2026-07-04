@@ -69,7 +69,8 @@
     const ig = document.querySelector('.footer-social [data-content-href="instagramUrl"]');
     const social = document.querySelector(".footer-social");
     if (ig) ig.style.display = hideIg ? "none" : "";
-    if (social) social.style.display = hideIg ? "none" : "";
+    // 非表示時はサーバーが <style> を注入済み。表示時はそれに勝つよう flex を明示。
+    if (social) social.style.display = hideIg ? "none" : "flex";
   }
 
   function categoryLabel(key) {

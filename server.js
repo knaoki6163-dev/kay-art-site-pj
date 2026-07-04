@@ -210,6 +210,17 @@ app.use((req, res, next) => {
   if (req.secure) {
     res.setHeader("Strict-Transport-Security", "max-age=31536000; includeSubDomains");
   }
+  // キャッシュ制御：デプロイ後に古いHTML/CSS/JS（＝以前の見た目）が
+  // ブラウザに残らないよう、常にサーバーへ再確認させる（変更が無ければ304で軽い）。
+  // アップロード画像はファイル名がランダムで変わらないため長期キャッシュ。
+  const p = req.path.toLowerCase();
+  if (p.startsWith("/uploads/")) {
+    res.setHeader("Cache-Control", "public, max-age=2592000, immutable"); // 30日
+  } else if (/\.(?:png|jpe?g|webp|gif|ico|svg|woff2?)$/.test(p)) {
+    res.setHeader("Cache-Control", "public, max-age=604800"); // 7日
+  } else {
+    res.setHeader("Cache-Control", "no-cache");
+  }
   next();
 });
 
@@ -269,7 +280,16 @@ function serveTemplated(file) {
   return (req, res) => {
     fs.readFile(full, "utf8", (err, html) => {
       if (err) return res.status(404).send("not found");
-      res.type("html").send(html.split("__SITE_URL__").join(siteOrigin(req)));
+      let out = html.split("__SITE_URL__").join(siteOrigin(req));
+      // Instagram非表示の設定はサーバー側でHTMLに反映する。
+      // クライアントJSがAPI取得後に消す方式だけだと、取得までの一瞬
+      // アイコン行が見えてしまう（更新時に「以前の仕様」が見える現象）ため。
+      try {
+        if (getContent("ja").instagramVisible === "false") {
+          out = out.replace("</head>", "<style>.footer-social{display:none}</style></head>");
+        }
+      } catch (e) { /* 設定が読めなくても配信は続行 */ }
+      res.type("html").send(out);
     });
   };
 }
