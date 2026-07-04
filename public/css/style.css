@@ -584,6 +584,11 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .version-item { border: 1px solid var(--line); border-radius: 3px; background: rgba(255,255,255,0.55); padding: 0.8rem 1.1rem; }
 .version-item--github { border-left: 3px solid var(--blue-blot); }
 .version-item--admin { border-left: 3px solid var(--accent); }
+/* コード修正の作業元（Claude Code / Codex）を色分け */
+.version-item--claude { border-left: 3px solid var(--accent-soft); }
+.version-item--codex { border-left: 3px solid var(--green); }
+.version-item--claude .version-item__badge { color: var(--accent-soft); }
+.version-item--codex .version-item__badge { color: var(--green); }
 .version-item__head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
 .version-item__badge { font-family: var(--serif-en); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-soft); text-transform: uppercase; }
 .version-item__time { font-family: var(--serif-en); font-size: 0.8rem; color: var(--ink-soft); white-space: nowrap; }
@@ -592,6 +597,17 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .version-item__summary a:hover { text-decoration: underline; }
 .admin-body .version-item { background: #2a2622; border-color: #463f35; color: #ece7dd; }
 .admin-body .version-item__badge, .admin-body .version-item__time { color: #b3a999; }
+.admin-body .version-item--claude .version-item__badge { color: var(--accent-soft); }
+.admin-body .version-item--codex .version-item__badge { color: #7fa06e; }
+
+/* 月・年の区切り見出し（左上に配置、その月の項目群の先頭） */
+.version-month-divider {
+  text-align: left; font-family: var(--serif-en); font-size: 0.9rem; letter-spacing: 0.06em;
+  color: var(--ink); font-weight: 600; margin: 0.6rem 0 -0.1rem; padding-bottom: 0.3rem;
+  border-bottom: 1px solid var(--line);
+}
+.version-month-divider:first-child { margin-top: 0; }
+.admin-body .version-month-divider { color: #ece7dd; border-color: #463f35; }
 
 .content-form { max-width: 720px; }
 .content-group { border: 1px solid var(--line); border-radius: 4px; background: rgba(255,255,255,0.45); padding: 1.4rem 1.5rem; margin-bottom: 1.4rem; }
