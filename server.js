@@ -130,8 +130,9 @@ const MESSAGES_FILE = path.join(DATA_DIR, "messages.json");
 const CONTENT_FILE = path.join(DATA_DIR, "content.json");
 const NEWS_FILE = path.join(DATA_DIR, "news.json");   // 公開サイトでは「Info」として表示
 const BLOG_FILE = path.join(DATA_DIR, "blog.json");
+const ACTIVITY_FILE = path.join(DATA_DIR, "activity.json"); // 管理画面からの更新履歴（バージョン管理用）
 
-for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE, BLOG_FILE]) {
+for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE, BLOG_FILE, ACTIVITY_FILE]) {
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
 }
 if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
@@ -188,6 +189,17 @@ function readJson(file) {
 }
 function writeJson(file, data) {
   fs.writeFileSync(file, JSON.stringify(data, null, 2));
+}
+
+/* ----- 管理画面からの更新履歴（バージョン管理タブ用） -----
+   各admin書き込み操作の直後に一文で記録する。最新500件のみ保持。 */
+const ACTIVITY_MAX = 500;
+function logActivity(summary) {
+  try {
+    const list = readJson(ACTIVITY_FILE);
+    list.unshift({ id: crypto.randomBytes(8).toString("hex"), summary, createdAt: Date.now() });
+    writeJson(ACTIVITY_FILE, list.slice(0, ACTIVITY_MAX));
+  } catch (e) { /* 履歴の記録失敗で本来の操作を止めない */ }
 }
 
 /* ----- ミドルウェア ----- */
@@ -465,14 +477,17 @@ app.post("/api/admin/news", requireAuth, (req, res) => {
   const item = { id: crypto.randomBytes(8).toString("hex"), date, title, createdAt: Date.now() };
   news.push(item);
   writeJson(NEWS_FILE, news);
+  logActivity("お知らせを追加：" + title);
   res.json({ ok: true, item });
 });
 app.delete("/api/admin/news/:id", requireAuth, (req, res) => {
   let news = readJson(NEWS_FILE);
   const before = news.length;
+  const removed = news.find((n) => n.id === req.params.id);
   news = news.filter((n) => n.id !== req.params.id);
   if (news.length === before) return res.status(404).json({ error: "見つかりません。" });
   writeJson(NEWS_FILE, news);
+  logActivity("お知らせを削除：" + (removed && removed.title || req.params.id));
   res.json({ ok: true });
 });
 
@@ -486,14 +501,17 @@ app.post("/api/admin/blog", requireAuth, (req, res) => {
   const item = { id: crypto.randomBytes(8).toString("hex"), date, title, body: body.slice(0, 8000), createdAt: Date.now() };
   posts.push(item);
   writeJson(BLOG_FILE, posts);
+  logActivity("Blog記事を追加：" + title);
   res.json({ ok: true, item });
 });
 app.delete("/api/admin/blog/:id", requireAuth, (req, res) => {
   let posts = readJson(BLOG_FILE);
   const before = posts.length;
+  const removed = posts.find((p) => p.id === req.params.id);
   posts = posts.filter((p) => p.id !== req.params.id);
   if (posts.length === before) return res.status(404).json({ error: "見つかりません。" });
   writeJson(BLOG_FILE, posts);
+  logActivity("Blog記事を削除：" + (removed && removed.title || req.params.id));
   res.json({ ok: true });
 });
 
@@ -515,6 +533,7 @@ app.put("/api/admin/content", requireAuth, (req, res) => {
     }
   }
   writeJson(CONTENT_FILE, out);
+  logActivity("サイトの文章を更新");
   res.json({ ok: true });
 });
 
@@ -531,6 +550,7 @@ app.put("/api/admin/settings", requireAuth, (req, res) => {
     return res.status(400).json({ error: "https:// で始まるURLを入力してください。" });
   }
   writeJson(SETTINGS_FILE, { lookerUrl: url.slice(0, 1000) });
+  logActivity("アクセス解析（Looker Studio埋め込み）の設定を更新");
   res.json({ ok: true });
 });
 
@@ -558,6 +578,7 @@ app.post("/api/admin/works", requireAuth, upload.single("image"), (req, res) => 
   };
   works.push(work);
   writeJson(WORKS_FILE, works);
+  logActivity("作品を追加：" + title);
   res.json({ ok: true, work });
 });
 
@@ -584,6 +605,7 @@ app.put("/api/admin/works/:id", requireAuth, (req, res) => {
   if ((req.body.technique != null || req.body.size != null) && work.medium != null) delete work.medium;
 
   writeJson(WORKS_FILE, works);
+  logActivity("作品を編集：" + work.title);
   res.json({ ok: true, work });
 });
 
@@ -595,6 +617,7 @@ app.delete("/api/admin/works/:id", requireAuth, (req, res) => {
 
   const [removed] = works.splice(idx, 1);
   writeJson(WORKS_FILE, works);
+  logActivity("作品を削除：" + removed.title);
 
   // 画像ファイルも削除
   // 実ファイルの場所は UPLOAD_DIR（Renderでは永続ディスク）。public 配下とは限らない。
@@ -639,6 +662,58 @@ app.put("/api/admin/messages/:id", requireAuth, (req, res) => {
   if (req.body.important != null) m.important = !!req.body.important;
   writeJson(MESSAGES_FILE, messages);
   res.json({ ok: true, message: m });
+});
+
+/* ----- バージョン管理（GitHubのコード修正履歴 ＋ 管理画面からの更新履歴） -----
+   GitHub側は公開リポジトリのコミット一覧APIを使用（認証不要だが未認証は60回/時間の
+   レート制限があるため、短時間キャッシュして呼び過ぎを防ぐ）。 */
+const GITHUB_REPO = process.env.GITHUB_REPO || "knaoki6163-dev/kay-art-site-pj";
+const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
+const GITHUB_CACHE_MS = 5 * 60 * 1000; // 5分
+let githubCache = { at: 0, items: [] };
+
+async function fetchGithubCommits() {
+  const now = Date.now();
+  if (now - githubCache.at < GITHUB_CACHE_MS) return githubCache.items;
+  try {
+    const headers = { "User-Agent": "aquarelle-admin", Accept: "application/vnd.github+json" };
+    if (GITHUB_TOKEN) headers.Authorization = "Bearer " + GITHUB_TOKEN;
+    const res = await fetch(
+      "https://api.github.com/repos/" + GITHUB_REPO + "/commits?per_page=30",
+      { headers }
+    );
+    if (!res.ok) throw new Error("GitHub API " + res.status);
+    const data = await res.json();
+    const items = data.map((c) => {
+      const fullMessage = (c.commit && c.commit.message) || "";
+      const title = fullMessage.split("\n")[0].trim();
+      const date = (c.commit && c.commit.author && c.commit.author.date) || (c.commit && c.commit.committer && c.commit.committer.date);
+      return {
+        source: "github",
+        summary: title || "(無題のコミット)",
+        createdAt: date ? new Date(date).getTime() : 0,
+        url: c.html_url || null,
+        author: (c.commit && c.commit.author && c.commit.author.name) || "",
+      };
+    });
+    githubCache = { at: now, items };
+    return items;
+  } catch (e) {
+    // 取得失敗時は直近の成功キャッシュ（無ければ空配列）を返し、管理画面ログだけでも表示する
+    return githubCache.items;
+  }
+}
+
+// 新しい順：GitHubのコミット履歴 ＋ 管理画面からの更新履歴 を統合して返す
+app.get("/api/admin/version-history", requireAuth, async (req, res) => {
+  const adminItems = readJson(ACTIVITY_FILE).map((a) => ({
+    source: "admin",
+    summary: a.summary,
+    createdAt: a.createdAt || 0,
+  }));
+  const githubItems = await fetchGithubCommits();
+  const all = adminItems.concat(githubItems).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  res.json(all.slice(0, 200));
 });
 
 /* ----- multer等のエラーハンドリング ----- */

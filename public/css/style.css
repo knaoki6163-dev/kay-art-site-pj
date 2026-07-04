@@ -579,6 +579,20 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .msg__star.is-on { color: #e0a73c; }
 .msg.is-important { border-left: 3px solid #e0a73c; }
 
+/* バージョン管理（GitHubのコード修正履歴 ＋ 管理画面からの更新履歴） */
+.version-list { display: flex; flex-direction: column; gap: 0.7rem; }
+.version-item { border: 1px solid var(--line); border-radius: 3px; background: rgba(255,255,255,0.55); padding: 0.8rem 1.1rem; }
+.version-item--github { border-left: 3px solid var(--blue-blot); }
+.version-item--admin { border-left: 3px solid var(--accent); }
+.version-item__head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
+.version-item__badge { font-family: var(--serif-en); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-soft); text-transform: uppercase; }
+.version-item__time { font-family: var(--serif-en); font-size: 0.8rem; color: var(--ink-soft); white-space: nowrap; }
+.version-item__summary { font-size: 0.95rem; }
+.version-item__summary a { color: var(--accent); }
+.version-item__summary a:hover { text-decoration: underline; }
+.admin-body .version-item { background: #2a2622; border-color: #463f35; color: #ece7dd; }
+.admin-body .version-item__badge, .admin-body .version-item__time { color: #b3a999; }
+
 .content-form { max-width: 720px; }
 .content-group { border: 1px solid var(--line); border-radius: 4px; background: rgba(255,255,255,0.45); padding: 1.4rem 1.5rem; margin-bottom: 1.4rem; }
 .content-group h3 { font-size: 1.05rem; letter-spacing: 0.04em; margin-bottom: 1rem; padding-bottom: 0.5rem; border-bottom: 1px solid var(--line); }

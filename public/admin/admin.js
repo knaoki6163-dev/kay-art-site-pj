@@ -124,6 +124,7 @@
       if (tab.dataset.tab === "analytics") loadAnalytics();
       if (tab.dataset.tab === "news") loadNews();
       if (tab.dataset.tab === "blog") loadBlog();
+      if (tab.dataset.tab === "version") loadVersionHistory();
     });
   });
 
@@ -558,6 +559,43 @@
         } catch (e) {}
       });
       list.appendChild(item);
+    });
+  }
+
+  /* ---------- バージョン管理（GitHubのコード修正履歴 ＋ 管理画面からの更新履歴） ---------- */
+  // 「◯分前 / ◯時間前 / 日付」の簡易相対表示。詳細日時はtitle属性で確認できる。
+  function fmtRelative(ts) {
+    if (!ts) return "";
+    const diffMin = Math.floor((Date.now() - ts) / 60000);
+    if (diffMin < 1) return "たった今";
+    if (diffMin < 60) return diffMin + "分前";
+    const diffH = Math.floor(diffMin / 60);
+    if (diffH < 24) return diffH + "時間前";
+    const diffD = Math.floor(diffH / 24);
+    if (diffD < 7) return diffD + "日前";
+    return fmtDate(ts);
+  }
+  async function loadVersionHistory() {
+    const list = $("version-list");
+    let items = [];
+    try { items = await (await fetch("/api/admin/version-history")).json(); } catch (e) { items = []; }
+    list.innerHTML = "";
+    $("version-empty").hidden = items.length > 0;
+    items.forEach((it) => {
+      const li = document.createElement("li");
+      li.className = "version-item version-item--" + (it.source === "github" ? "github" : "admin");
+      const badge = it.source === "github" ? "コード修正（GitHub）" : "管理画面";
+      const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
+      const summaryHtml = it.url
+        ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"
+        : esc(it.summary);
+      li.innerHTML =
+        '<div class="version-item__head">' +
+          '<span class="version-item__badge">' + esc(badge) + "</span>" +
+          '<span class="version-item__time" title="' + esc(titleAttr) + '">' + esc(fmtRelative(it.createdAt)) + "</span>" +
+        "</div>" +
+        '<div class="version-item__summary">・' + summaryHtml + "</div>";
+      list.appendChild(li);
     });
   }
 
