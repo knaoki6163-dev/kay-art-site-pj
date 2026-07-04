@@ -28,7 +28,13 @@
 }
 
 * { box-sizing: border-box; }
-html { scroll-behavior: smooth; overflow-x: hidden; }
+/* ルート（html）の背景をフッター色にする。
+   iOSなどで下端を引っ張った（オーバースクロールした）とき、フッターの下に出る
+   余白がフッターと同じ色になり、フッターが伸びているように見える。
+   本文は body / .paper-grain が paper 色で覆うのでページ自体の見た目は変わらない。
+   管理画面（.admin-body）だけは暗い色に。 */
+html { scroll-behavior: smooth; overflow-x: hidden; background-color: var(--paper-deep); }
+html:has(.admin-body) { background-color: #3a352e; }
 body {
   margin: 0;
   font-family: var(--serif-jp);
