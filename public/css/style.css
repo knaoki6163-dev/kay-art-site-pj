@@ -53,23 +53,22 @@ a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
 
 /* ---------- ページ遷移アニメーション（新しいページが右から出てくる） ---------- */
-/* 対応ブラウザ（Chrome/Edge、対応版Safari）：ページ全体のクロスドキュメント
-   View Transition を有効化し、旧ページは左へ抜け、新ページは右から入ってくる。
-   非対応ブラウザでは @view-transition は無視され、下の <main> フォールバックのみ効く。 */
+/* Chrome/Safariの実機・ヘッドレス双方で検証した結果、Cross-document View
+   Transitions（@view-transition + ::view-transition-old/new）は実際の
+   ナビゲーションでは発火しなかった（CSSOM上は認識されるが無効）。
+   そのため見た目を担っているのは <main> 側のフォールバックアニメーションのみ。
+   Home への遷移時は、main.js がリンククリック時に sessionStorage へ
+   フラグを立て、index.html の head 内の同期スクリプトがそれを読んで
+   <html> に vt-to-home を付与する（main の描画前に確定させる必要があるため）。 */
 @media (prefers-reduced-motion: no-preference) {
-  @view-transition {
-    navigation: auto;
-  }
-  ::view-transition-old(root) { animation: page-slide-out .32s var(--ease) both; }
-  ::view-transition-new(root) { animation: page-slide-in .38s var(--ease) both; }
-  @keyframes page-slide-out { to { transform: translateX(-6%); opacity: 0; } }
-  @keyframes page-slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
-
-  /* View Transitions 非対応ブラウザ向けのフォールバック：
-     ページ本体（main）だけが右から軽くスライドインする。ヘッダーはfixedのまま動かさない。 */
   main { animation: page-content-in .5s var(--ease); }
+  html.vt-to-home main { animation: page-content-in-reverse .5s var(--ease); }
   @keyframes page-content-in {
     from { opacity: 0; transform: translateX(5%); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+  @keyframes page-content-in-reverse {
+    from { opacity: 0; transform: translateX(-5%); }
     to { opacity: 1; transform: translateX(0); }
   }
 }
