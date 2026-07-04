@@ -516,7 +516,8 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .login-box input:focus { outline: none; border-color: var(--accent); }
 .login-box .btn { width: 100%; }
 
-.admin-tabs { display: flex; gap: 0.5rem; margin-bottom: 2rem; flex-wrap: wrap; }
+.admin-tabs { display: flex; gap: 0.5rem; padding-bottom: 1.4rem; margin-bottom: 2rem; flex-wrap: wrap; border-bottom: 1px solid var(--line); }
+.admin-body .admin-tabs { border-color: #463f35; }
 .admin-tab { position: relative; font-family: var(--serif-jp); font-size: 0.95rem; letter-spacing: 0.06em; padding: 0.5em 1.3em; border: 1px solid var(--line); border-radius: 999px; background: transparent; color: var(--ink-soft); cursor: pointer; transition: all .3s var(--ease); }
 .tab-badge {
   position: absolute; top: -7px; right: -7px;
@@ -601,8 +602,7 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .admin-body .version-item--codex .version-item__badge { color: #7fa06e; }
 
 /* バージョン管理タブの説明文の下の区切り線（旧：ヘッダー下にあったものをここへ移動） */
-.version-intro { padding-bottom: 1.2rem; margin-bottom: 1.2rem; border-bottom: 1px solid var(--line); }
-.admin-body .version-intro { border-color: #463f35; }
+.version-intro { margin-bottom: 1.2rem; }
 
 /* 月・年の区切り見出し（左上に配置、その月の項目群の先頭） */
 .version-month-divider {
