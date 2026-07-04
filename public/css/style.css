@@ -33,7 +33,7 @@
    余白がフッターと同じ色になり、フッターが伸びているように見える。
    本文は body / .paper-grain が paper 色で覆うのでページ自体の見た目は変わらない。
    管理画面（.admin-body）だけは暗い色に。 */
-html { scroll-behavior: smooth; overflow-x: hidden; background-color: var(--paper-deep); }
+html { scroll-behavior: smooth; overflow-x: hidden; background-color: var(--paper-deep); overscroll-behavior-y: none; }
 html:has(.admin-body) { background-color: #3a352e; }
 body {
   margin: 0;
@@ -44,6 +44,9 @@ body {
   font-feature-settings: "palt";
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
+  /* ページ端（フッターの下・先頭の上）へスクロールが滑って弾む挙動を止める。
+     html と body の両方に指定（Safari対策）。 */
+  overscroll-behavior-y: none;
 }
 h1, h2, h3 { font-weight: 500; line-height: 1.4; margin: 0; }
 p { margin: 0 0 1em; }
