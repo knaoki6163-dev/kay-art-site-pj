@@ -403,10 +403,10 @@ body:has(> .site-footer) {
      さらに、ちょうど 100dvh だとページ内にスクロール余地が全く無くなり、
      Safari が下部ツールバーの折りたたみ／高さ計算をうまく行えず、
      フッターの下（ツールバーの手前）に一瞬ページ色の帯が見えることがある。
-     これを防ぐため、コンテンツが短いページでも常にごくわずか（1dvh分）
+     これを防ぐため、コンテンツが短いページでも常に少し（4dvh分）
      スクロールできる余地を残す。0にしないこと。 */
-  min-height: 101vh;
-  min-height: 101dvh;
+  min-height: 104vh;
+  min-height: 104dvh;
   display: flex;
   flex-direction: column;
 }
