@@ -51,6 +51,28 @@ h1, h2, h3 { font-weight: 500; line-height: 1.4; margin: 0; }
 p { margin: 0 0 1em; }
 a { color: inherit; text-decoration: none; }
 img { max-width: 100%; display: block; }
+
+/* ---------- ページ遷移アニメーション（新しいページが右から出てくる） ---------- */
+/* 対応ブラウザ（Chrome/Edge、対応版Safari）：ページ全体のクロスドキュメント
+   View Transition を有効化し、旧ページは左へ抜け、新ページは右から入ってくる。
+   非対応ブラウザでは @view-transition は無視され、下の <main> フォールバックのみ効く。 */
+@media (prefers-reduced-motion: no-preference) {
+  @view-transition {
+    navigation: auto;
+  }
+  ::view-transition-old(root) { animation: page-slide-out .32s var(--ease) both; }
+  ::view-transition-new(root) { animation: page-slide-in .38s var(--ease) both; }
+  @keyframes page-slide-out { to { transform: translateX(-6%); opacity: 0; } }
+  @keyframes page-slide-in { from { transform: translateX(100%); } to { transform: translateX(0); } }
+
+  /* View Transitions 非対応ブラウザ向けのフォールバック：
+     ページ本体（main）だけが右から軽くスライドインする。ヘッダーはfixedのまま動かさない。 */
+  main { animation: page-content-in .5s var(--ease); }
+  @keyframes page-content-in {
+    from { opacity: 0; transform: translateX(5%); }
+    to { opacity: 1; transform: translateX(0); }
+  }
+}
 ul { margin: 0; padding: 0; list-style: none; }
 
 .paper-grain {
@@ -599,13 +621,24 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 /* バージョン管理タブの説明文の下の区切り線（旧：ヘッダー下にあったものをここへ移動） */
 .version-intro { margin-bottom: 1.2rem; }
 
-/* 月・年の区切り見出し（左上に配置、その月の項目群の先頭） */
+/* 月・年ごとに折りたためるグループ（<details>/<summary>）。
+   グループ間の間隔は .version-list の gap が担うので、ここでは付けない。 */
+.version-month-group { list-style: none; }
 .version-month-divider {
+  list-style: none; cursor: pointer; user-select: none;
+  display: flex; align-items: center; gap: 0.5em;
   text-align: left; font-family: var(--serif-en); font-size: 0.9rem; letter-spacing: 0.06em;
-  color: var(--ink); font-weight: 600; margin: 0.6rem 0 -0.1rem; padding-bottom: 0.3rem;
+  color: var(--ink); font-weight: 600; padding-bottom: 0.3rem;
   border-bottom: 1px solid var(--line);
 }
-.version-month-divider:first-child { margin-top: 0; }
+.version-month-divider::-webkit-details-marker { display: none; } /* Safari既定の三角マーカーを消し、自前の矢印に差し替える */
+.version-month-divider::marker { content: ""; }
+.version-month-divider::before {
+  content: "▸"; display: inline-block; font-size: 0.75em; color: var(--ink-soft);
+  transition: transform .2s var(--ease);
+}
+.version-month-group[open] > .version-month-divider::before { transform: rotate(90deg); }
+.version-month-items { display: flex; flex-direction: column; gap: 0.7rem; margin-top: 0.7rem; }
 .admin-body .version-month-divider { color: #ece7dd; border-color: #463f35; }
 
 .content-form { max-width: 720px; }

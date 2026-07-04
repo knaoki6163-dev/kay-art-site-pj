@@ -588,38 +588,57 @@
     if (it.agent === "codex") return { label: "コード修正（Codex）", cls: "codex" };
     return { label: "コード修正（GitHub）", cls: "github" };
   }
+  function buildVersionItem(it) {
+    const li = document.createElement("li");
+    const badge = versionBadgeInfo(it);
+    li.className = "version-item version-item--" + badge.cls;
+    const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
+    const summaryHtml = it.url
+      ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"
+      : esc(it.summary);
+    li.innerHTML =
+      '<div class="version-item__head">' +
+        '<span class="version-item__badge">' + esc(badge.label) + "</span>" +
+        '<span class="version-item__time" title="' + esc(titleAttr) + '">' + esc(fmtRelative(it.createdAt)) + "</span>" +
+      "</div>" +
+      '<div class="version-item__summary">・' + summaryHtml + "</div>";
+    return li;
+  }
   async function loadVersionHistory() {
     const list = $("version-list");
     let items = [];
     try { items = await (await fetch("/api/admin/version-history")).json(); } catch (e) { items = []; }
     list.innerHTML = "";
     $("version-empty").hidden = items.length > 0;
-    let lastMonthKey = null;
+
+    // 月ごとにグループ化（新しい順を維持したまま、月が変わるところで区切る）
+    const groups = [];
+    let current = null;
     items.forEach((it) => {
-      // 月が変わったら区切り見出しを挿入（新しい順なので降順に「YYYY年M月」が現れる）
       const d = it.createdAt ? new Date(it.createdAt) : null;
       const monthKey = d ? d.getFullYear() + "-" + d.getMonth() : "unknown";
-      if (monthKey !== lastMonthKey) {
-        lastMonthKey = monthKey;
-        const divider = document.createElement("li");
-        divider.className = "version-month-divider";
-        divider.textContent = d ? d.getFullYear() + "年" + (d.getMonth() + 1) + "月" : "日付不明";
-        list.appendChild(divider);
+      if (!current || current.key !== monthKey) {
+        current = { key: monthKey, label: d ? d.getFullYear() + "年" + (d.getMonth() + 1) + "月" : "日付不明", items: [] };
+        groups.push(current);
       }
+      current.items.push(it);
+    });
 
+    // 月ごとに折りたためる（<details>）。直近の月だけ開いた状態にしておく。
+    groups.forEach((g, idx) => {
       const li = document.createElement("li");
-      const badge = versionBadgeInfo(it);
-      li.className = "version-item version-item--" + badge.cls;
-      const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
-      const summaryHtml = it.url
-        ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"
-        : esc(it.summary);
-      li.innerHTML =
-        '<div class="version-item__head">' +
-          '<span class="version-item__badge">' + esc(badge.label) + "</span>" +
-          '<span class="version-item__time" title="' + esc(titleAttr) + '">' + esc(fmtRelative(it.createdAt)) + "</span>" +
-        "</div>" +
-        '<div class="version-item__summary">・' + summaryHtml + "</div>";
+      const details = document.createElement("details");
+      details.className = "version-month-group";
+      details.open = idx === 0;
+      const summary = document.createElement("summary");
+      summary.className = "version-month-divider";
+      summary.textContent = g.label + "（" + g.items.length + "件）";
+      details.appendChild(summary);
+      const ul = document.createElement("ul");
+      ul.className = "version-month-items";
+      g.items.forEach((it) => ul.appendChild(buildVersionItem(it)));
+      details.appendChild(ul);
+      li.appendChild(details);
       list.appendChild(li);
     });
   }
