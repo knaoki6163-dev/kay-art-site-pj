@@ -15,20 +15,28 @@
   // 表示されるようにする。
   window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
 
-  // ページ遷移アニメーション：Homeへ向かうリンクをクリックしたときだけ「逆再生」
-  // （それまでのページが右へ退き、Home が左から現れる）にする。
+  // ページ遷移アニメーション。
+  // ・Homeへ向かうリンクをクリックしたときだけ「逆再生」（それまでのページが
+  //   右へ退き、Home が左から現れる）にする。
+  // ・PC版のみ：Works/Info/Blog/Artist/Contact 同士の行き来は横スライドにする。
   // Cross-document View Transitions（pageswap/pagereveal）は検証時点で
   // Chrome/Safariとも実際のナビゲーションでは発火しなかったため使わない。
-  // 代わりに sessionStorage でフラグを渡す（Home 側の判定は head 内の
+  // 代わりに sessionStorage でフラグを渡す（遷移先での判定は head 内の
   // 同期スクリプトで行う。<main> の描画前に間に合わせる必要があるため）。
   function isHomePath(pathname) { return pathname === "/" || pathname === "/index.html"; }
+  const SUBPAGE_PATHS = ["/works.html", "/info.html", "/blog.html", "/artist.html", "/contact.html"];
+  function isSubpagePath(pathname) { return SUBPAGE_PATHS.includes(pathname); }
   document.addEventListener("click", (e) => {
     const a = e.target.closest("a[href]");
     if (!a) return;
     try {
       const url = new URL(a.href, location.href);
-      if (url.origin === location.origin && isHomePath(url.pathname)) {
+      if (url.origin !== location.origin) return;
+      if (isHomePath(url.pathname)) {
         sessionStorage.setItem("vtToHome", "1");
+      } else if (isSubpagePath(url.pathname) && document.body.classList.contains("subpage")) {
+        // 現在地・遷移先がどちらもサブページの場合のみ（Homeからサブページへは対象外）
+        sessionStorage.setItem("vtSubpage", "1");
       }
     } catch (err) { /* href解析に失敗しても遷移自体は通常どおり行う */ }
   });
