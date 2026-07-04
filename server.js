@@ -675,6 +675,23 @@ let githubCache = { at: 0, items: [] };
 // GitHubの1ページ最大は100件。過去分も見えるよう複数ページ取得する（既定200件分＝2ページ）。
 const GITHUB_MAX_PAGES = 2;
 
+// コミットが Claude Code / Codex どちらの作業由来かを判定する。
+// Claude: コミットのauthorが "Claude" <noreply@anthropic.com>（Co-Authored-By含む）。
+// Codex: このリポジトリではブランチ名が "codex/..." で作られ、マージ時にそのブランチ名が
+//        コミットメッセージ（"Merge pull request ... from .../codex/xxx"）に残る。
+function detectAgent(authorName, authorEmail, fullMessage) {
+  const name = (authorName || "").toLowerCase();
+  const email = (authorEmail || "").toLowerCase();
+  const msg = (fullMessage || "").toLowerCase();
+  if (name === "claude" || email.endsWith("@anthropic.com") || msg.includes("co-authored-by: claude")) {
+    return "claude";
+  }
+  if (/(^|[/\s])codex\//.test(msg) || name.includes("codex")) {
+    return "codex";
+  }
+  return null;
+}
+
 async function fetchGithubCommits() {
   const now = Date.now();
   if (now - githubCache.at < GITHUB_CACHE_MS) return githubCache.items;
@@ -696,12 +713,15 @@ async function fetchGithubCommits() {
       const fullMessage = (c.commit && c.commit.message) || "";
       const title = fullMessage.split("\n")[0].trim();
       const date = (c.commit && c.commit.author && c.commit.author.date) || (c.commit && c.commit.committer && c.commit.committer.date);
+      const authorName = (c.commit && c.commit.author && c.commit.author.name) || "";
+      const authorEmail = (c.commit && c.commit.author && c.commit.author.email) || "";
       return {
         source: "github",
         summary: title || "(無題のコミット)",
         createdAt: date ? new Date(date).getTime() : 0,
         url: c.html_url || null,
-        author: (c.commit && c.commit.author && c.commit.author.name) || "",
+        author: authorName,
+        agent: detectAgent(authorName, authorEmail, fullMessage),
       };
     });
     githubCache = { at: now, items };

@@ -577,23 +577,42 @@
     if (diffD < 7) return diffD + "日前";
     return fmtDate(ts);
   }
+  // GitHub項目のバッジ文言とCSSクラス（Claude / Codex を判別して表示）
+  function versionBadgeInfo(it) {
+    if (it.source !== "github") return { label: "管理画面", cls: "admin" };
+    if (it.agent === "claude") return { label: "コード修正（Claude）", cls: "claude" };
+    if (it.agent === "codex") return { label: "コード修正（Codex）", cls: "codex" };
+    return { label: "コード修正（GitHub）", cls: "github" };
+  }
   async function loadVersionHistory() {
     const list = $("version-list");
     let items = [];
     try { items = await (await fetch("/api/admin/version-history")).json(); } catch (e) { items = []; }
     list.innerHTML = "";
     $("version-empty").hidden = items.length > 0;
+    let lastMonthKey = null;
     items.forEach((it) => {
+      // 月が変わったら区切り見出しを挿入（新しい順なので降順に「YYYY年M月」が現れる）
+      const d = it.createdAt ? new Date(it.createdAt) : null;
+      const monthKey = d ? d.getFullYear() + "-" + d.getMonth() : "unknown";
+      if (monthKey !== lastMonthKey) {
+        lastMonthKey = monthKey;
+        const divider = document.createElement("li");
+        divider.className = "version-month-divider";
+        divider.textContent = d ? d.getFullYear() + "年" + (d.getMonth() + 1) + "月" : "日付不明";
+        list.appendChild(divider);
+      }
+
       const li = document.createElement("li");
-      li.className = "version-item version-item--" + (it.source === "github" ? "github" : "admin");
-      const badge = it.source === "github" ? "コード修正（GitHub）" : "管理画面";
+      const badge = versionBadgeInfo(it);
+      li.className = "version-item version-item--" + badge.cls;
       const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
       const summaryHtml = it.url
         ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"
         : esc(it.summary);
       li.innerHTML =
         '<div class="version-item__head">' +
-          '<span class="version-item__badge">' + esc(badge) + "</span>" +
+          '<span class="version-item__badge">' + esc(badge.label) + "</span>" +
           '<span class="version-item__time" title="' + esc(titleAttr) + '">' + esc(fmtRelative(it.createdAt)) + "</span>" +
         "</div>" +
         '<div class="version-item__summary">・' + summaryHtml + "</div>";
