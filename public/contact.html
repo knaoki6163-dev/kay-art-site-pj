@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <script src="js/analytics.js?v=12"></script>
+  <script src="js/analytics.js?v=16"></script>
   <title>Contact — A. Kato</title>
   <meta name="description" content="A. Kato への作品のご依頼・展示・ご質問はこちらから。" />
   <link rel="canonical" href="__SITE_URL__/contact.html" />
@@ -18,7 +18,21 @@
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Shippori+Mincho:wght@400;500;600;700&family=Yellowtail&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
-  <link rel="stylesheet" href="css/style.css?v=12" />
+  <link rel="stylesheet" href="css/style.css?v=16" />
+  <script>
+    // 他のサブページ（Works/Info/Blog/Artist/Contact）からのリンクをクリックした
+    // 直後だけ、PC版の横スライド演出を有効にする。main.js のクリックリスナーが
+    // sessionStorage にフラグを立てる。<main> のCSSアニメーションは描画開始と
+    // 同時に評価されるため、body/main が作られる前（head内）で同期的に判定する。
+    (function () {
+      try {
+        if (sessionStorage.getItem("vtSubpage")) {
+          document.documentElement.classList.add("vt-subpage");
+          sessionStorage.removeItem("vtSubpage");
+        }
+      } catch (e) {}
+    })();
+  </script>
 </head>
 <body class="subpage">
   <div class="paper-grain" aria-hidden="true"></div>
@@ -74,16 +88,16 @@
   </main>
 
   <footer class="site-footer">
-    <div class="footer-social">
-      <a href="#" data-content-href="instagramUrl" aria-label="Instagram" title="Instagram">
-        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
-      </a>
-    </div>
     <div class="footer-base">
+      <div class="footer-social">
+        <a href="#" data-content-href="instagramUrl" aria-label="Instagram" title="Instagram">
+          <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3" width="18" height="18" rx="5"/><circle cx="12" cy="12" r="4"/><circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/></svg>
+        </a>
+      </div>
       <p class="copyright">© <span id="year"></span> <span data-content="siteName">A. Kato</span>. <span data-content="copyrightSuffix">All Rights Reserved.</span></p>
     </div>
   </footer>
 
-  <script src="js/main.js?v=12"></script>
+  <script src="js/main.js?v=16"></script>
 </body>
 </html>
