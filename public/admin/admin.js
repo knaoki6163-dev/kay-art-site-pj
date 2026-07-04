@@ -124,7 +124,9 @@
       if (tab.dataset.tab === "analytics") loadAnalytics();
       if (tab.dataset.tab === "news") loadNews();
       if (tab.dataset.tab === "blog") loadBlog();
-      if (tab.dataset.tab === "version") loadVersionHistory();
+      // バージョン管理タブを開いている間だけ自動更新（離れたら止める）
+      stopVersionAutoRefresh();
+      if (tab.dataset.tab === "version") { loadVersionHistory(); startVersionAutoRefresh(); }
     });
   });
 
@@ -598,6 +600,20 @@
       list.appendChild(li);
     });
   }
+  // タブを開いている間、30秒ごとに自動更新。タブを離れる／画面が非表示になったら止める。
+  let versionTimer = null;
+  function startVersionAutoRefresh() {
+    stopVersionAutoRefresh();
+    versionTimer = setInterval(() => {
+      if (document.visibilityState === "visible") loadVersionHistory();
+    }, 30000);
+  }
+  function stopVersionAutoRefresh() {
+    if (versionTimer) { clearInterval(versionTimer); versionTimer = null; }
+  }
+  document.addEventListener("visibilitychange", () => {
+    if (document.visibilityState === "visible" && versionTimer) loadVersionHistory();
+  });
 
   /* ---------- ダッシュボードの初期化 ---------- */
   async function init() {
