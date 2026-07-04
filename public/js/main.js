@@ -8,6 +8,13 @@
 (function () {
   "use strict";
 
+  // Safariの「戻る/進む」はページをbfcacheに保存し、再訪問時にJSを再実行せず
+  // そのままのDOMを復元することがある。すると、離脱時点でまだJSが反映しきって
+  // いなかった状態（画像未設定・古い表示のまま等）が一瞬そのまま見えてしまう。
+  // bfcacheから復元されたとき（persisted）は必ず読み込み直し、常に最新の状態で
+  // 表示されるようにする。
+  window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
+
   const LANGS = ["ja", "en"];
   const TRANSPARENT = "data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg'/%3E";
 

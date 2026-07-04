@@ -8,6 +8,10 @@
 (function () {
   "use strict";
 
+  // 「戻る/進む」でbfcacheから復元されたときは、ログイン状態や各タブの内容が
+  // 古いまま一瞬表示されることがあるため、必ず読み込み直す（公開サイト側と同じ対策）。
+  window.addEventListener("pageshow", (e) => { if (e.persisted) location.reload(); });
+
   const $ = (id) => document.getElementById(id);
   const loginView = $("login-view");
   const appView = $("app-view");
