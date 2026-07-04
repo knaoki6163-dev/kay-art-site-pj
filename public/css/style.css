@@ -32,8 +32,10 @@
    iOSなどで下端を引っ張った（オーバースクロールした）とき、フッターの下に出る
    余白がフッターと同じ色になり、フッターが伸びているように見える。
    本文は body / .paper-grain が paper 色で覆うのでページ自体の見た目は変わらない。
-   管理画面（.admin-body）だけは暗い色に。 */
-html { scroll-behavior: smooth; overflow-x: hidden; background-color: var(--paper-deep); overscroll-behavior-y: none; }
+   管理画面（.admin-body）だけは暗い色に。
+   ★注意（再発防止）★ overscroll-behavior は none にしないこと。
+   端まで引っ張ったときに弾む（ラバーバンド）挙動をあえて残す仕様。 */
+html { scroll-behavior: smooth; overflow-x: hidden; background-color: var(--paper-deep); }
 html:has(.admin-body) { background-color: #3a352e; }
 body {
   margin: 0;
@@ -44,9 +46,6 @@ body {
   font-feature-settings: "palt";
   -webkit-font-smoothing: antialiased;
   overflow-x: hidden;
-  /* ページ端（フッターの下・先頭の上）へスクロールが滑って弾む挙動を止める。
-     html と body の両方に指定（Safari対策）。 */
-  overscroll-behavior-y: none;
 }
 h1, h2, h3 { font-weight: 500; line-height: 1.4; margin: 0; }
 p { margin: 0 0 1em; }
@@ -403,10 +402,10 @@ body:has(> .site-footer) {
      さらに、ちょうど 100dvh だとページ内にスクロール余地が全く無くなり、
      Safari が下部ツールバーの折りたたみ／高さ計算をうまく行えず、
      フッターの下（ツールバーの手前）に一瞬ページ色の帯が見えることがある。
-     これを防ぐため、コンテンツが短いページでも常に少し（4dvh分）
+     これを防ぐため、コンテンツが短いページでも常にしっかり（30dvh分）
      スクロールできる余地を残す。0にしないこと。 */
-  min-height: 104vh;
-  min-height: 104dvh;
+  min-height: 130vh;
+  min-height: 130dvh;
   display: flex;
   flex-direction: column;
 }
