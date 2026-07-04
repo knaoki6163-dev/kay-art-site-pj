@@ -63,9 +63,13 @@
       const key = node.dataset.contentHref;
       if (c[key]) node.setAttribute("href", c[key]);
     });
-    // フッターのInstagramリンクの表示/非表示（管理画面で切替）
+    // フッターのInstagramリンクの表示/非表示（管理画面で切替）。
+    // 非表示のときは SNS 行ごと消して、フッター上部に空白バンドが残らないようにする。
+    const hideIg = (c.instagramVisible === "false");
     const ig = document.querySelector('.footer-social [data-content-href="instagramUrl"]');
-    if (ig) ig.style.display = (c.instagramVisible === "false") ? "none" : "";
+    const social = document.querySelector(".footer-social");
+    if (ig) ig.style.display = hideIg ? "none" : "";
+    if (social) social.style.display = hideIg ? "none" : "";
   }
 
   function categoryLabel(key) {
