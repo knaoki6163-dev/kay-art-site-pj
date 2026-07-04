@@ -285,6 +285,19 @@
       if (e.key === "ArrowLeft") stepLb(-1);
       if (e.key === "ArrowRight") stepLb(1);
     });
+
+    // 横スワイプで前後の作品に切り替え（スマホでの閲覧用）
+    let touchStartX = 0, touchStartY = 0;
+    lightbox.addEventListener("touchstart", (e) => {
+      const t = e.changedTouches[0];
+      touchStartX = t.clientX; touchStartY = t.clientY;
+    }, { passive: true });
+    lightbox.addEventListener("touchend", (e) => {
+      const t = e.changedTouches[0];
+      const dx = t.clientX - touchStartX, dy = t.clientY - touchStartY;
+      // 縦スクロール・単なるタップと誤認しないよう、横方向にしっかり動いた場合のみ切り替える
+      if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy) * 1.5) stepLb(dx < 0 ? 1 : -1);
+    }, { passive: true });
   }
 
   /* ---------- ヘッダーの状態 ---------- */
@@ -384,8 +397,13 @@
 
   /* ---------- 起動 ---------- */
   applyI18n();
-  applyContent();
-  initHero();
+  // ヒーローは作品画像・文章がAPIから届くまで一瞬、画像なしの暗いオーバーレイ
+  // （.hero__scrim）だけが見えてしまう（他ページから戻った際に「以前の見た目」に
+  // 見える原因）。取得が終わるまで非表示にし、揃ってからフェード表示する。
+  const heroEl = document.querySelector(".hero");
+  Promise.all([applyContent(), initHero()]).finally(() => {
+    if (heroEl) heroEl.classList.add("is-ready");
+  });
   if (gallery) { (async function () { await loadCategories(); await loadWorks(); })(); }
   initInfo();
   initBlog();

@@ -219,7 +219,13 @@ ul { margin: 0; padding: 0; list-style: none; }
   display: flex; align-items: center;
   padding: 0 clamp(1.5rem, 7vw, 7rem);
   overflow: hidden;
+  /* 作品画像・文章がAPIから届くまでは非表示にする。画像が無い状態だと
+     .hero__scrim の暗いグラデーションだけが一瞬見えてしまう（他ページから
+     Homeに戻った際に「以前の見た目」に見える原因だった）。JSが揃ったら
+     .is-ready を付けてフェード表示する。JS無効時は noscript で常に表示。 */
+  opacity: 0;
 }
+.hero.is-ready { opacity: 1; transition: opacity .4s var(--ease); }
 .hero__carousel { position: absolute; inset: 0; z-index: 0; }
 .hero__slide {
   position: absolute; inset: 0;
