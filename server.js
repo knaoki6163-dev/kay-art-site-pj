@@ -259,7 +259,6 @@ app.get("/robots.txt", (req, res) => {
   res.type("text/plain").send(
     "User-agent: *\n" +
     "Allow: /\n" +
-    "Disallow: /admin\n" +
     "Disallow: /api\n" +
     "Sitemap: " + origin + "/sitemap.xml\n"
   );
@@ -752,5 +751,5 @@ app.use((err, req, res, next) => {
 
 app.listen(PORT, () => {
   console.log(`Aquarelle server running → http://localhost:${PORT}`);
-  console.log(`ダッシュボード → http://localhost:${PORT}/admin/`);
+  console.log(`ダッシュボード → http://localhost:${PORT}/katoasao/`);
 });
