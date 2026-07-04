@@ -58,6 +58,7 @@
       <button class="admin-tab" data-tab="content">サイトの文章</button>
       <button class="admin-tab" data-tab="messages">お問い合わせ<span class="tab-badge" id="msg-badge" hidden>0</span></button>
       <button class="admin-tab" data-tab="analytics">アクセス解析</button>
+      <button class="admin-tab" data-tab="version">バージョン管理</button>
     </div>
 
     <!-- 作品の管理 -->
@@ -212,6 +213,15 @@
     <section class="admin-panel" id="panel-messages">
       <div id="messages-list"></div>
       <p class="admin-empty" id="messages-empty" hidden>お問い合わせはまだありません。</p>
+    </section>
+
+    <!-- バージョン管理（GitHubのコード修正履歴 ＋ 管理画面からの更新履歴） -->
+    <section class="admin-panel" id="panel-version">
+      <p class="muted" style="margin-bottom:1rem;">
+        コードの修正履歴（GitHub）と、この管理画面からの更新履歴を、新しい順にまとめて表示します。
+      </p>
+      <ul class="version-list" id="version-list"></ul>
+      <p class="admin-empty" id="version-empty" hidden>まだ更新履歴がありません。</p>
     </section>
   </div>
 
