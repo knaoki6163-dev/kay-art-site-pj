@@ -672,19 +672,27 @@ const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
 const GITHUB_CACHE_MS = 5 * 60 * 1000; // 5分
 let githubCache = { at: 0, items: [] };
 
+// GitHubの1ページ最大は100件。過去分も見えるよう複数ページ取得する（既定200件分＝2ページ）。
+const GITHUB_MAX_PAGES = 2;
+
 async function fetchGithubCommits() {
   const now = Date.now();
   if (now - githubCache.at < GITHUB_CACHE_MS) return githubCache.items;
   try {
     const headers = { "User-Agent": "aquarelle-admin", Accept: "application/vnd.github+json" };
     if (GITHUB_TOKEN) headers.Authorization = "Bearer " + GITHUB_TOKEN;
-    const res = await fetch(
-      "https://api.github.com/repos/" + GITHUB_REPO + "/commits?per_page=30",
-      { headers }
-    );
-    if (!res.ok) throw new Error("GitHub API " + res.status);
-    const data = await res.json();
-    const items = data.map((c) => {
+    let all = [];
+    for (let page = 1; page <= GITHUB_MAX_PAGES; page++) {
+      const res = await fetch(
+        "https://api.github.com/repos/" + GITHUB_REPO + "/commits?per_page=100&page=" + page,
+        { headers }
+      );
+      if (!res.ok) throw new Error("GitHub API " + res.status);
+      const data = await res.json();
+      all = all.concat(data);
+      if (data.length < 100) break; // これ以上ページが無い
+    }
+    const items = all.map((c) => {
       const fullMessage = (c.commit && c.commit.message) || "";
       const title = fullMessage.split("\n")[0].trim();
       const date = (c.commit && c.commit.author && c.commit.author.date) || (c.commit && c.commit.committer && c.commit.committer.date);
@@ -713,7 +721,7 @@ app.get("/api/admin/version-history", requireAuth, async (req, res) => {
   }));
   const githubItems = await fetchGithubCommits();
   const all = adminItems.concat(githubItems).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  res.json(all.slice(0, 200));
+  res.json(all.slice(0, 300));
 });
 
 /* ----- multer等のエラーハンドリング ----- */
