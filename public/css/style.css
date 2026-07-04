@@ -400,6 +400,8 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
   padding: 2.8rem clamp(1.5rem, 7vw, 7rem);
   display: flex; flex-direction: column; align-items: center; gap: 1.3rem;
   text-align: center;
+  /* フッターは本文より少し暗い色に（全ページ共通） */
+  background: var(--paper-deep);
 }
 .footer-social { display: flex; gap: 1.1rem; justify-content: center; }
 .footer-social a { color: var(--ink-soft); display: inline-flex; transition: color .3s var(--ease); }

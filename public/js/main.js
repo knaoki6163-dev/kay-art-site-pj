@@ -15,9 +15,10 @@
   const I18N = {
     ja: {
       "nav.home": "ホーム", "nav.works": "作品", "nav.about": "アーティスト", "nav.contact": "お問い合わせ",
-      "form.name": "お名前", "form.email": "メールアドレス", "form.message": "メッセージ", "form.send": "送信する",
+      "form.name": "お名前", "form.email": "メールアドレス", "form.message": "メッセージ", "form.send": "送信",
       "filter.all": "全て", "works.empty": "作品はまだ登録されていません。",
       "info.empty": "お知らせはまだありません。", "blog.empty": "記事はまだありません。",
+      "form.confirm": "この内容で送信しますか？",
       "form.required": "すべての項目をご入力ください。", "form.sending": "送信中…",
       "form.thanks": "メッセージをありがとうございます。折り返しご連絡いたします。",
       "form.fail": "送信に失敗しました。時間をおいてお試しください。", "form.neterr": "通信エラーが発生しました。時間をおいてお試しください。",
@@ -28,6 +29,7 @@
       "form.name": "Name", "form.email": "Email", "form.message": "Message", "form.send": "Send",
       "filter.all": "All", "works.empty": "No works have been added yet.",
       "info.empty": "No updates yet.", "blog.empty": "No posts yet.",
+      "form.confirm": "Send this message?",
       "form.required": "Please fill in all fields.", "form.sending": "Sending…",
       "form.thanks": "Thank you for your message. I'll get back to you soon.",
       "form.fail": "Failed to send. Please try again later.", "form.neterr": "A network error occurred. Please try again later.",
@@ -331,6 +333,7 @@
       e.preventDefault();
       note.classList.remove("is-error");
       if (!form.checkValidity()) { note.textContent = t("form.required"); note.classList.add("is-error"); form.reportValidity(); return; }
+      if (!window.confirm(t("form.confirm"))) return; // 送信前の確認ポップアップ
       note.textContent = t("form.sending");
       try {
         const res = await fetch("/api/contact", {
