@@ -33,7 +33,7 @@
 ### 3. デプロイ完了 → URLを開く
 - 数分でビルドが終わり、`https://aquarelle-portfolio.onrender.com` のようなURLが発行されます。
 - 公開サイト：そのURL
-- 管理画面：そのURL + `/admin/`（例：`https://....onrender.com/admin/`）
+- 管理画面：そのURL + `/katoasao/`（例：`https://....onrender.com/katoasao/`）
 
 ### 4. 作品を登録してみる
 1. 管理画面を開き、設定したパスワードでログイン
@@ -66,5 +66,5 @@
 ```bash
 npm install
 ADMIN_PASSWORD=好きなパスワード npm start
-# → http://localhost:3000 と http://localhost:3000/admin/
+# → http://localhost:3000 と http://localhost:3000/katoasao/
 ```

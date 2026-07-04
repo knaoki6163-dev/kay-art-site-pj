@@ -8,7 +8,7 @@
 
 - **多言語対応** — 右上のプルダウンで 日本語 / English を切替（UIラベル＋編集文章を言語別に表示）
 - **作品ギャラリー** — メーソンリー表示・カテゴリ切替・クリックで拡大（ライトボックス）
-- **管理画面（`/admin/`）** — パスワードでログインし、
+- **管理画面（`/katoasao/`）** — パスワードでログインし、
   - 作品の写真アップロード（タイトル・カテゴリ・制作年・技法を登録）
   - 登録済み作品の削除
   - **お知らせ（News）の追加・削除**
@@ -66,7 +66,7 @@
 | `/artist.html` | `public/artist.html` | アーティスト紹介ページ。管理画面で編集したプロフィール文や署名を反映します。 |
 | `/contact.html` | `public/contact.html` | お問い合わせページ。送信内容は `data/messages.json` に保存され、管理画面で確認できます。 |
 | `/privacy.html` | `public/privacy.html` | Google Analytics とお問い合わせフォームに関するプライバシーポリシーです。 |
-| `/admin/` | `public/admin/index.html` | 管理画面。作品、Info、Blog、サイト文章、アクセス解析設定、お問い合わせを管理します。 |
+| `/katoasao/` | `public/katoasao/index.html` | 管理画面。作品、Info、Blog、サイト文章、アクセス解析設定、お問い合わせを管理します。 |
 
 ### 共通レイアウト・動作
 
@@ -103,7 +103,7 @@ ADMIN_PASSWORD=好きなパスワード npm start
 
 # 3. ブラウザで開く
 #   公開サイト  → http://localhost:3000
-#   管理画面    → http://localhost:3000/admin/
+#   管理画面    → http://localhost:3000/katoasao/
 ```
 
 > `ADMIN_PASSWORD` を指定しないと既定値 `change-me` になります。公開前に必ず設定してください。
