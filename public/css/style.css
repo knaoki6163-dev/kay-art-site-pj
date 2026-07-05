@@ -762,6 +762,7 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 /* サブページでも背景は擬似要素側に（上記と同じ包含ブロック問題を避けるため） */
 body.subpage .site-header::before { background: rgba(243, 239, 230, 0.92); opacity: 1; }
 body.subpage .brand__name, body.subpage .nav a { color: var(--ink); }
+body.subpage .nav-toggle span { color: var(--ink); }
 body.subpage .lang-switch { color: var(--ink); }
 body.subpage .lang-switch select { border-color: var(--line); }
 .page-wrap { padding-top: clamp(90px, 12vh, 130px); padding-bottom: clamp(2rem, 5vw, 4rem); min-height: 56vh; }
