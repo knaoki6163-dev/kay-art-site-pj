@@ -36,8 +36,7 @@
 │   ├── news.json          # Info（お知らせ）
 │   ├── blog.json          # Blog 記事
 │   ├── messages.json      # お問い合わせ
-│   ├── content.json       # サイト文章・SNSリンク等
-│   └── settings.json      # Looker Studio 埋め込みURL等
+│   └── content.json       # サイト文章・SNSリンク等
 └── public/                # 公開ファイル
     ├── index.html         # トップ
     ├── works.html         # 作品一覧
@@ -83,7 +82,7 @@
 | Info | お知らせの追加・削除 | `data/news.json` |
 | Blog | ブログ記事の追加・削除 | `data/blog.json` |
 | サイト編集 | サイト名、キャッチコピー、プロフィール、ボタン文言、SNSリンク、著作権表記などを日本語 / English 別に編集 | `data/content.json` |
-| Analytics | Looker Studio の埋め込みURLを保存し、管理画面内にレポートを表示 | `data/settings.json` |
+| Analytics | GA4 Data API から取得した実データ（総訪問者数・折れ線グラフ・平均滞在時間・直帰率・流入元・作品別閲覧数・リアルタイム・国別・新規/リピーター）を表示 | GA4（サーバー環境変数経由） |
 | お問い合わせ | 受信メッセージの一覧、未読管理、重要フラグ切替 | `data/messages.json` |
 
 ### API 構成
@@ -115,6 +114,8 @@ ADMIN_PASSWORD=好きなパスワード npm start
 | `ADMIN_PASSWORD` | 管理画面のログインパスワード | `change-me`（要変更）|
 | `SESSION_SECRET` | セッション暗号化キー（任意。未指定時は自動生成）| ランダム |
 | `PORT` | 待ち受けポート | `3000` |
+| `GA4_PROPERTY_ID` | アクセス解析タブ用の GA4 プロパティID | 未設定（タブが「未設定」表示になる）|
+| `GA4_SERVICE_ACCOUNT_JSON` | 上記プロパティを閲覧できるサービスアカウントの鍵（JSON、または base64） | 未設定 |
 
 ## カテゴリの編集
 

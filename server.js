@@ -17,6 +17,7 @@ const multer = require("multer");
 const path = require("path");
 const fs = require("fs");
 const crypto = require("crypto");
+const ga4 = require("./ga4");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -136,8 +137,6 @@ for (const file of [WORKS_FILE, MESSAGES_FILE, NEWS_FILE, BLOG_FILE, ACTIVITY_FI
   if (!fs.existsSync(file)) fs.writeFileSync(file, "[]");
 }
 if (!fs.existsSync(CONTENT_FILE)) fs.writeFileSync(CONTENT_FILE, "{}");
-const SETTINGS_FILE = path.join(DATA_DIR, "settings.json");
-if (!fs.existsSync(SETTINGS_FILE)) fs.writeFileSync(SETTINGS_FILE, "{}");
 
 // 保存済みの文章を読み込む（旧フラット形式は自動で ja として移行）
 function readSavedContent() {
@@ -554,21 +553,61 @@ app.put("/api/admin/content", requireAuth, (req, res) => {
   res.json({ ok: true });
 });
 
-// 管理設定（Looker Studio の埋め込みURLなど・管理者のみ）
-app.get("/api/admin/settings", requireAuth, (req, res) => {
-  let s = {};
-  try { s = JSON.parse(fs.readFileSync(SETTINGS_FILE, "utf8")); } catch (e) { s = {}; }
-  res.json({ lookerUrl: typeof s.lookerUrl === "string" ? s.lookerUrl : "" });
+/* ----- アクセス解析（Google Analytics 4 Data API） -----
+   GA4_PROPERTY_ID / GA4_SERVICE_ACCOUNT_JSON が未設定の場合は
+   configured:false を返し、画面側で案内メッセージを表示する。
+   各レポートは Promise.allSettled で個別に失敗を許容し、
+   一部のレポート（例：作品別イベントのカスタムディメンション未登録）が
+   失敗しても他のパネルは表示できるようにする。 */
+function settle(result, fallback) {
+  return result.status === "fulfilled" ? result.value : fallback;
+}
+function settleError(result) {
+  return result.status === "rejected" ? (result.reason && result.reason.message) || "取得に失敗しました。" : null;
+}
+
+app.get("/api/admin/analytics/overview", requireAuth, async (req, res) => {
+  if (!ga4.enabled) return res.json({ configured: false });
+  const [totals, trend, traffic, topWorksRaw, country, newReturning] = await Promise.allSettled([
+    ga4.fetchTotals(), ga4.fetchTrend(), ga4.fetchTraffic(), ga4.fetchTopWorksRaw(), ga4.fetchCountry(), ga4.fetchNewReturning(),
+  ]);
+
+  // 作品別イベント（GA4のwork_id）に、こちらが持つ作品メタデータ（タイトル・画像）を突き合わせる
+  const worksRaw = settle(topWorksRaw, []);
+  const allWorks = readJson(WORKS_FILE);
+  const works = worksRaw
+    .map((r) => {
+      const w = allWorks.find((x) => x.id === r.workId);
+      return { title: w ? w.title : "（削除済みの作品）", image: w ? w.image : null, views: r.views };
+    })
+    .filter((w) => w.views > 0);
+
+  res.json({
+    configured: true,
+    totals: settle(totals, null),
+    totalsError: settleError(totals),
+    trend: settle(trend, []),
+    trendError: settleError(trend),
+    traffic: settle(traffic, []),
+    trafficError: settleError(traffic),
+    works,
+    worksError: settleError(topWorksRaw),
+    country: settle(country, []),
+    countryError: settleError(country),
+    newReturning: settle(newReturning, null),
+    newReturningError: settleError(newReturning),
+  });
 });
 
-app.put("/api/admin/settings", requireAuth, (req, res) => {
-  const url = (req.body.lookerUrl || "").toString().trim();
-  if (url && !/^https:\/\//i.test(url)) {
-    return res.status(400).json({ error: "https:// で始まるURLを入力してください。" });
-  }
-  writeJson(SETTINGS_FILE, { lookerUrl: url.slice(0, 1000) });
-  logActivity("アクセス解析（Looker Studio埋め込み）の設定を更新");
-  res.json({ ok: true });
+app.get("/api/admin/analytics/realtime", requireAuth, async (req, res) => {
+  if (!ga4.enabled) return res.json({ configured: false });
+  const [users, pages] = await Promise.allSettled([ga4.fetchRealtimeUsers(), ga4.fetchRealtimePages()]);
+  res.json({
+    configured: true,
+    users: settle(users, { now: 0, bars: [] }),
+    pages: settle(pages, []),
+    error: settleError(users) || settleError(pages),
+  });
 });
 
 // 作品アップロード

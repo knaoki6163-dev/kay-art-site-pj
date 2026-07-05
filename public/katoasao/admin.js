@@ -125,54 +125,220 @@
       $("panel-" + tab.dataset.tab).classList.add("is-active");
       if (tab.dataset.tab === "messages") { loadMessages(); markMessagesRead(); }
       if (tab.dataset.tab === "content") loadContent();
-      if (tab.dataset.tab === "analytics") loadAnalytics();
       if (tab.dataset.tab === "news") loadNews();
       if (tab.dataset.tab === "blog") loadBlog();
-      // バージョン管理タブを開いている間だけ自動更新（離れたら止める）
+      // バージョン管理／アクセス解析タブを開いている間だけ自動更新（離れたら止める）
       stopVersionAutoRefresh();
+      stopAnalyticsAutoRefresh();
       if (tab.dataset.tab === "version") { loadVersionHistory(); startVersionAutoRefresh(); }
+      if (tab.dataset.tab === "analytics") loadAnalytics();
     });
   });
 
-  /* ---------- アクセス解析（Looker Studio 埋め込み） ---------- */
-  function renderLooker(url) {
-    const embed = $("looker-embed");
-    const empty = $("looker-empty");
-    embed.innerHTML = "";
-    if (url) {
-      empty.hidden = true;
-      const f = document.createElement("iframe");
-      f.src = url;
-      f.className = "looker-frame";
-      f.setAttribute("frameborder", "0");
-      f.setAttribute("allowfullscreen", "");
-      embed.appendChild(f);
-    } else {
-      empty.hidden = false;
+  /* ---------- アクセス解析（GA4 Data API） ---------- */
+  function anFmtSecs(sec) {
+    sec = Math.max(0, Math.round(sec));
+    return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+  }
+  function anDeltaVisitors(pct) {
+    if (pct == null) return { text: "前日比 —", cls: "" };
+    const up = pct >= 0;
+    return { text: (up ? "▲ " : "▼ ") + Math.abs(pct) + "% 前日比", cls: up ? "is-up" : "" };
+  }
+  function anDeltaAvg(diffSec) {
+    const up = diffSec >= 0;
+    return { text: (up ? "▲ " : "▼ ") + Math.abs(diffSec) + "秒 前日比", cls: up ? "is-up" : "" };
+  }
+  function anDeltaBounce(diffPt) {
+    const down = diffPt <= 0;
+    return { text: (down ? "▼ " : "▲ ") + Math.abs(diffPt) + "pt 前日比" + (down ? " 改善" : ""), cls: down ? "is-good" : "" };
+  }
+  function anSetUpdatedNow() {
+    const d = new Date();
+    const p = (n) => String(n).padStart(2, "0");
+    $("an-updated").textContent = "最終更新 " + p(d.getHours()) + ":" + p(d.getMinutes()) + ":" + p(d.getSeconds());
+  }
+
+  function renderTrendChart(trend) {
+    const line = $("an-trend-line"), area = $("an-trend-area"), dot = $("an-trend-dot");
+    if (!trend || !trend.length) {
+      line.setAttribute("points", ""); area.setAttribute("d", "");
+      dot.setAttribute("cx", "0"); dot.setAttribute("cy", "88");
+      return;
     }
+    const W = 320, top = 8, bot = 88;
+    const vals = trend.map((t) => t.value);
+    const mn = Math.min(...vals), mx = Math.max(...vals);
+    const n = vals.length;
+    const xa = (i) => (n > 1 ? (i / (n - 1)) * W : W);
+    const ya = (v) => bot - ((v - mn) / (mx - mn || 1)) * (bot - top);
+    const pts = vals.map((v, i) => xa(i).toFixed(1) + "," + ya(v).toFixed(1));
+    line.setAttribute("points", pts.join(" "));
+    area.setAttribute("d", "M0," + bot + " L" + pts.join(" L") + " L" + W + "," + bot + " Z");
+    dot.setAttribute("cx", xa(n - 1).toFixed(1));
+    dot.setAttribute("cy", ya(vals[n - 1]).toFixed(1));
   }
-  async function loadAnalytics() {
-    let url = "";
-    try { url = (await (await fetch("/api/admin/settings")).json()).lookerUrl || ""; } catch (e) {}
-    $("looker-url").value = url;
-    renderLooker(url);
+
+  function renderTraffic(list) {
+    const wrap = $("an-traffic");
+    wrap.innerHTML = "";
+    if (!list || !list.length) { wrap.innerHTML = '<p class="an-hint">データがまだありません。</p>'; return; }
+    list.forEach((t) => {
+      const row = document.createElement("div");
+      row.innerHTML =
+        '<div class="an-traffic-row__head">' +
+          '<div class="an-traffic-row__label"><span class="an-traffic-row__name">' + esc(t.label) + '</span>' +
+            '<span class="an-traffic-row__sub">' + esc(t.sub) + '</span></div>' +
+          '<span class="an-traffic-row__pct">' + t.pct + '%</span>' +
+        '</div>' +
+        '<div class="an-bar-track"><div class="an-bar-fill" style="width:' + t.pct + '%"></div></div>';
+      wrap.appendChild(row);
+    });
   }
-  $("looker-form").addEventListener("submit", async (e) => {
-    e.preventDefault();
-    const note = $("looker-note");
-    note.textContent = "保存中…"; note.classList.remove("is-error");
-    const url = $("looker-url").value.trim();
-    try {
-      const res = await fetch("/api/admin/settings", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lookerUrl: url }),
-      });
-      const data = await res.json();
-      if (res.ok && data.ok) { note.textContent = "保存しました。"; renderLooker(url); }
-      else { note.textContent = data.error || "保存に失敗しました。"; note.classList.add("is-error"); }
-    } catch (err) { note.textContent = "通信エラーが発生しました。"; note.classList.add("is-error"); }
-  });
+
+  function renderWorks(list) {
+    const wrap = $("an-works");
+    wrap.innerHTML = "";
+    $("an-works-hint").hidden = !!(list && list.length);
+    if (!list || !list.length) return;
+    const max = Math.max(...list.map((w) => w.views));
+    list.forEach((w, i) => {
+      const row = document.createElement("div");
+      row.className = "an-work-row";
+      const thumb = w.image
+        ? '<img class="an-work-row__thumb" src="' + esc(w.image) + '" alt="" />'
+        : '<div class="an-work-row__thumb"></div>';
+      row.innerHTML =
+        '<span class="an-work-row__rank">' + String(i + 1).padStart(2, "0") + '</span>' + thumb +
+        '<div class="an-work-row__body">' +
+          '<div class="an-work-row__top"><span class="an-work-row__title">' + esc(w.title) + '</span>' +
+            '<span class="an-work-row__views">' + w.views.toLocaleString("ja-JP") + '</span></div>' +
+          '<div class="an-bar-track"><div class="an-bar-fill" style="width:' + Math.round((w.views / max) * 100) + '%"></div></div>' +
+        '</div>';
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderRtBars(bars) {
+    const wrap = $("an-rt-bars");
+    wrap.innerHTML = "";
+    const max = Math.max(1, ...(bars || []));
+    (bars || []).forEach((v) => {
+      const span = document.createElement("span");
+      span.style.height = (10 + (v / max) * 90) + "%";
+      wrap.appendChild(span);
+    });
+  }
+  function renderRtPages(list) {
+    const wrap = $("an-rt-pages");
+    wrap.innerHTML = "";
+    if (!list || !list.length) { wrap.innerHTML = '<p class="an-hint">現在の閲覧者はいません。</p>'; return; }
+    const max = Math.max(...list.map((p) => p.n));
+    list.forEach((p) => {
+      const row = document.createElement("div");
+      row.className = "an-rt-page-row";
+      row.innerHTML =
+        '<span class="an-rt-page-row__name">' + esc(p.name) + '</span>' +
+        '<div class="an-rt-page-row__right"><div class="an-bar-track"><div class="an-bar-fill" style="width:' +
+          Math.round((p.n / max) * 100) + '%"></div></div><span class="an-rt-page-row__n">' + p.n + '</span></div>';
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderCountry(list) {
+    const wrap = $("an-country");
+    wrap.innerHTML = "";
+    if (!list || !list.length) { wrap.innerHTML = '<p class="an-hint">データがまだありません。</p>'; return; }
+    list.forEach((c) => {
+      const row = document.createElement("div");
+      row.innerHTML =
+        '<div class="an-country-row__head"><span>' + esc(c.label) + '</span><span class="an-country-row__pct">' + c.pct + '%</span></div>' +
+        '<div class="an-bar-track"><div class="an-bar-fill" style="width:' + c.pct + '%"></div></div>';
+      wrap.appendChild(row);
+    });
+  }
+
+  function renderNewRet(nr) {
+    if (!nr) {
+      $("an-newret-new").style.width = "0%";
+      $("an-newret-new-str").textContent = "—";
+      $("an-newret-ret-str").textContent = "—";
+      return;
+    }
+    $("an-newret-new").style.width = nr.newPct + "%";
+    $("an-newret-new-str").textContent = nr.newPct + "%";
+    $("an-newret-ret-str").textContent = nr.returningPct + "%";
+  }
+
+  async function loadAnalyticsOverview() {
+    let data;
+    try { data = await (await fetch("/api/admin/analytics/overview")).json(); }
+    catch (e) { data = { configured: true, totalsError: "通信エラーが発生しました。" }; }
+
+    if (!data.configured) {
+      $("an-empty").hidden = false;
+      $("an-body").hidden = true;
+      $("an-error").hidden = true;
+      return;
+    }
+    $("an-empty").hidden = true;
+    $("an-body").hidden = false;
+
+    const t = data.totals;
+    $("an-kpi-visitors").textContent = t ? t.visitors.toLocaleString("ja-JP") : "—";
+    const dv = anDeltaVisitors(t && t.dVisitorsPct);
+    $("an-kpi-visitors-delta").textContent = dv.text; $("an-kpi-visitors-delta").className = "an-delta " + dv.cls;
+
+    $("an-kpi-avg").textContent = t ? anFmtSecs(t.avgSecs) : "—";
+    const da = anDeltaAvg(t ? t.dAvgSecs : 0);
+    $("an-kpi-avg-delta").textContent = da.text; $("an-kpi-avg-delta").className = "an-delta " + da.cls;
+
+    $("an-kpi-bounce").textContent = t ? t.bounce.toFixed(1) + "%" : "—";
+    const db = anDeltaBounce(t ? t.dBounce : 0);
+    $("an-kpi-bounce-delta").textContent = db.text; $("an-kpi-bounce-delta").className = "an-delta " + db.cls;
+
+    renderTrendChart(data.trend);
+    renderTraffic(data.traffic);
+    renderWorks(data.works);
+    renderCountry(data.country);
+    renderNewRet(data.newReturning);
+
+    const errors = [data.totalsError, data.trendError, data.trafficError, data.worksError, data.countryError, data.newReturningError].filter(Boolean);
+    const errBox = $("an-error");
+    if (errors.length) {
+      errBox.hidden = false;
+      errBox.textContent = "一部のデータを取得できませんでした：" + Array.from(new Set(errors)).join(" / ");
+    } else {
+      errBox.hidden = true;
+    }
+    anSetUpdatedNow();
+  }
+
+  async function loadAnalyticsRealtime() {
+    let data;
+    try { data = await (await fetch("/api/admin/analytics/realtime")).json(); }
+    catch (e) { return; }
+    if (!data.configured) return;
+    $("an-rt-now").textContent = (data.users && data.users.now) || 0;
+    renderRtBars(data.users && data.users.bars);
+    renderRtPages(data.pages);
+  }
+
+  let anOverviewTimer = null, anRealtimeTimer = null;
+  function startAnalyticsAutoRefresh() {
+    stopAnalyticsAutoRefresh();
+    anOverviewTimer = setInterval(() => { if (document.visibilityState === "visible") loadAnalyticsOverview(); }, 60000);
+    anRealtimeTimer = setInterval(() => { if (document.visibilityState === "visible") loadAnalyticsRealtime(); }, 15000);
+  }
+  function stopAnalyticsAutoRefresh() {
+    if (anOverviewTimer) { clearInterval(anOverviewTimer); anOverviewTimer = null; }
+    if (anRealtimeTimer) { clearInterval(anRealtimeTimer); anRealtimeTimer = null; }
+  }
+  function loadAnalytics() {
+    loadAnalyticsOverview();
+    loadAnalyticsRealtime();
+    startAnalyticsAutoRefresh();
+  }
 
   /* ---------- お問い合わせ 未読バッジ（タブ＋ベル） ---------- */
   async function refreshMessageBadge() {
@@ -654,7 +820,10 @@
     if (versionTimer) { clearInterval(versionTimer); versionTimer = null; }
   }
   document.addEventListener("visibilitychange", () => {
-    if (document.visibilityState === "visible" && versionTimer) loadVersionHistory();
+    if (document.visibilityState !== "visible") return;
+    if (versionTimer) loadVersionHistory();
+    if (anOverviewTimer) loadAnalyticsOverview();
+    if (anRealtimeTimer) loadAnalyticsRealtime();
   });
 
   /* ---------- ダッシュボードの初期化 ---------- */

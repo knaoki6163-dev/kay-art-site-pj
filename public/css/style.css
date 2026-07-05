@@ -670,9 +670,98 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .admin-note.is-error { color: #b23b2a; }
 .admin-empty { color: var(--ink-soft); text-align: center; padding: 2rem; }
 
-/* Looker Studio 埋め込み */
-.looker-frame { width: 100%; height: 80vh; min-height: 480px; border: 1px solid var(--line); border-radius: 4px; background: #fff; }
-.admin-body .looker-frame { border-color: #463f35; }
+/* =========================================================
+   アクセス解析（Google Analytics 4 Data API）
+   ========================================================= */
+.an-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
+.an-head__title { display: flex; align-items: baseline; gap: 0.6rem; }
+.an-head__title h2 { font-size: 1.15rem; font-weight: 600; }
+.an-head__live { display: flex; align-items: center; gap: 0.5rem; }
+.an-eyebrow { font-family: var(--serif-en); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+.an-eyebrow--accent { color: var(--accent); }
+.an-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: an-pulse 1.8s infinite ease-in-out; }
+@keyframes an-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: .35; } }
+.an-updated { font-family: var(--serif-en); font-size: 0.72rem; letter-spacing: 0.05em; color: var(--ink-soft); }
+
+.an-grid { display: grid; gap: 0.9rem; margin-bottom: 0.9rem; }
+.an-grid--kpi { grid-template-columns: 2fr 1fr 1fr; }
+.an-grid--2 { grid-template-columns: 1.12fr 1fr; }
+.an-grid--3 { grid-template-columns: 1.5fr 1fr 1fr; }
+
+.an-card { background: rgba(255,255,255,0.5); border: 1px solid var(--line); border-radius: 10px; padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.5rem; }
+.an-card--wide { gap: 0.4rem; }
+.an-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.8rem; }
+.an-card__num { text-align: right; flex-shrink: 0; }
+.an-card__label { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
+.an-sub { font-family: var(--serif-jp); font-size: 0.78rem; color: var(--ink-soft); }
+.an-num { font-family: var(--serif-en); font-size: 2.1rem; font-weight: 500; line-height: 0.95; color: var(--ink); }
+.an-card--wide .an-num { font-size: 2.4rem; }
+.an-num--rt { font-size: 2.8rem; }
+.an-num--sm { font-size: 1.35rem; }
+.an-delta { font-family: var(--serif-en); font-size: 0.72rem; letter-spacing: 0.04em; color: var(--ink-soft); }
+.an-delta.is-up { color: var(--accent); }
+.an-delta.is-good { color: var(--an-good, #5f6f47); }
+
+.an-chart { position: relative; margin-top: 0.2rem; }
+.an-chart svg { width: 100%; height: 92px; display: block; overflow: visible; }
+.an-gridline { stroke: var(--line); stroke-width: 1; }
+.an-chart__axis { display: flex; justify-content: space-between; font-family: var(--serif-en); font-size: 0.68rem; letter-spacing: 0.05em; color: var(--ink-soft); margin-top: 0.2rem; }
+
+/* 汎用バー（トラック＋フィル） */
+.an-bar-track { position: relative; background: rgba(0,0,0,0.06); border-radius: 999px; overflow: hidden; }
+.an-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent)); border-radius: 999px; transition: width 1s cubic-bezier(.2,.7,.2,1); }
+
+.an-traffic { display: flex; flex-direction: column; gap: 0.9rem; }
+.an-traffic-row__head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.4rem; }
+.an-traffic-row__label { display: flex; align-items: baseline; gap: 0.5rem; }
+.an-traffic-row__name { font-size: 0.95rem; }
+.an-traffic-row__sub { font-family: var(--serif-en); font-size: 0.66rem; letter-spacing: 0.08em; color: var(--ink-soft); }
+.an-traffic-row__pct { font-family: var(--serif-en); font-size: 1.3rem; }
+.an-traffic .an-bar-track { height: 26px; border-radius: 7px; }
+.an-traffic .an-bar-fill { border-radius: 7px; }
+
+.an-works { display: flex; flex-direction: column; gap: 0.75rem; }
+.an-work-row { display: flex; align-items: center; gap: 0.7rem; }
+.an-work-row__rank { font-family: var(--serif-en); font-size: 0.72rem; color: var(--ink-soft); width: 16px; flex-shrink: 0; }
+.an-work-row__thumb { width: 42px; height: 42px; border-radius: 6px; flex-shrink: 0; object-fit: cover; background: rgba(0,0,0,0.08); border: 1px solid var(--line); }
+.an-work-row__body { flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 0.3rem; }
+.an-work-row__top { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; }
+.an-work-row__title { font-size: 0.9rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.an-work-row__views { font-family: var(--serif-en); font-size: 1rem; flex-shrink: 0; }
+.an-works .an-bar-track { height: 4px; }
+.an-hint { color: var(--ink-soft); font-size: 0.82rem; padding-top: 0.4rem; }
+
+.an-rt-now { display: flex; align-items: baseline; gap: 0.5rem; margin-bottom: 0.6rem; }
+.an-rt-bars { display: flex; align-items: flex-end; gap: 2px; height: 52px; margin-bottom: 1rem; }
+.an-rt-bars > span { flex: 1; background: var(--accent); opacity: 0.7; border-radius: 1px; transition: height .6s; }
+.an-rt-pages-label { margin-bottom: 0.6rem; display: block; }
+.an-rt-pages { display: flex; flex-direction: column; gap: 0.55rem; }
+.an-rt-page-row { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
+.an-rt-page-row__name { font-size: 0.86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.an-rt-page-row__right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
+.an-rt-page-row .an-bar-track { width: 60px; height: 5px; }
+.an-rt-page-row__n { font-family: var(--serif-en); font-size: 1rem; color: var(--accent); width: 20px; text-align: right; }
+
+.an-country { display: flex; flex-direction: column; gap: 0.8rem; }
+.an-country-row__head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.35rem; }
+.an-country-row__pct { font-family: var(--serif-en); font-size: 1.2rem; }
+.an-country .an-bar-track { height: 7px; }
+
+.an-newret-bar { display: flex; height: 18px; border-radius: 999px; overflow: hidden; margin-bottom: 1rem; background: rgba(0,0,0,0.06); }
+.an-newret-bar__new { background: var(--accent); transition: width 1s cubic-bezier(.2,.7,.2,1); }
+.an-newret-bar__ret { flex: 1; }
+.an-newret-legend { display: flex; flex-direction: column; gap: 0.8rem; }
+.an-newret-legend__item { display: flex; align-items: center; gap: 0.6rem; }
+.an-flex1 { flex: 1; font-size: 0.9rem; }
+.an-dot { width: 9px; height: 9px; border-radius: 2px; flex-shrink: 0; }
+.an-dot--accent { background: var(--accent); }
+.an-dot--muted { background: var(--ink-soft); }
+
+@media (max-width: 720px) {
+  .an-grid--kpi, .an-grid--2, .an-grid--3 { grid-template-columns: 1fr; }
+  .an-num { font-size: 1.9rem; }
+  .an-card--wide .an-num { font-size: 2.1rem; }
+}
 
 /* =========================================================
    ダッシュボード：ダークテーマ
@@ -757,6 +846,22 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .btn--ghost { background: transparent; border: 1px solid #4a4339; color: #ece7dd; }
 .admin-body .btn--ghost { background: transparent; color: #ece7dd; }
 .admin-body .btn--ghost:hover { background: rgba(255,255,255,0.06); border-color: #5a5346; }
+
+/* アクセス解析（ダーク） */
+.admin-body .an-eyebrow { color: #b3a999; }
+.admin-body .an-updated { color: #8a8073; }
+.admin-body .an-card { background: #2a2622; border-color: #463f35; }
+.admin-body .an-sub { color: #b3a999; }
+.admin-body .an-num { color: #f3efe6; }
+.admin-body .an-delta { color: #8a8073; }
+.admin-body .an-delta.is-good { color: #8fa06e; }
+.admin-body .an-gridline { stroke: #463f35; }
+.admin-body .an-chart__axis { color: #8a8073; }
+.admin-body .an-bar-track { background: #332e29; }
+.admin-body .an-work-row__thumb { background: #332e29; border-color: #463f35; }
+.admin-body .an-hint { color: #8a8073; }
+.admin-body .an-newret-bar { background: #332e29; }
+.admin-body .an-dot--muted { background: #6e6759; }
 
 /* ---------- 専用ページ（works / info / blog / artist / contact） ---------- */
 /* サブページでも背景は擬似要素側に（上記と同じ包含ブロック問題を避けるため） */

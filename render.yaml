@@ -30,6 +30,13 @@ services:
         value: /var/data/data
       - key: UPLOAD_DIR
         value: /var/data/uploads
+      # アクセス解析（GA4 Data API）。未設定でもサーバーは動きます
+      # （管理画面のアクセス解析タブが「未設定」表示になるだけ）。
+      # 設定方法は DEPLOY.md を参照してください。
+      - key: GA4_PROPERTY_ID
+        sync: false
+      - key: GA4_SERVICE_ACCOUNT_JSON
+        sync: false
 
     # 永続ディスク（作品画像・お問い合わせ・文章の保存先）
     disk:
