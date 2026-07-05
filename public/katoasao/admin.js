@@ -747,17 +747,24 @@
     if (diffD < 7) return diffD + "日前";
     return fmtDate(ts);
   }
-  // GitHub項目のバッジ文言とCSSクラス（Claude / Codex を判別して表示）
+  // 項目のバッジ文言とCSSクラスを決める。
+  // ・管理画面からの更新 → 「サイトの情報更新」
+  // ・GitHubのコミット → 改修の種類（バグ修正 / サイトの改修 / サイトの大幅改修）＋
+  //   作業元（Claude / Codex / GitHub）を併記。色分けは作業元(cls)で行う。
+  // ・compact=true の項目（サイトの情報更新・バグ修正）はボックスを少し低くする。
   function versionBadgeInfo(it) {
-    if (it.source !== "github") return { label: "管理画面", cls: "admin" };
-    if (it.agent === "claude") return { label: "コード修正（Claude）", cls: "claude" };
-    if (it.agent === "codex") return { label: "コード修正（Codex）", cls: "codex" };
-    return { label: "コード修正（GitHub）", cls: "github" };
+    if (it.source !== "github") return { label: "サイトの情報更新", cls: "admin", compact: true };
+    const category =
+      it.changeType === "major" ? "サイトの大幅改修" :
+      it.changeType === "bug" ? "バグ修正" : "サイトの改修";
+    const agentName = it.agent === "claude" ? "Claude" : it.agent === "codex" ? "Codex" : "GitHub";
+    const cls = it.agent === "claude" ? "claude" : it.agent === "codex" ? "codex" : "github";
+    return { label: category + "（" + agentName + "）", cls: cls, compact: it.changeType === "bug" };
   }
   function buildVersionItem(it) {
     const li = document.createElement("li");
     const badge = versionBadgeInfo(it);
-    li.className = "version-item version-item--" + badge.cls;
+    li.className = "version-item version-item--" + badge.cls + (badge.compact ? " version-item--compact" : "");
     const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
     const summaryHtml = it.url
       ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"

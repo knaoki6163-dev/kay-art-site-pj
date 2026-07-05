@@ -748,6 +748,20 @@ function detectAgent(authorName, authorEmail, fullMessage) {
   return null;
 }
 
+// コミット内容から改修の種類を判定して、管理画面のバッジ文言に使う。
+//   major … 大規模な改修（作り替え・刷新・新機能・置き換え 等）
+//   bug   … 不具合の修正（fix / 修正 / バグ 等）
+//   minor … それ以外の通常の改修（既定）
+// 判定はコミットの1行目（タイトル）を主対象にする。大幅改修 → バグ修正 → 改修 の順に見る。
+const MAJOR_RE = /(大幅|全面|刷新|リニューアル|renewal|overhaul|置き?換|replace|作り?直|再構築|rebuild|新機能|新規実装|大規模)/i;
+const BUG_RE = /(\bfix|\bbug|hotfix|修正|バグ|不具合|直し|直す)/i;
+function classifyChange(title) {
+  const t = title || "";
+  if (MAJOR_RE.test(t)) return "major";
+  if (BUG_RE.test(t)) return "bug";
+  return "minor";
+}
+
 async function fetchGithubCommits() {
   const now = Date.now();
   if (now - githubCache.at < GITHUB_CACHE_MS) return githubCache.items;
@@ -778,6 +792,7 @@ async function fetchGithubCommits() {
         url: c.html_url || null,
         author: authorName,
         agent: detectAgent(authorName, authorEmail, fullMessage),
+        changeType: classifyChange(title),
       };
     });
     githubCache = { at: now, items };
