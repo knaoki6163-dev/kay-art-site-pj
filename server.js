@@ -170,6 +170,12 @@ function getContent(lang) {
   return out;
 }
 
+// data-content 系の値をHTMLへ埋め込む際のエスケープ（クライアント側 esc/escBr と同じ規則）
+function escHtml(s) {
+  return (s == null ? "" : String(s)).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+}
+function escBrServer(s) { return escHtml(s).replace(/\n/g, "<br>"); }
+
 // 管理画面の編集用：共通＋各言語の現在値（フォールバックなし）を返す
 function getContentRaw() {
   const saved = readSavedContent();
@@ -292,11 +298,23 @@ function serveTemplated(file) {
     fs.readFile(full, "utf8", (err, html) => {
       if (err) return res.status(404).send("not found");
       let out = html.split("__SITE_URL__").join(siteOrigin(req));
-      // Instagram非表示の設定はサーバー側でHTMLに反映する。
-      // クライアントJSがAPI取得後に消す方式だけだと、取得までの一瞬
-      // アイコン行が見えてしまう（更新時に「以前の仕様」が見える現象）ため。
+      // サイトの文章（管理画面「サイトの文章」で編集）は配信時点でHTMLへ直接反映する。
+      // クライアントJSがAPI取得後に data-content 要素を書き換える方式だけだと、
+      // 取得までの一瞬 HTML に書かれた既定文言（古い内容）が見えてしまう
+      // （Instagram表示切替と同じ理由。言語はサーバーが判別できないため既定の
+      // 日本語で埋め込み、英語表示の利用者はこれまで通りクライアント側で
+      // 切り替わる）。
       try {
-        if (getContent("ja").instagramVisible === "false") {
+        const content = getContent("ja");
+        out = out.replace(
+          /(<([a-zA-Z0-9]+)\b[^>]*\bdata-content="([a-zA-Z]+)"[^>]*>)([\s\S]*?)(<\/\2>)/g,
+          (match, openTag, tagName, key, inner, closeTag) =>
+            content[key] != null ? openTag + escBrServer(content[key]) + closeTag : match
+        );
+        out = out.replace(/<a\b[^>]*\bdata-content-href="([a-zA-Z]+)"[^>]*>/g, (tag, key) =>
+          content[key] != null ? tag.replace(/href="[^"]*"/, 'href="' + escHtml(content[key]) + '"') : tag
+        );
+        if (content.instagramVisible === "false") {
           out = out.replace("</head>", "<style>.footer-social{display:none}</style></head>");
         }
       } catch (e) { /* 設定が読めなくても配信は続行 */ }
