@@ -683,10 +683,13 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 @keyframes an-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: .35; } }
 .an-updated { font-family: var(--serif-en); font-size: 0.72rem; letter-spacing: 0.05em; color: var(--ink-soft); }
 
+/* グリッドのトラックは minmax(0, ...) にする。既定の 1fr は minmax(auto, 1fr)
+   と等価で、カード内に縮まないコンテンツ（例：リアルタイムの長い閲覧中ページ名）が
+   あるとトラックがコンテナ幅を超えて広がり、同じ列の他カードごと右にはみ出す。 */
 .an-grid { display: grid; gap: 0.9rem; margin-bottom: 0.9rem; }
-.an-grid--kpi { grid-template-columns: 2fr 1fr 1fr; }
-.an-grid--2 { grid-template-columns: 1.12fr 1fr; }
-.an-grid--3 { grid-template-columns: 1.5fr 1fr 1fr; }
+.an-grid--kpi { grid-template-columns: minmax(0, 2fr) minmax(0, 1fr) minmax(0, 1fr); }
+.an-grid--2 { grid-template-columns: minmax(0, 1.12fr) minmax(0, 1fr); }
+.an-grid--3 { grid-template-columns: minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1fr); }
 
 .an-card { background: rgba(255,255,255,0.5); border: 1px solid var(--line); border-radius: 10px; padding: 1.1rem 1.2rem; display: flex; flex-direction: column; gap: 0.5rem; }
 .an-card--wide { gap: 0.4rem; }
@@ -737,7 +740,7 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .an-rt-pages-label { margin-bottom: 0.6rem; display: block; }
 .an-rt-pages { display: flex; flex-direction: column; gap: 0.55rem; }
 .an-rt-page-row { display: flex; align-items: center; justify-content: space-between; gap: 0.6rem; }
-.an-rt-page-row__name { font-size: 0.86rem; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.an-rt-page-row__name { font-size: 0.86rem; min-width: 0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .an-rt-page-row__right { display: flex; align-items: center; gap: 0.5rem; flex-shrink: 0; }
 .an-rt-page-row .an-bar-track { width: 60px; height: 5px; }
 .an-rt-page-row__n { font-family: var(--serif-en); font-size: 1rem; color: var(--accent); width: 20px; text-align: right; }
@@ -758,7 +761,7 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .an-dot--muted { background: var(--ink-soft); }
 
 @media (max-width: 720px) {
-  .an-grid--kpi, .an-grid--2, .an-grid--3 { grid-template-columns: 1fr; }
+  .an-grid--kpi, .an-grid--2, .an-grid--3 { grid-template-columns: minmax(0, 1fr); }
   .an-num { font-size: 1.9rem; }
   .an-card--wide .an-num { font-size: 2.1rem; }
 }
