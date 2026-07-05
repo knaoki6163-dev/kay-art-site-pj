@@ -280,6 +280,10 @@
       else { lbImage.src = TRANSPARENT; lbImage.alt = ""; lbImage.classList.add("lightbox__image--ph"); }
       lbTitle.textContent = work.title;
       lbMeta.textContent = [categoryLabel(work.category), workMeta(work)].filter(Boolean).join(" · ");
+      // アクセス解析（管理画面の「作品別閲覧数」）用のカスタムイベント
+      if (typeof gtag === "function" && work.id) {
+        gtag("event", "view_work", { work_id: work.id, work_title: work.title });
+      }
     }
     function openLightbox(index) {
       lastFocused = document.activeElement; showLightbox(index);

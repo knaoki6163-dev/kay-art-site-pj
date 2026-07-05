@@ -8,7 +8,7 @@
 
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&display=swap" rel="stylesheet" />
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="stylesheet" href="/css/style.css?v=17" />
 </head>
@@ -188,25 +188,124 @@
       </form>
     </section>
 
-    <!-- アクセス解析（Looker Studio 埋め込み） -->
+    <!-- アクセス解析（Google Analytics 4 Data API） -->
     <section class="admin-panel" id="panel-analytics">
-      <form class="content-form" id="looker-form" style="margin-bottom:1.5rem;">
-        <p class="muted" style="margin-bottom:1rem;">
-          Google の無料ツール「Looker Studio」で作ったダッシュボードの<strong>埋め込みURL</strong>を貼ると、ここにアクセス解析を表示できます。
-          （Looker Studio でレポートを開き「共有 → 埋め込み」→ iframe の <code>src=...</code> のURLを貼り付け）
-        </p>
-        <div class="content-field">
-          <label for="looker-url">Looker Studio 埋め込みURL</label>
-          <input type="text" id="looker-url" placeholder="https://lookerstudio.google.com/embed/reporting/...." />
+      <div class="an-head">
+        <div class="an-head__title">
+          <h2>概要</h2><span class="an-eyebrow">OVERVIEW</span>
         </div>
-        <div style="margin-top:1rem; display:flex; flex-wrap:wrap; gap:.6rem; align-items:center;">
-          <button type="submit" class="btn">保存して表示</button>
-          <a class="btn btn--ghost" href="https://lookerstudio.google.com/" target="_blank" rel="noopener">Looker Studio を開く</a>
+        <div class="an-head__live">
+          <span class="an-live-dot" id="an-live-dot"></span>
+          <span class="an-eyebrow an-eyebrow--accent">LIVE</span>
+          <span class="an-updated" id="an-updated"></span>
         </div>
-        <p class="admin-note" id="looker-note" style="margin-top:.6rem;"></p>
-      </form>
-      <div id="looker-embed"></div>
-      <p class="admin-empty" id="looker-empty">まだ埋め込みURLが設定されていません。上の欄にURLを貼って保存してください。</p>
+      </div>
+
+      <p class="admin-empty" id="an-empty" hidden>
+        まだアクセス解析（GA4）が設定されていません。サーバーの環境変数
+        <code>GA4_PROPERTY_ID</code> と <code>GA4_SERVICE_ACCOUNT_JSON</code> を設定すると、
+        ここに実際のアクセス状況が表示されます。設定方法は DEPLOY.md を参照してください。
+      </p>
+      <p class="admin-note is-error" id="an-error" hidden></p>
+
+      <div id="an-body" hidden>
+        <div class="an-grid an-grid--kpi">
+          <div class="an-card an-card--wide">
+            <div class="an-card__head">
+              <div>
+                <div class="an-eyebrow">TOTAL VISITORS</div>
+                <div class="an-sub">総訪問者数 · 直近24時間</div>
+              </div>
+              <div class="an-card__num">
+                <div class="an-num" id="an-kpi-visitors">—</div>
+                <span class="an-delta" id="an-kpi-visitors-delta"></span>
+              </div>
+            </div>
+            <div class="an-chart">
+              <svg id="an-trend-svg" viewBox="0 0 320 96" preserveAspectRatio="none">
+                <line x1="0" y1="16" x2="320" y2="16" class="an-gridline"></line>
+                <line x1="0" y1="52" x2="320" y2="52" class="an-gridline"></line>
+                <line x1="0" y1="88" x2="320" y2="88" class="an-gridline"></line>
+                <defs>
+                  <linearGradient id="an-area-grad" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stop-color="var(--accent)" stop-opacity="0.28"></stop>
+                    <stop offset="100%" stop-color="var(--accent)" stop-opacity="0"></stop>
+                  </linearGradient>
+                </defs>
+                <path id="an-trend-area" fill="url(#an-area-grad)"></path>
+                <polyline id="an-trend-line" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
+                <circle id="an-trend-dot" r="3.5" fill="var(--accent)"></circle>
+              </svg>
+              <div class="an-chart__axis"><span>24h前</span><span>18h前</span><span>12h前</span><span>6h前</span><span>現在</span></div>
+            </div>
+          </div>
+
+          <div class="an-card">
+            <div class="an-eyebrow">AVG. TIME ON SITE</div>
+            <div class="an-sub">平均滞在時間</div>
+            <div class="an-num" id="an-kpi-avg">—</div>
+            <span class="an-delta" id="an-kpi-avg-delta"></span>
+          </div>
+
+          <div class="an-card">
+            <div class="an-eyebrow">BOUNCE RATE</div>
+            <div class="an-sub">直帰率</div>
+            <div class="an-num" id="an-kpi-bounce">—</div>
+            <span class="an-delta" id="an-kpi-bounce-delta"></span>
+          </div>
+        </div>
+
+        <div class="an-grid an-grid--2">
+          <div class="an-card">
+            <div class="an-card__label">
+              <span class="an-eyebrow an-eyebrow--accent">TRAFFIC SOURCES</span>
+              <span class="an-sub">流入元の内訳 · 直近28日</span>
+            </div>
+            <div class="an-traffic" id="an-traffic"></div>
+          </div>
+          <div class="an-card">
+            <div class="an-card__label">
+              <span class="an-eyebrow an-eyebrow--accent">MOST VIEWED WORKS</span>
+              <span class="an-sub">作品別 閲覧数 · 直近28日</span>
+            </div>
+            <div class="an-works" id="an-works"></div>
+            <p class="an-hint" id="an-works-hint" hidden>作品の閲覧イベントが集計され次第、ここにランキングが表示されます（GA4側の反映には数時間かかることがあります）。</p>
+          </div>
+        </div>
+
+        <div class="an-grid an-grid--3">
+          <div class="an-card">
+            <div class="an-card__label">
+              <span class="an-eyebrow an-eyebrow--accent">REALTIME · 過去30分</span>
+              <span class="an-sub">アクティブユーザー</span>
+            </div>
+            <div class="an-rt-now"><span class="an-num an-num--rt" id="an-rt-now">—</span><span class="an-sub">人が閲覧中</span></div>
+            <div class="an-rt-bars" id="an-rt-bars"></div>
+            <div class="an-eyebrow an-rt-pages-label">閲覧中のページ · ACTIVE PAGES</div>
+            <div class="an-rt-pages" id="an-rt-pages"></div>
+          </div>
+
+          <div class="an-card">
+            <div class="an-card__label">
+              <span class="an-eyebrow an-eyebrow--accent">COUNTRY</span>
+              <span class="an-sub">国・地域別 · 直近28日</span>
+            </div>
+            <div class="an-country" id="an-country"></div>
+          </div>
+
+          <div class="an-card">
+            <div class="an-card__label">
+              <span class="an-eyebrow an-eyebrow--accent">USERS</span>
+              <span class="an-sub">新規 / リピーター · 直近28日</span>
+            </div>
+            <div class="an-newret-bar"><div class="an-newret-bar__new" id="an-newret-new"></div><div class="an-newret-bar__ret"></div></div>
+            <div class="an-newret-legend">
+              <div class="an-newret-legend__item"><span class="an-dot an-dot--accent"></span><span class="an-flex1">新規</span><span class="an-num an-num--sm" id="an-newret-new-str">—</span></div>
+              <div class="an-newret-legend__item"><span class="an-dot an-dot--muted"></span><span class="an-flex1">リピーター</span><span class="an-num an-num--sm" id="an-newret-ret-str">—</span></div>
+            </div>
+          </div>
+        </div>
+      </div>
     </section>
 
     <!-- お問い合わせ -->
