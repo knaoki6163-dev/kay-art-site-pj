@@ -534,9 +534,19 @@ app.delete("/api/admin/blog/:id", requireAuth, (req, res) => {
 // 管理画面の編集用：共通＋各言語の現在値を返す
 app.get("/api/admin/content", requireAuth, (req, res) => res.json(getContentRaw()));
 
+// サイトの文章の各項目の、更新履歴に出す分かりやすい名前。
+const CONTENT_LABELS = {
+  siteName: "サイト名", aboutSignature: "署名",
+  instagramUrl: "InstagramのURL", instagramVisible: "Instagramの表示",
+  heroTitle: "トップの見出し", heroLead: "トップのリード文", heroButton: "トップのボタン",
+  aboutBody: "プロフィール本文", aboutButton: "プロフィールのボタン",
+  contactDesc: "お問い合わせの説明", copyrightSuffix: "著作権表記",
+};
+
 // サイトの文章を保存（多言語：{ shared, ja, en, zh } の既知キーのみ受け付ける）
 app.put("/api/admin/content", requireAuth, (req, res) => {
   const body = req.body || {};
+  const before = getContentRaw(); // 変更点の記録用に、更新前の値を控えておく
   const out = { shared: {} };
   for (const k of SHARED_KEYS) {
     if (body.shared && body.shared[k] != null) out.shared[k] = String(body.shared[k]).slice(0, 4000);
@@ -549,7 +559,25 @@ app.put("/api/admin/content", requireAuth, (req, res) => {
     }
   }
   writeJson(CONTENT_FILE, out);
-  logActivity("サイトの文章を更新");
+
+  // 実際に変わった項目だけを、分かりやすい名前で記録する（言語違いは1つにまとめる）。
+  // 何も変わっていない保存では履歴を残さない（同じ内容の連続記録を防ぐ）。
+  const changed = [];
+  for (const k of SHARED_KEYS) {
+    if (out.shared[k] != null && String(out.shared[k]) !== String((before.shared || {})[k] ?? "")) {
+      changed.push(CONTENT_LABELS[k] || k);
+    }
+  }
+  for (const k of LOCALIZED_KEYS) {
+    const label = CONTENT_LABELS[k] || k;
+    if (changed.includes(label)) continue;
+    const diff = LANGS.some((lang) => out[lang][k] != null && String(out[lang][k]) !== String((before[lang] || {})[k] ?? ""));
+    if (diff) changed.push(label);
+  }
+  if (changed.length) {
+    const shown = changed.slice(0, 6).join("・") + (changed.length > 6 ? ` ほか${changed.length - 6}件` : "");
+    logActivity("サイトの文章を更新：" + shown);
+  }
   res.json({ ok: true });
 });
 
