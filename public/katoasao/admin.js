@@ -801,6 +801,10 @@
       detailHtml;
     return li;
   }
+  // 月ごとの開閉状態を覚えておく（キー："年-月"）。30秒ごとの自動更新でリストを
+  // 作り直しても、ユーザーが手動で開け閉めした状態を維持するために使う。
+  // （これが無いと、開いた月が更新のたびに勝手に閉じてしまう。）
+  const versionMonthOpen = {};
   async function loadVersionHistory() {
     const list = $("version-list");
     let data = null;
@@ -829,12 +833,16 @@
       current.items.push(it);
     });
 
-    // 月ごとに折りたためる（<details>）。直近の月だけ開いた状態にしておく。
+    // 月ごとに折りたためる（<details>）。開閉は手動。初回は今月（先頭）だけ開き、
+    // 過去の月は閉じておく。一度ユーザーが操作した月は、その開閉状態を維持する
+    // （自動更新で作り直しても勝手に閉じない）。
     groups.forEach((g, idx) => {
       const li = document.createElement("li");
       const details = document.createElement("details");
       details.className = "version-month-group";
-      details.open = idx === 0;
+      const isOpen = (g.key in versionMonthOpen) ? versionMonthOpen[g.key] : (idx === 0);
+      details.open = isOpen;
+      versionMonthOpen[g.key] = isOpen;
       const summary = document.createElement("summary");
       summary.className = "version-month-divider";
       summary.textContent = g.label + "（" + g.items.length + "件）";
@@ -843,6 +851,8 @@
       ul.className = "version-month-items";
       g.items.forEach((it) => ul.appendChild(buildVersionItem(it)));
       details.appendChild(ul);
+      // ユーザーが開け閉めしたら、その状態を覚える（次の自動更新でも維持する）。
+      details.addEventListener("toggle", () => { versionMonthOpen[g.key] = details.open; });
       li.appendChild(details);
       list.appendChild(li);
     });
