@@ -782,6 +782,27 @@ function classifyChange(title) {
   return "minor";
 }
 
+// 「サイトの大幅改修」の項目に添える、修正前後の詳細説明。
+// コミット本文（1行目のタイトル以降）から、署名やセッションURL等のメタ行を
+// 取り除いた本文だけを取り出す。長すぎる場合は800文字で切る。
+function extractDetail(fullMessage) {
+  const lines = (fullMessage || "").split("\n");
+  lines.shift(); // タイトル行を除く
+  const out = [];
+  for (const raw of lines) {
+    const l = raw.replace(/\r$/, "");
+    const s = l.trim();
+    if (/^co-authored-by:/i.test(s)) continue;
+    if (/^claude-session:/i.test(s)) continue;
+    if (/claude\.ai\/code/i.test(s)) continue;
+    if (/^🤖/.test(s)) continue;
+    if (/generated with .*claude/i.test(s)) continue;
+    if (/^-{3,}$/.test(s)) continue; // squashマージの区切り線
+    out.push(l.replace(/^\*\s+/, "")); // squashの箇条書き先頭の "* " を除去
+  }
+  return out.join("\n").replace(/\n{3,}/g, "\n\n").trim().slice(0, 800);
+}
+
 async function fetchGithubCommits() {
   const now = Date.now();
   if (now - githubCache.at < GITHUB_CACHE_MS) return githubCache.items;
@@ -805,6 +826,7 @@ async function fetchGithubCommits() {
       const date = (c.commit && c.commit.author && c.commit.author.date) || (c.commit && c.commit.committer && c.commit.committer.date);
       const authorName = (c.commit && c.commit.author && c.commit.author.name) || "";
       const authorEmail = (c.commit && c.commit.author && c.commit.author.email) || "";
+      const changeType = classifyChange(title);
       return {
         source: "github",
         summary: title || "(無題のコミット)",
@@ -812,7 +834,9 @@ async function fetchGithubCommits() {
         url: c.html_url || null,
         author: authorName,
         agent: detectAgent(authorName, authorEmail, fullMessage),
-        changeType: classifyChange(title),
+        changeType: changeType,
+        // 大幅改修のときだけ、修正前後の詳細（コミット本文）を添える。
+        detail: changeType === "major" ? extractDetail(fullMessage) : "",
       };
     });
     githubCache = { at: now, items };

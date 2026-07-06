@@ -753,13 +753,14 @@
   //   サイトの項目の名称変更 / サーバー関連の変更 / 機能の追加・改善 / その他の修正 /
   //   バグ修正 / サイトの大幅改修）＋作業元（Claude / Codex / GitHub）を併記。
   //   色分けは作業元(cls)で行う。
-  // ・compact=true（サイトの情報更新・バグ修正）はボックスを少し低く、
-  //   tall=true（サイトの大幅改修）は少し高くして見分けやすくする。
+  // ・compact=true（サイトの情報更新・バグ修正）はボックスを少し低くする。
+  // ・major=true（サイトの大幅改修）は左帯を太くし、本文の下に修正前後の詳細
+  //   （it.detail）を少し小さい字のボックスで添える。本文の文字サイズは他と同じ。
   // changeType（サーバー判定）を日本語のカテゴリ名に対応づける。
   const CHANGE_LABELS = {
     major: "サイトの大幅改修",
     bug: "バグ修正",
-    config: "サーバー関連の変更",
+    config: "サーバー関連の修正",
     feature: "機能の追加・改善",
     adminpanel: "管理画面の仕様変更",
     design: "サイトのデザイン修正",
@@ -775,7 +776,7 @@
       label: category + "（" + agentName + "）",
       cls: cls,
       compact: it.changeType === "bug",
-      tall: it.changeType === "major",
+      major: it.changeType === "major",
     };
   }
   function buildVersionItem(it) {
@@ -783,17 +784,21 @@
     const badge = versionBadgeInfo(it);
     li.className = "version-item version-item--" + badge.cls +
       (badge.compact ? " version-item--compact" : "") +
-      (badge.tall ? " version-item--tall" : "");
+      (badge.major ? " version-item--major" : "");
     const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
     const summaryHtml = it.url
       ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"
       : esc(it.summary);
+    const detailHtml = (badge.major && it.detail)
+      ? '<div class="version-item__detail">' + esc(it.detail) + "</div>"
+      : "";
     li.innerHTML =
       '<div class="version-item__head">' +
         '<span class="version-item__badge">' + esc(badge.label) + "</span>" +
         '<span class="version-item__time" title="' + esc(titleAttr) + '">' + esc(fmtRelative(it.createdAt)) + "</span>" +
       "</div>" +
-      '<div class="version-item__summary">・' + summaryHtml + "</div>";
+      '<div class="version-item__summary">・' + summaryHtml + "</div>" +
+      detailHtml;
     return li;
   }
   async function loadVersionHistory() {

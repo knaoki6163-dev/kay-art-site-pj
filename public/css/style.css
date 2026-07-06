@@ -626,10 +626,21 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 /* 「サイトの情報更新」と「バグ修正」は数が多く内容も短いので、少し縦を詰めて表示する。 */
 .version-item--compact { padding: 0.45rem 1.1rem; }
 .version-item--compact .version-item__head { margin-bottom: 0.15rem; }
-/* 「サイトの大幅改修」は重要なので縦幅を広げ、左帯も太くして目立たせる。 */
-.version-item--tall { padding: 1.4rem 1.2rem; border-left-width: 5px; }
-.version-item--tall .version-item__head { margin-bottom: 0.55rem; }
-.version-item--tall .version-item__summary { font-size: 1.08rem; }
+/* 「サイトの大幅改修」は重要なので左帯を太くし、本文の下に修正前後の詳細を
+   少し小さい字のボックスで添える（本文の文字サイズは他のカテゴリと同じ）。 */
+.version-item--major { border-left-width: 5px; }
+.version-item__detail {
+  margin-top: 0.55rem;
+  padding: 0.6rem 0.85rem;
+  border: 1px solid var(--line);
+  border-radius: 5px;
+  background: rgba(0,0,0,0.03);
+  font-size: 0.82rem;
+  line-height: 1.75;
+  color: var(--ink-soft);
+  white-space: pre-line;
+}
+.admin-body .version-item__detail { border-color: #463f35; background: #22201c; color: #c8bfb1; }
 .version-item__head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.6rem; flex-wrap: wrap; margin-bottom: 0.3rem; }
 .version-item__badge { font-family: var(--serif-en); font-size: 0.72rem; letter-spacing: 0.06em; color: var(--ink-soft); text-transform: uppercase; }
 .version-item__time { font-family: var(--serif-en); font-size: 0.8rem; color: var(--ink-soft); white-space: nowrap; }
