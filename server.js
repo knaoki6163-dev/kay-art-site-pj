@@ -749,16 +749,30 @@ function detectAgent(authorName, authorEmail, fullMessage) {
 }
 
 // コミット内容から改修の種類を判定して、管理画面のバッジ文言に使う。
-//   major … 大規模な改修（作り替え・刷新・新機能・置き換え 等）
-//   bug   … 不具合の修正（fix / 修正 / バグ 等）
-//   minor … それ以外の通常の改修（既定）
-// 判定はコミットの1行目（タイトル）を主対象にする。大幅改修 → バグ修正 → 改修 の順に見る。
+//   major   … 大規模な改修（作り替え・刷新・新機能・置き換え 等）
+//   bug     … 不具合の修正（fix / 修正 / バグ 等）
+//   config  … 設定・その他の調整（キャッシュ・ドメイン・SEO・ドキュメント等の裏方）
+//   feature … 機能の追加・改善（新しい操作や便利機能）
+//   design  … デザインの調整（レイアウト・色・余白・アニメーション）
+//   text    … 文言・表記の変更（ラベルや名称の変更）
+//   minor   … 上記に当てはまらない通常の改修（既定・「サイトの改修」）
+// 判定はコミットの1行目（タイトル）を主対象にする。1つのコミットが複数領域に
+// またがることがあるため、上から順に最初に当たった種類に振り分ける（precedence）。
 const MAJOR_RE = /(大幅|全面|刷新|リニューアル|renewal|overhaul|置き?換|replace|作り?直|再構築|rebuild|新機能|新規実装|大規模)/i;
 const BUG_RE = /(\bfix|\bbug|hotfix|修正|バグ|不具合|直し|直す)/i;
+const CONFIG_RE = /(redirect|cache|deploy|domain|robots|sitemap|\bseo\b|\bsync\b|security|paginate|onrender|\bdocs?\b|readme|環境変数|キャッシュ|ドメイン|リダイレクト|セキュリティ|デプロイ|設定)/i;
+// 「featured」（トップ表示フラグ）に反応しないよう feature は単語境界付きで判定する。
+const FEATURE_RE = /(\badd\b|added|adding|\bfeature\b|toggle|support|enable|auto[- ]?fill|auto[- ]?refresh|\bauto\b|swipe|persist|modal|combining|追加|機能|対応|有効化)/i;
+const DESIGN_RE = /(design|layout|align|footer|header|\bcolou?r|spacing|\bgap\b|margin|padding|\bstyle\b|\bfont\b|transition|animation|divider|sticky|overscroll|scroll|bounce|decorative|shapes|left-aligned|full-width|\bgrid\b|section|\bedge\b|レイアウト|デザイン|配置|余白|見た目|アニメ|位置|揃え)/i;
+const TEXT_RE = /(rename|reword|relabel|wording|\blabel\b|文言|表記|ラベル|名称|リネーム)/i;
 function classifyChange(title) {
   const t = title || "";
   if (MAJOR_RE.test(t)) return "major";
   if (BUG_RE.test(t)) return "bug";
+  if (CONFIG_RE.test(t)) return "config";
+  if (FEATURE_RE.test(t)) return "feature";
+  if (DESIGN_RE.test(t)) return "design";
+  if (TEXT_RE.test(t)) return "text";
   return "minor";
 }
 

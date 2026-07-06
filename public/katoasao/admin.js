@@ -752,11 +752,19 @@
   // ・GitHubのコミット → 改修の種類（バグ修正 / サイトの改修 / サイトの大幅改修）＋
   //   作業元（Claude / Codex / GitHub）を併記。色分けは作業元(cls)で行う。
   // ・compact=true の項目（サイトの情報更新・バグ修正）はボックスを少し低くする。
+  // changeType（サーバー判定）を日本語のカテゴリ名に対応づける。
+  const CHANGE_LABELS = {
+    major: "サイトの大幅改修",
+    bug: "バグ修正",
+    config: "設定・その他の調整",
+    feature: "機能の追加・改善",
+    design: "デザインの調整",
+    text: "文言・表記の変更",
+    minor: "サイトの改修",
+  };
   function versionBadgeInfo(it) {
     if (it.source !== "github") return { label: "サイトの情報更新", cls: "admin", compact: true };
-    const category =
-      it.changeType === "major" ? "サイトの大幅改修" :
-      it.changeType === "bug" ? "バグ修正" : "サイトの改修";
+    const category = CHANGE_LABELS[it.changeType] || "サイトの改修";
     const agentName = it.agent === "claude" ? "Claude" : it.agent === "codex" ? "Codex" : "GitHub";
     const cls = it.agent === "claude" ? "claude" : it.agent === "codex" ? "codex" : "github";
     return { label: category + "（" + agentName + "）", cls: cls, compact: it.changeType === "bug" };
