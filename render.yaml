@@ -37,6 +37,15 @@ services:
         sync: false
       - key: GA4_SERVICE_ACCOUNT_JSON
         sync: false
+      # 更新履歴タブのGitHubコミット履歴用。未設定だと未認証(60回/時)で
+      # 共有IPではすぐAPI制限に達し、GitHubの履歴が表示されなくなります。
+      # 権限（スコープ）なしのPersonal Access Tokenで十分（制限が5000回/時に）。
+      # 設定方法は DEPLOY.md を参照してください。
+      - key: GITHUB_TOKEN
+        sync: false
+      # 対象リポジトリ（既定値と同じなら未設定でも可）。
+      - key: GITHUB_REPO
+        value: knaoki6163-dev/kay-art-site-pj
 
     # 永続ディスク（作品画像・お問い合わせ・文章の保存先）
     disk:
