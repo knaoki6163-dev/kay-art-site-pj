@@ -749,18 +749,21 @@
   }
   // 項目のバッジ文言とCSSクラスを決める。
   // ・管理画面からの更新 → 「サイトの情報更新」
-  // ・GitHubのコミット → 改修の種類（バグ修正 / サイトデザインの調整 / 機能の追加・改善 /
-  //   ラベル・名称の変更 / 内部設計の修正 / その他の修正 / サイトの大幅改修）＋
-  //   作業元（Claude / Codex / GitHub）を併記。色分けは作業元(cls)で行う。
-  // ・compact=true の項目（サイトの情報更新・バグ修正）はボックスを少し低くする。
+  // ・GitHubのコミット → 改修の種類（管理画面の仕様変更 / サイトのデザイン修正 /
+  //   サイトの項目の名称変更 / サーバー関連の変更 / 機能の追加・改善 / その他の修正 /
+  //   バグ修正 / サイトの大幅改修）＋作業元（Claude / Codex / GitHub）を併記。
+  //   色分けは作業元(cls)で行う。
+  // ・compact=true（サイトの情報更新・バグ修正）はボックスを少し低く、
+  //   tall=true（サイトの大幅改修）は少し高くして見分けやすくする。
   // changeType（サーバー判定）を日本語のカテゴリ名に対応づける。
   const CHANGE_LABELS = {
     major: "サイトの大幅改修",
     bug: "バグ修正",
-    config: "内部設計の修正",
+    config: "サーバー関連の変更",
     feature: "機能の追加・改善",
-    design: "サイトデザインの調整",
-    text: "ラベル・名称の変更",
+    adminpanel: "管理画面の仕様変更",
+    design: "サイトのデザイン修正",
+    text: "サイトの項目の名称変更",
     minor: "その他の修正",
   };
   function versionBadgeInfo(it) {
@@ -768,12 +771,19 @@
     const category = CHANGE_LABELS[it.changeType] || "その他の修正";
     const agentName = it.agent === "claude" ? "Claude" : it.agent === "codex" ? "Codex" : "GitHub";
     const cls = it.agent === "claude" ? "claude" : it.agent === "codex" ? "codex" : "github";
-    return { label: category + "（" + agentName + "）", cls: cls, compact: it.changeType === "bug" };
+    return {
+      label: category + "（" + agentName + "）",
+      cls: cls,
+      compact: it.changeType === "bug",
+      tall: it.changeType === "major",
+    };
   }
   function buildVersionItem(it) {
     const li = document.createElement("li");
     const badge = versionBadgeInfo(it);
-    li.className = "version-item version-item--" + badge.cls + (badge.compact ? " version-item--compact" : "");
+    li.className = "version-item version-item--" + badge.cls +
+      (badge.compact ? " version-item--compact" : "") +
+      (badge.tall ? " version-item--tall" : "");
     const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
     const summaryHtml = it.url
       ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"
