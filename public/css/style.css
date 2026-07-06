@@ -614,6 +614,7 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .msg.is-important { border-left: 3px solid #e0a73c; }
 
 /* バージョン管理（GitHubのコード修正履歴 ＋ 管理画面からの更新履歴） */
+.version-github-error { margin: 0 0 1rem; padding: 0.7rem 0.9rem; border: 1px solid #b23b2a; border-radius: 5px; background: rgba(178,59,42,0.08); font-size: 0.85rem; line-height: 1.7; }
 .version-list { display: flex; flex-direction: column; gap: 0.7rem; }
 .version-item { border: 1px solid var(--line); border-radius: 3px; background: rgba(255,255,255,0.55); padding: 0.8rem 1.1rem; }
 .version-item--github { border-left: 3px solid var(--blue-blot); }

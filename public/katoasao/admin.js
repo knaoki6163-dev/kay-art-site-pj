@@ -803,10 +803,18 @@
   }
   async function loadVersionHistory() {
     const list = $("version-list");
-    let items = [];
-    try { items = await (await fetch("/api/admin/version-history")).json(); } catch (e) { items = []; }
+    let data = null;
+    try { data = await (await fetch("/api/admin/version-history")).json(); } catch (e) { data = null; }
+    // 旧形式（配列）と新形式（{items, githubError}）の両方に対応。
+    const items = Array.isArray(data) ? data : (data && data.items) || [];
+    const githubError = Array.isArray(data) ? null : (data && data.githubError) || null;
     list.innerHTML = "";
     $("version-empty").hidden = items.length > 0;
+
+    // GitHubの履歴が取得できなかったときは、その理由を上部に表示する
+    // （サイトの情報更新ログだけになって「消えた」ように見えるのを防ぐ）。
+    const errEl = $("version-github-error");
+    if (errEl) { errEl.hidden = !githubError; errEl.textContent = githubError || ""; }
 
     // 月ごとにグループ化（新しい順を維持したまま、月が変わるところで区切る）
     const groups = [];

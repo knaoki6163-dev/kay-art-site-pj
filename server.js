@@ -753,8 +753,9 @@ app.put("/api/admin/messages/:id", requireAuth, (req, res) => {
    レート制限があるため、短時間キャッシュして呼び過ぎを防ぐ）。 */
 const GITHUB_REPO = process.env.GITHUB_REPO || "knaoki6163-dev/kay-art-site-pj";
 const GITHUB_TOKEN = process.env.GITHUB_TOKEN || "";
-const GITHUB_CACHE_MS = 5 * 60 * 1000; // 5分
-let githubCache = { at: 0, items: [] };
+const GITHUB_CACHE_MS = 5 * 60 * 1000;      // 成功時は5分キャッシュ
+const GITHUB_FAIL_CACHE_MS = 3 * 60 * 1000; // 失敗時は3分だけキャッシュして再試行（叩き過ぎ防止）
+let githubCache = { at: 0, items: [], error: null };
 
 // GitHubの1ページ最大は100件。過去分も見えるよう複数ページ取得する（既定200件分＝2ページ）。
 const GITHUB_MAX_PAGES = 2;
@@ -831,9 +832,26 @@ function extractDetail(fullMessage) {
   return out.join("\n").replace(/\n{3,}/g, "\n\n").trim().slice(0, 800);
 }
 
+// GitHubのAPI失敗を、管理画面に出す分かりやすい日本語メッセージに変換する。
+function githubErrorMessage(status) {
+  if (status === 403 || status === 429) {
+    return GITHUB_TOKEN
+      ? "GitHubのAPI制限に達しました。しばらくすると自動で復帰します。"
+      : "GitHubのAPI制限に達しています（未認証は1時間あたり60回まで。共有サーバーではすぐ上限に達します）。Renderの環境変数 GITHUB_TOKEN を設定すると解消します（手順は DEPLOY.md）。";
+  }
+  if (status === 404) {
+    return "GitHubリポジトリが見つかりません（GITHUB_REPO の設定、または非公開リポジトリで GITHUB_TOKEN 未設定の可能性）。";
+  }
+  if (status === 401) return "GITHUB_TOKEN が無効です。有効なトークンを設定してください。";
+  return "GitHubのコミット履歴を取得できませんでした（HTTP " + status + "）。";
+}
+
+// GitHubのコミット履歴を取得。成功/失敗に関わらず { items, error } を返す。
+// 失敗時は直近の成功データ（あれば）を items に残しつつ error に理由を入れる。
 async function fetchGithubCommits() {
   const now = Date.now();
-  if (now - githubCache.at < GITHUB_CACHE_MS) return githubCache.items;
+  const ttl = githubCache.error ? GITHUB_FAIL_CACHE_MS : GITHUB_CACHE_MS;
+  if (githubCache.at && now - githubCache.at < ttl) return githubCache;
   try {
     const headers = { "User-Agent": "aquarelle-admin", Accept: "application/vnd.github+json" };
     if (GITHUB_TOKEN) headers.Authorization = "Bearer " + GITHUB_TOKEN;
@@ -843,7 +861,11 @@ async function fetchGithubCommits() {
         "https://api.github.com/repos/" + GITHUB_REPO + "/commits?per_page=100&page=" + page,
         { headers }
       );
-      if (!res.ok) throw new Error("GitHub API " + res.status);
+      if (!res.ok) {
+        const err = new Error("GitHub API " + res.status);
+        err.status = res.status;
+        throw err;
+      }
       const data = await res.json();
       all = all.concat(data);
       if (data.length < 100) break; // これ以上ページが無い
@@ -867,11 +889,14 @@ async function fetchGithubCommits() {
         detail: changeType === "major" ? extractDetail(fullMessage) : "",
       };
     });
-    githubCache = { at: now, items };
-    return items;
+    githubCache = { at: now, items, error: null };
+    return githubCache;
   } catch (e) {
-    // 取得失敗時は直近の成功キャッシュ（無ければ空配列）を返し、管理画面ログだけでも表示する
-    return githubCache.items;
+    // 失敗時：理由を残し、直近の成功データがあればそれも残す（管理ログは必ず表示できる）。
+    const msg = e && e.status ? githubErrorMessage(e.status) : "GitHubに接続できませんでした（ネットワークエラー）。";
+    console.error("⚠ GitHubコミット取得に失敗:", e && (e.message || e));
+    githubCache = { at: now, items: githubCache.items || [], error: msg };
+    return githubCache;
   }
 }
 
@@ -882,9 +907,9 @@ app.get("/api/admin/version-history", requireAuth, async (req, res) => {
     summary: a.summary,
     createdAt: a.createdAt || 0,
   }));
-  const githubItems = await fetchGithubCommits();
-  const all = adminItems.concat(githubItems).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
-  res.json(all.slice(0, 300));
+  const gh = await fetchGithubCommits();
+  const all = adminItems.concat(gh.items).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  res.json({ items: all.slice(0, 300), githubError: gh.error || null });
 });
 
 /* ----- multer等のエラーハンドリング ----- */
