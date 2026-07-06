@@ -769,9 +769,13 @@
   };
   function versionBadgeInfo(it) {
     if (it.source !== "github") return { label: "サイトの情報更新", cls: "admin", compact: true };
-    const category = CHANGE_LABELS[it.changeType] || "その他の修正";
     const agentName = it.agent === "claude" ? "Claude" : it.agent === "codex" ? "Codex" : "GitHub";
     const cls = it.agent === "claude" ? "claude" : it.agent === "codex" ? "codex" : "github";
+    // 最初のコミット（サイトの開設）だけの専用カテゴリ。記念の項目なので作業元は付けない。
+    if (/^\s*(initial commit|first commit|初期コミット)\s*$/i.test(it.summary || "")) {
+      return { label: "サイトの開設", cls: cls, compact: false, major: false };
+    }
+    const category = CHANGE_LABELS[it.changeType] || "その他の修正";
     return {
       label: category + "（" + agentName + "）",
       cls: cls,

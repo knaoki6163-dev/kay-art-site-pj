@@ -661,15 +661,15 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .version-month-group { list-style: none; }
 .version-month-divider {
   list-style: none; cursor: pointer; user-select: none;
-  display: flex; align-items: center; gap: 0.5em;
-  text-align: left; font-family: var(--serif-en); font-size: 0.9rem; letter-spacing: 0.06em;
-  color: var(--ink); font-weight: 600; padding-bottom: 0.3rem;
+  display: flex; align-items: center; gap: 0.45em;
+  text-align: left; font-family: var(--serif-en); font-size: 1.1rem; letter-spacing: 0.06em;
+  color: var(--ink); font-weight: 600; padding-bottom: 0.4rem;
   border-bottom: 1px solid var(--line);
 }
 .version-month-divider::-webkit-details-marker { display: none; } /* Safari既定の三角マーカーを消し、自前の矢印に差し替える */
 .version-month-divider::marker { content: ""; }
 .version-month-divider::before {
-  content: "▸"; display: inline-block; font-size: 0.75em; color: var(--ink-soft);
+  content: "▸"; display: inline-block; font-size: 1.25em; line-height: 1; color: var(--accent);
   transition: transform .2s var(--ease);
 }
 .version-month-group[open] > .version-month-divider::before { transform: rotate(90deg); }
