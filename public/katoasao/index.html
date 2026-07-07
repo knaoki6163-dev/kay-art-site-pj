@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="stylesheet" href="/css/style.css?v=24" />
+  <link rel="stylesheet" href="/css/style.css?v=25" />
 </head>
 <body class="admin-body">
   <div class="paper-grain" aria-hidden="true"></div>
@@ -214,12 +214,18 @@
             <div class="an-card__head">
               <div>
                 <div class="an-eyebrow">TOTAL VISITORS</div>
-                <div class="an-sub">総訪問者数 · 直近24時間</div>
+                <div class="an-sub">総訪問者数（本日） · グラフは<span id="an-trend-range">直近24時間</span>の推移</div>
               </div>
               <div class="an-card__num">
                 <div class="an-num" id="an-kpi-visitors">—</div>
                 <span class="an-delta" id="an-kpi-visitors-delta"></span>
               </div>
+            </div>
+            <div class="an-mini-tabs an-mini-tabs--right" id="an-trend-tabs">
+              <button type="button" class="an-mini-tab is-active" data-period="24h">24h</button>
+              <button type="button" class="an-mini-tab" data-period="7d">7日</button>
+              <button type="button" class="an-mini-tab" data-period="28d">28日</button>
+              <button type="button" class="an-mini-tab" data-period="90d">90日</button>
             </div>
             <div class="an-chart">
               <svg id="an-trend-svg" viewBox="0 0 320 96" preserveAspectRatio="none">
@@ -236,7 +242,7 @@
                 <polyline id="an-trend-line" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
                 <circle id="an-trend-dot" r="3.5" fill="var(--accent)"></circle>
               </svg>
-              <div class="an-chart__axis"><span>24h前</span><span>18h前</span><span>12h前</span><span>6h前</span><span>現在</span></div>
+              <div class="an-chart__axis" id="an-trend-axis"><span>24h前</span><span>18h前</span><span>12h前</span><span>6h前</span><span>現在</span></div>
             </div>
           </div>
 
@@ -261,7 +267,8 @@
               <span class="an-eyebrow an-eyebrow--accent">TRAFFIC SOURCES</span>
               <span class="an-sub">流入元の内訳 · 直近28日</span>
             </div>
-            <div class="an-traffic" id="an-traffic"></div>
+            <div class="an-stack" id="an-stack"></div>
+            <div class="an-stack-legend" id="an-stack-legend"></div>
           </div>
           <div class="an-card">
             <div class="an-card__label">
@@ -287,8 +294,12 @@
 
           <div class="an-card">
             <div class="an-card__label">
-              <span class="an-eyebrow an-eyebrow--accent">COUNTRY</span>
-              <span class="an-sub">国・地域別 · 直近28日</span>
+              <span class="an-eyebrow an-eyebrow--accent">COUNTRY / CITY</span>
+              <span class="an-sub">地域別 · 直近28日</span>
+              <div class="an-mini-tabs" id="an-geo-tabs">
+                <button type="button" class="an-mini-tab is-active" data-geo="country">国</button>
+                <button type="button" class="an-mini-tab" data-geo="city">都市</button>
+              </div>
             </div>
             <div class="an-country" id="an-country"></div>
           </div>
@@ -303,6 +314,17 @@
               <div class="an-newret-legend__item"><span class="an-dot an-dot--accent"></span><span class="an-flex1">新規</span><span class="an-num an-num--sm" id="an-newret-new-str">—</span></div>
               <div class="an-newret-legend__item"><span class="an-dot an-dot--muted"></span><span class="an-flex1">リピーター</span><span class="an-num an-num--sm" id="an-newret-ret-str">—</span></div>
             </div>
+          </div>
+        </div>
+
+        <div class="an-grid">
+          <div class="an-card">
+            <div class="an-card__label">
+              <span class="an-eyebrow an-eyebrow--accent">ACTIVE HOURS</span>
+              <span class="an-sub">曜日×時間帯の訪問傾向 · 直近28日</span>
+            </div>
+            <div class="an-heatmap" id="an-heatmap"></div>
+            <p class="an-hint" id="an-heatmap-hint" hidden>データが集まり次第、色の濃淡で「よく見られている曜日・時間帯」が表示されます。</p>
           </div>
         </div>
       </div>
@@ -387,6 +409,6 @@
     </div>
   </div>
 
-  <script src="/katoasao/admin.js?v=24"></script>
+  <script src="/katoasao/admin.js?v=25"></script>
 </body>
 </html>

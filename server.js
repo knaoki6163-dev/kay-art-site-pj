@@ -596,8 +596,9 @@ function settleError(result) {
 
 app.get("/api/admin/analytics/overview", requireAuth, async (req, res) => {
   if (!ga4.enabled) return res.json({ configured: false });
-  const [totals, trend, traffic, topWorksRaw, country, newReturning] = await Promise.allSettled([
-    ga4.fetchTotals(), ga4.fetchTrend(), ga4.fetchTraffic(), ga4.fetchTopWorksRaw(), ga4.fetchCountry(), ga4.fetchNewReturning(),
+  const [totals, trend, traffic, topWorksRaw, country, city, heatmap, newReturning] = await Promise.allSettled([
+    ga4.fetchTotals(), ga4.fetchTrend(), ga4.fetchTraffic(), ga4.fetchTopWorksRaw(),
+    ga4.fetchCountry(), ga4.fetchCity(), ga4.fetchHeatmap(), ga4.fetchNewReturning(),
   ]);
 
   // 作品別イベント（GA4のwork_id）に、こちらが持つ作品メタデータ（タイトル・画像）を突き合わせる
@@ -622,8 +623,26 @@ app.get("/api/admin/analytics/overview", requireAuth, async (req, res) => {
     worksError: settleError(topWorksRaw),
     country: settle(country, []),
     countryError: settleError(country),
+    city: settle(city, []),
+    cityError: settleError(city),
+    heatmap: settle(heatmap, null),
+    heatmapError: settleError(heatmap),
     newReturning: settle(newReturning, null),
     newReturningError: settleError(newReturning),
+  });
+});
+
+// 訪問者数トレンドの期間切替用（24h / 7d / 28d / 90d）。
+// 概要APIは初期表示用に24hを含むので、切替時だけこちらを呼ぶ。
+app.get("/api/admin/analytics/trend", requireAuth, async (req, res) => {
+  if (!ga4.enabled) return res.json({ configured: false });
+  const period = ga4.TREND_PERIODS[req.query.period] ? req.query.period : "24h";
+  const [trend] = await Promise.allSettled([ga4.fetchTrend(period)]);
+  res.json({
+    configured: true,
+    period,
+    trend: settle(trend, []),
+    error: settleError(trend),
   });
 });
 

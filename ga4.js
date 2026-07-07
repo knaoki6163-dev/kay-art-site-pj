@@ -117,43 +117,73 @@ function fetchTotals() {
   });
 }
 
-// 直近24時間の推移（折れ線グラフ用）
-function fetchTrend() {
-  return cached("trend", 45_000, async () => {
+// 訪問者数の推移（折れ線グラフ用）。期間切替に対応：
+//   24h … 時間単位・直近24時間（従来どおり）
+//   7d / 28d / 90d … 日単位。keepEmptyRows でアクセス0の日も行として
+//   返させ、日付の抜けでグラフの時間軸が縮まないようにする。
+const TREND_PERIODS = { "24h": 1, "7d": 7, "28d": 28, "90d": 90 };
+function fetchTrend(period) {
+  period = TREND_PERIODS[period] ? period : "24h";
+  return cached("trend:" + period, 45_000, async () => {
+    if (period === "24h") {
+      const data = await runReport({
+        dateRanges: [{ startDate: "2daysAgo", endDate: "today" }],
+        dimensions: [{ name: "dateHour" }],
+        metrics: [{ name: "activeUsers" }],
+        orderBys: [{ dimension: { dimensionName: "dateHour" }, desc: false }],
+      });
+      const rows = (data.rows || []).map((r) => ({ hour: dim(r, 0), value: Math.round(num(r, 0)) }));
+      return rows.slice(-24);
+    }
+    const days = TREND_PERIODS[period];
     const data = await runReport({
-      dateRanges: [{ startDate: "2daysAgo", endDate: "today" }],
-      dimensions: [{ name: "dateHour" }],
+      dateRanges: [{ startDate: (days - 1) + "daysAgo", endDate: "today" }],
+      dimensions: [{ name: "date" }],
       metrics: [{ name: "activeUsers" }],
-      orderBys: [{ dimension: { dimensionName: "dateHour" }, desc: false }],
+      orderBys: [{ dimension: { dimensionName: "date" }, desc: false }],
+      keepEmptyRows: true,
+      limit: 400,
     });
-    const rows = (data.rows || []).map((r) => ({ hour: dim(r, 0), value: Math.round(num(r, 0)) }));
-    return rows.slice(-24);
+    return (data.rows || []).map((r) => ({ day: dim(r, 0), value: Math.round(num(r, 0)) }));
   });
 }
 
-// 流入元（検索 / SNS /直接 / その他）
+// 流入元の詳細（instagram.com / google / 直接 … の実名）。
+// よく知られたソースは日本語/サービス名に寄せ、Instagram系のドメイン違いは1つに束ねる。
+// 上位5＋その他 を積み上げ棒グラフ用に割合で返す。
+function sourceLabel(src) {
+  const s = (src || "").toLowerCase();
+  if (s === "(direct)" || s === "(not set)") return "直接";
+  if (s.includes("instagram")) return "Instagram";
+  if (s === "google" || s === "google.com") return "Google検索";
+  if (s.includes("yahoo")) return "Yahoo!";
+  if (s === "t.co" || s === "twitter.com" || s === "x.com") return "X（旧Twitter）";
+  if (s.includes("bing")) return "Bing";
+  if (s.includes("facebook") || s === "m.facebook.com" || s === "fb.me") return "Facebook";
+  if (s.includes("pinterest")) return "Pinterest";
+  return src;
+}
 function fetchTraffic() {
   return cached("traffic", 45_000, async () => {
     const data = await runReport({
       dateRanges: [{ startDate: "28daysAgo", endDate: "today" }],
-      dimensions: [{ name: "sessionDefaultChannelGroup" }],
+      dimensions: [{ name: "sessionSource" }],
       metrics: [{ name: "sessions" }],
       orderBys: [{ metric: { metricName: "sessions" }, desc: true }],
-      limit: 20,
+      limit: 50,
     });
-    const buckets = { 検索: { sub: "ORGANIC / PAID SEARCH", n: 0 }, SNS: { sub: "SOCIAL", n: 0 }, 直接: { sub: "DIRECT", n: 0 }, その他: { sub: "REFERRAL / OTHER", n: 0 } };
+    const byLabel = new Map();
     (data.rows || []).forEach((r) => {
-      const g = dim(r, 0);
-      const n = num(r, 0);
-      if (/search/i.test(g)) buckets["検索"].n += n;
-      else if (/social/i.test(g)) buckets["SNS"].n += n;
-      else if (/^direct$/i.test(g)) buckets["直接"].n += n;
-      else buckets["その他"].n += n;
+      const label = sourceLabel(dim(r, 0));
+      byLabel.set(label, (byLabel.get(label) || 0) + num(r, 0));
     });
-    const total = Object.values(buckets).reduce((a, b) => a + b.n, 0);
-    return Object.entries(buckets)
-      .filter(([, v]) => v.n > 0)
-      .map(([label, v]) => ({ label, sub: v.sub, pct: total > 0 ? Math.round((v.n / total) * 100) : 0 }));
+    const rows = [...byLabel.entries()].map(([label, n]) => ({ label, n })).sort((a, b) => b.n - a.n);
+    const total = rows.reduce((a, b) => a + b.n, 0);
+    const top = rows.slice(0, 5);
+    const restN = rows.slice(5).reduce((a, b) => a + b.n, 0);
+    const items = top.map((r) => ({ label: r.label, pct: total > 0 ? Math.round((r.n / total) * 100) : 0 }));
+    if (restN > 0) items.push({ label: "その他", pct: Math.round((restN / total) * 100) });
+    return items.filter((i) => i.pct > 0);
   });
 }
 
@@ -201,6 +231,59 @@ const JP_COUNTRY = {
   "United Kingdom": "イギリス", Germany: "ドイツ", Australia: "オーストラリア", Canada: "カナダ",
   Thailand: "タイ", Italy: "イタリア", Spain: "スペイン", Vietnam: "ベトナム", India: "インド",
 };
+
+// 都市別（上位5＋その他）。GA4は都市名を英語で返すので、主要都市は日本語に変換する。
+const JP_CITY = {
+  Tokyo: "東京", Osaka: "大阪", Nagoya: "名古屋", Yokohama: "横浜", Kyoto: "京都",
+  Sapporo: "札幌", Fukuoka: "福岡", Kobe: "神戸", Sendai: "仙台", Hiroshima: "広島",
+  Kawasaki: "川崎", Saitama: "さいたま", Chiba: "千葉", Kitakyushu: "北九州",
+  Niigata: "新潟", Hamamatsu: "浜松", Kumamoto: "熊本", Okayama: "岡山",
+  Kanazawa: "金沢", Shizuoka: "静岡", Utsunomiya: "宇都宮", Matsuyama: "松山",
+  Kagoshima: "鹿児島", Naha: "那覇", Shinjuku: "新宿", Shibuya: "渋谷", Minato: "港区",
+  Setagaya: "世田谷", "New York": "ニューヨーク", "Los Angeles": "ロサンゼルス",
+  Paris: "パリ", London: "ロンドン", Seoul: "ソウル", Taipei: "台北",
+};
+function fetchCity() {
+  return cached("city", 45_000, async () => {
+    const data = await runReport({
+      dateRanges: [{ startDate: "28daysAgo", endDate: "today" }],
+      dimensions: [{ name: "city" }],
+      metrics: [{ name: "activeUsers" }],
+      orderBys: [{ metric: { metricName: "activeUsers" }, desc: true }],
+      limit: 100,
+    });
+    const rows = (data.rows || [])
+      .map((r) => ({ label: dim(r, 0), n: num(r, 0) }))
+      .filter((r) => r.label && r.label !== "(not set)");
+    const total = rows.reduce((a, b) => a + b.n, 0);
+    const top = rows.slice(0, 5);
+    const restN = rows.slice(5).reduce((a, b) => a + b.n, 0);
+    const items = top.map((r) => ({ label: JP_CITY[r.label] || r.label, pct: total > 0 ? Math.round((r.n / total) * 100) : 0 }));
+    if (restN > 0) items.push({ label: "その他", pct: Math.round((restN / total) * 100) });
+    return items;
+  });
+}
+
+// 曜日×時間帯のヒートマップ（直近28日）。dayOfWeekは 0=日曜〜6=土曜、
+// hourは "00"〜"23"（どちらもGA4プロパティのタイムゾーン基準）。
+function fetchHeatmap() {
+  return cached("heatmap", 45_000, async () => {
+    const data = await runReport({
+      dateRanges: [{ startDate: "28daysAgo", endDate: "today" }],
+      dimensions: [{ name: "dayOfWeek" }, { name: "hour" }],
+      metrics: [{ name: "activeUsers" }],
+      limit: 200,
+    });
+    const matrix = Array.from({ length: 7 }, () => Array(24).fill(0));
+    (data.rows || []).forEach((r) => {
+      const d = parseInt(dim(r, 0), 10);
+      const h = parseInt(dim(r, 1), 10);
+      if (d >= 0 && d <= 6 && h >= 0 && h <= 23) matrix[d][h] += Math.round(num(r, 0));
+    });
+    const max = Math.max(0, ...matrix.flat());
+    return { matrix, max };
+  });
+}
 
 // 新規 / リピーター
 function fetchNewReturning() {
@@ -254,11 +337,14 @@ function fetchRealtimePages() {
 module.exports = {
   enabled,
   GA4_PROPERTY_ID,
+  TREND_PERIODS,
   fetchTotals,
   fetchTrend,
   fetchTraffic,
   fetchTopWorksRaw,
   fetchCountry,
+  fetchCity,
+  fetchHeatmap,
   fetchNewReturning,
   fetchRealtimeUsers,
   fetchRealtimePages,
