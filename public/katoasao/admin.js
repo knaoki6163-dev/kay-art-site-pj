@@ -334,12 +334,23 @@
     const hasData = !!(matrix && max > 0);
     if (hint) hint.hidden = hasData;
     if (!matrix) return;
+    // 曜日を横（最上段のヘッダー）、時間を縦（左の目盛り）に並べる。
+    // 最上段：左上の空きマス＋日〜土の曜日ラベル
+    const corner = document.createElement("div");
+    wrap.appendChild(corner);
     for (let d = 0; d < 7; d++) {
       const dayLabel = document.createElement("div");
       dayLabel.className = "an-heat-day";
       dayLabel.textContent = AN_DAY_LABELS[d];
       wrap.appendChild(dayLabel);
-      for (let h = 0; h < 24; h++) {
+    }
+    // 2段目以降：各行が1時間分（左に時間の目盛り、続けて日〜土のセル）
+    for (let h = 0; h < 24; h++) {
+      const lab = document.createElement("div");
+      lab.className = "an-heat-hour";
+      if (h % 3 === 0) lab.textContent = h + "時";
+      wrap.appendChild(lab);
+      for (let d = 0; d < 7; d++) {
         const v = (matrix[d] && matrix[d][h]) || 0;
         const cell = document.createElement("div");
         cell.className = "an-heat-cell";
@@ -350,15 +361,6 @@
         cell.title = AN_DAY_LABELS[d] + "曜 " + h + "時 · " + v + "人";
         wrap.appendChild(cell);
       }
-    }
-    // 最下段：時間の目盛り（0 / 6 / 12 / 18 / 23 時だけ表示）
-    const corner = document.createElement("div");
-    wrap.appendChild(corner);
-    for (let h = 0; h < 24; h++) {
-      const lab = document.createElement("div");
-      lab.className = "an-heat-hour";
-      if (h === 0 || h === 6 || h === 12 || h === 18 || h === 23) lab.textContent = String(h);
-      wrap.appendChild(lab);
     }
   }
 
