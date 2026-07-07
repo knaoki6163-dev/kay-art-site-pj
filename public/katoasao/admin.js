@@ -179,20 +179,69 @@
     dot.setAttribute("cy", ya(vals[n - 1]).toFixed(1));
   }
 
+  /* --- トレンドの期間切替（24h / 7日 / 28日 / 90日） --- */
+  let anTrendPeriod = "24h";
+  let anTrend24 = [];   // 概要APIが返す24hデータの控え（切替時の再取得を減らす）
+  const AN_PERIOD_INFO = {
+    "24h": { range: "直近24時間", axis: ["24h前", "18h前", "12h前", "6h前", "現在"] },
+    "7d": { range: "直近7日", axis: ["7日前", "5日前", "4日前", "2日前", "現在"] },
+    "28d": { range: "直近28日", axis: ["28日前", "21日前", "14日前", "7日前", "現在"] },
+    "90d": { range: "直近90日", axis: ["90日前", "68日前", "45日前", "23日前", "現在"] },
+  };
+  function renderTrendAxis(period) {
+    const info = AN_PERIOD_INFO[period] || AN_PERIOD_INFO["24h"];
+    const rangeEl = $("an-trend-range");
+    if (rangeEl) rangeEl.textContent = info.range;
+    const axisEl = $("an-trend-axis");
+    if (axisEl) axisEl.innerHTML = info.axis.map((t) => "<span>" + esc(t) + "</span>").join("");
+  }
+  async function renderTrendForPeriod(period) {
+    renderTrendAxis(period);
+    if (period === "24h") { renderTrendChart(anTrend24); return; }
+    let data = null;
+    try { data = await (await fetch("/api/admin/analytics/trend?period=" + encodeURIComponent(period))).json(); }
+    catch (e) { return; } // 取得失敗時は直前のグラフを残す
+    if (!data || !data.configured) return;
+    if (period !== anTrendPeriod) return; // 取得中に別の期間へ切り替えられていたら破棄
+    renderTrendChart(data.trend || []);
+  }
+  const trendTabsEl = $("an-trend-tabs");
+  if (trendTabsEl) {
+    trendTabsEl.querySelectorAll(".an-mini-tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.period === anTrendPeriod) return;
+        trendTabsEl.querySelectorAll(".an-mini-tab").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        anTrendPeriod = btn.dataset.period;
+        renderTrendForPeriod(anTrendPeriod);
+      });
+    });
+  }
+
+  /* --- 流入元の詳細（積み上げ棒グラフ＋凡例） --- */
+  // 積み上げの各セグメント色。「その他」は常に控えめなグレーにする。
+  const AN_STACK_COLORS = ["#c2764e", "#5d7a96", "#8fa06e", "#d8927a", "#b3a065"];
+  const AN_STACK_OTHER = "#8a8073";
   function renderTraffic(list) {
-    const wrap = $("an-traffic");
-    wrap.innerHTML = "";
-    if (!list || !list.length) { wrap.innerHTML = '<p class="an-hint">データがまだありません。</p>'; return; }
-    list.forEach((t) => {
+    const bar = $("an-stack");
+    const legend = $("an-stack-legend");
+    bar.innerHTML = ""; legend.innerHTML = "";
+    if (!list || !list.length) { legend.innerHTML = '<p class="an-hint">データがまだありません。</p>'; return; }
+    list.forEach((t, i) => {
+      const color = t.label === "その他" ? AN_STACK_OTHER : AN_STACK_COLORS[i % AN_STACK_COLORS.length];
+      const seg = document.createElement("div");
+      seg.className = "an-stack__seg";
+      seg.style.flexGrow = String(Math.max(1, t.pct)); // 幅は割合で按分（合計が100未満でも全幅を使う）
+      seg.style.background = color;
+      seg.title = t.label + " " + t.pct + "%";
+      bar.appendChild(seg);
       const row = document.createElement("div");
+      row.className = "an-stack-legend__item";
       row.innerHTML =
-        '<div class="an-traffic-row__head">' +
-          '<div class="an-traffic-row__label"><span class="an-traffic-row__name">' + esc(t.label) + '</span>' +
-            '<span class="an-traffic-row__sub">' + esc(t.sub) + '</span></div>' +
-          '<span class="an-traffic-row__pct">' + t.pct + '%</span>' +
-        '</div>' +
-        '<div class="an-bar-track"><div class="an-bar-fill" style="width:' + t.pct + '%"></div></div>';
-      wrap.appendChild(row);
+        '<span class="an-dot" style="background:' + color + '"></span>' +
+        '<span class="an-flex1">' + esc(t.label) + "</span>" +
+        '<span class="an-num an-num--sm">' + t.pct + "%</span>";
+      legend.appendChild(row);
     });
   }
 
@@ -258,6 +307,61 @@
     });
   }
 
+  /* --- 地域別の「国 / 都市」切替 --- */
+  let anGeoMode = "country";
+  let anGeoData = { country: [], city: [] };
+  const geoTabsEl = $("an-geo-tabs");
+  if (geoTabsEl) {
+    geoTabsEl.querySelectorAll(".an-mini-tab").forEach((btn) => {
+      btn.addEventListener("click", () => {
+        if (btn.dataset.geo === anGeoMode) return;
+        geoTabsEl.querySelectorAll(".an-mini-tab").forEach((b) => b.classList.remove("is-active"));
+        btn.classList.add("is-active");
+        anGeoMode = btn.dataset.geo;
+        renderCountry(anGeoData[anGeoMode]);
+      });
+    });
+  }
+
+  /* --- 曜日×時間帯ヒートマップ --- */
+  const AN_DAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"]; // GA4のdayOfWeekは0=日曜
+  function renderHeatmap(hm) {
+    const wrap = $("an-heatmap");
+    const hint = $("an-heatmap-hint");
+    wrap.innerHTML = "";
+    const matrix = hm && hm.matrix;
+    const max = (hm && hm.max) || 0;
+    const hasData = !!(matrix && max > 0);
+    if (hint) hint.hidden = hasData;
+    if (!matrix) return;
+    for (let d = 0; d < 7; d++) {
+      const dayLabel = document.createElement("div");
+      dayLabel.className = "an-heat-day";
+      dayLabel.textContent = AN_DAY_LABELS[d];
+      wrap.appendChild(dayLabel);
+      for (let h = 0; h < 24; h++) {
+        const v = (matrix[d] && matrix[d][h]) || 0;
+        const cell = document.createElement("div");
+        cell.className = "an-heat-cell";
+        if (v > 0 && max > 0) {
+          const a = 0.15 + 0.85 * (v / max);
+          cell.style.background = "rgba(194,118,78," + a.toFixed(2) + ")"; // var(--accent) #c2764e
+        }
+        cell.title = AN_DAY_LABELS[d] + "曜 " + h + "時 · " + v + "人";
+        wrap.appendChild(cell);
+      }
+    }
+    // 最下段：時間の目盛り（0 / 6 / 12 / 18 / 23 時だけ表示）
+    const corner = document.createElement("div");
+    wrap.appendChild(corner);
+    for (let h = 0; h < 24; h++) {
+      const lab = document.createElement("div");
+      lab.className = "an-heat-hour";
+      if (h === 0 || h === 6 || h === 12 || h === 18 || h === 23) lab.textContent = String(h);
+      wrap.appendChild(lab);
+    }
+  }
+
   function renderNewRet(nr) {
     if (!nr) {
       $("an-newret-new").style.width = "0%";
@@ -297,13 +401,16 @@
     const db = anDeltaBounce(t ? t.dBounce : 0);
     $("an-kpi-bounce-delta").textContent = db.text; $("an-kpi-bounce-delta").className = "an-delta " + db.cls;
 
-    renderTrendChart(data.trend);
+    anTrend24 = data.trend || [];
+    renderTrendForPeriod(anTrendPeriod); // 選択中の期間を維持したまま更新（24h以外は個別APIで再取得）
     renderTraffic(data.traffic);
     renderWorks(data.works);
-    renderCountry(data.country);
+    anGeoData = { country: data.country || [], city: data.city || [] };
+    renderCountry(anGeoData[anGeoMode]);
+    renderHeatmap(data.heatmap);
     renderNewRet(data.newReturning);
 
-    const errors = [data.totalsError, data.trendError, data.trafficError, data.worksError, data.countryError, data.newReturningError].filter(Boolean);
+    const errors = [data.totalsError, data.trendError, data.trafficError, data.worksError, data.countryError, data.cityError, data.heatmapError, data.newReturningError].filter(Boolean);
     const errBox = $("an-error");
     if (errors.length) {
       errBox.hidden = false;

@@ -733,14 +733,31 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .an-bar-track { position: relative; background: rgba(0,0,0,0.06); border-radius: 999px; overflow: hidden; }
 .an-bar-fill { height: 100%; background: linear-gradient(90deg, var(--accent), var(--accent)); border-radius: 999px; transition: width 1s cubic-bezier(.2,.7,.2,1); }
 
-.an-traffic { display: flex; flex-direction: column; gap: 0.9rem; }
-.an-traffic-row__head { display: flex; justify-content: space-between; align-items: flex-end; margin-bottom: 0.4rem; }
-.an-traffic-row__label { display: flex; align-items: baseline; gap: 0.5rem; }
-.an-traffic-row__name { font-size: 0.95rem; }
-.an-traffic-row__sub { font-family: var(--serif-en); font-size: 0.66rem; letter-spacing: 0.08em; color: var(--ink-soft); }
-.an-traffic-row__pct { font-family: var(--serif-en); font-size: 1.3rem; }
-.an-traffic .an-bar-track { height: 26px; border-radius: 7px; }
-.an-traffic .an-bar-fill { border-radius: 7px; }
+/* 期間・表示の切替に使う小さなタブ（トレンドの 24h/7日/28日/90日、地域別の 国/都市） */
+.an-mini-tabs { display: flex; gap: 0.3rem; }
+.an-mini-tabs--right { justify-content: flex-end; margin-bottom: 0.4rem; }
+.an-card__label .an-mini-tabs { margin-left: auto; }
+.an-mini-tab {
+  font-family: var(--serif-en); font-size: 0.7rem; letter-spacing: 0.08em;
+  padding: 0.2em 0.75em; border: 1px solid var(--line); border-radius: 999px;
+  background: transparent; color: var(--ink-soft); cursor: pointer;
+  transition: all .25s var(--ease);
+}
+.an-mini-tab:hover { border-color: var(--accent); color: var(--accent); }
+.an-mini-tab.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+/* 流入元の積み上げ棒グラフ（100%横棒＋凡例） */
+.an-stack { display: flex; height: 26px; border-radius: 7px; overflow: hidden; background: rgba(0,0,0,0.06); margin-bottom: 0.9rem; }
+.an-stack__seg { min-width: 3px; }
+.an-stack__seg + .an-stack__seg { border-left: 2px solid rgba(255,255,255,0.35); }
+.an-stack-legend { display: flex; flex-direction: column; gap: 0.55rem; }
+.an-stack-legend__item { display: flex; align-items: center; gap: 0.6rem; }
+
+/* 曜日×時間帯ヒートマップ（7行×24列。左に曜日、最下段に時間の目盛り） */
+.an-heatmap { display: grid; grid-template-columns: auto repeat(24, minmax(0, 1fr)); gap: 2px; }
+.an-heat-day { font-size: 0.72rem; color: var(--ink-soft); padding-right: 0.45em; display: flex; align-items: center; }
+.an-heat-cell { aspect-ratio: 1 / 1; min-height: 10px; border-radius: 2px; background: rgba(0,0,0,0.05); }
+.an-heat-hour { font-family: var(--serif-en); font-size: 0.62rem; color: var(--ink-soft); text-align: center; line-height: 1.6; }
 
 .an-works { display: flex; flex-direction: column; gap: 0.75rem; }
 .an-work-row { display: flex; align-items: center; gap: 0.7rem; }
@@ -884,6 +901,13 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .admin-body .an-hint { color: #8a8073; }
 .admin-body .an-newret-bar { background: #332e29; }
 .admin-body .an-dot--muted { background: #6e6759; }
+.admin-body .an-mini-tab { border-color: #4a4339; color: #c0b6a6; }
+.admin-body .an-mini-tab:hover { border-color: var(--accent); color: var(--accent); }
+.admin-body .an-mini-tab.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
+.admin-body .an-stack { background: #332e29; }
+.admin-body .an-stack__seg + .an-stack__seg { border-left-color: rgba(30,27,23,0.6); }
+.admin-body .an-heat-cell { background: #332e29; }
+.admin-body .an-heat-day, .admin-body .an-heat-hour { color: #8a8073; }
 
 /* ---------- 専用ページ（works / info / blog / artist / contact） ---------- */
 /* サブページでも背景は擬似要素側に（上記と同じ包含ブロック問題を避けるため） */
