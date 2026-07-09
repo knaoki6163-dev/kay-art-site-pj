@@ -852,8 +852,19 @@ function extractDetail(fullMessage) {
 }
 
 // GitHubのAPI失敗を、管理画面に出す分かりやすい日本語メッセージに変換する。
-function githubErrorMessage(status) {
+function githubErrorMessage(status, info) {
+  info = info || {};
+  const remaining = info.remaining;
+  const ghMsg = (info.ghMessage || "").toLowerCase();
   if (status === 403 || status === 429) {
+    // 403はレート上限とアカウント凍結（アクセスブロック）の両方で返る。
+    // 残り回数が0、または本文が rate limit のときだけ「API制限」。
+    // それ以外の403（残り回数があるのに拒否）は凍結・ブロックの可能性が高い。
+    const isRateLimit =
+      status === 429 || remaining === "0" || /rate limit/.test(ghMsg);
+    if (status === 403 && !isRateLimit) {
+      return "GitHubアカウントが凍結（またはアクセスをブロック）されている可能性があります。GitHub上でアカウント・リポジトリの状態をご確認ください。復帰後は自動で履歴の取得を再開します。";
+    }
     return GITHUB_TOKEN
       ? "GitHubのAPI制限に達しました。しばらくすると自動で復帰します。"
       : "GitHubのAPI制限に達しています（未認証は1時間あたり60回まで。共有サーバーではすぐ上限に達します）。Renderの環境変数 GITHUB_TOKEN を設定すると解消します（手順は DEPLOY.md）。";
@@ -883,6 +894,14 @@ async function fetchGithubCommits() {
       if (!res.ok) {
         const err = new Error("GitHub API " + res.status);
         err.status = res.status;
+        // レート上限（残り0）とアカウント凍結（残りあり）を見分けるための材料を残す
+        err.remaining = res.headers.get("x-ratelimit-remaining");
+        try {
+          const body = await res.json();
+          err.ghMessage = (body && body.message) || "";
+        } catch (_) {
+          err.ghMessage = "";
+        }
         throw err;
       }
       const data = await res.json();
@@ -912,7 +931,7 @@ async function fetchGithubCommits() {
     return githubCache;
   } catch (e) {
     // 失敗時：理由を残し、直近の成功データがあればそれも残す（管理ログは必ず表示できる）。
-    const msg = e && e.status ? githubErrorMessage(e.status) : "GitHubに接続できませんでした（ネットワークエラー）。";
+    const msg = e && e.status ? githubErrorMessage(e.status, { remaining: e.remaining, ghMessage: e.ghMessage }) : "GitHubに接続できませんでした（ネットワークエラー）。";
     console.error("⚠ GitHubコミット取得に失敗:", e && (e.message || e));
     githubCache = { at: now, items: githubCache.items || [], error: msg };
     return githubCache;

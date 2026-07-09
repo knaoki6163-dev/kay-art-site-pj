@@ -323,41 +323,56 @@
     });
   }
 
-  /* --- 曜日×時間帯ヒートマップ --- */
+  /* --- 曜日×時間帯ヒートマップ（2時間ごとに集約：24時間→12バケット） --- */
   const AN_DAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"]; // GA4のdayOfWeekは0=日曜
+  const AN_HEAT_BUCKETS = 12; // 2時間ごと
   function renderHeatmap(hm) {
     const wrap = $("an-heatmap");
     const hint = $("an-heatmap-hint");
     wrap.innerHTML = "";
     const matrix = hm && hm.matrix;
-    const max = (hm && hm.max) || 0;
-    const hasData = !!(matrix && max > 0);
+    if (!matrix) { if (hint) hint.hidden = false; return; }
+    // 時間別（0..23）を2時間ごとに合算し、集約後の最大値で色を正規化する
+    const buckets = [];
+    let bmax = 0;
+    for (let d = 0; d < 7; d++) {
+      buckets[d] = [];
+      for (let b = 0; b < AN_HEAT_BUCKETS; b++) {
+        const h0 = b * 2;
+        const v = ((matrix[d] && matrix[d][h0]) || 0) + ((matrix[d] && matrix[d][h0 + 1]) || 0);
+        buckets[d][b] = v;
+        if (v > bmax) bmax = v;
+      }
+    }
+    const hasData = bmax > 0;
     if (hint) hint.hidden = hasData;
-    if (!matrix) return;
     for (let d = 0; d < 7; d++) {
       const dayLabel = document.createElement("div");
       dayLabel.className = "an-heat-day";
       dayLabel.textContent = AN_DAY_LABELS[d];
       wrap.appendChild(dayLabel);
-      for (let h = 0; h < 24; h++) {
-        const v = (matrix[d] && matrix[d][h]) || 0;
+      for (let b = 0; b < AN_HEAT_BUCKETS; b++) {
+        const h0 = b * 2;
+        const v = buckets[d][b];
         const cell = document.createElement("div");
         cell.className = "an-heat-cell";
-        if (v > 0 && max > 0) {
-          const a = 0.15 + 0.85 * (v / max);
+        if (v > 0 && bmax > 0) {
+          const a = 0.15 + 0.85 * (v / bmax);
           cell.style.background = "rgba(194,118,78," + a.toFixed(2) + ")"; // var(--accent) #c2764e
         }
-        cell.title = AN_DAY_LABELS[d] + "曜 " + h + "時 · " + v + "人";
+        cell.title = AN_DAY_LABELS[d] + "曜 " + h0 + "–" + (h0 + 2) + "時 · " + v + "人";
         wrap.appendChild(cell);
       }
     }
-    // 最下段：時間の目盛り（0 / 6 / 12 / 18 / 23 時だけ表示）
+    // 最下段：時間の目盛り（0 / 6 / 12 / 18 / 24 時だけ表示）
     const corner = document.createElement("div");
     wrap.appendChild(corner);
-    for (let h = 0; h < 24; h++) {
+    for (let b = 0; b < AN_HEAT_BUCKETS; b++) {
+      const h0 = b * 2;
       const lab = document.createElement("div");
       lab.className = "an-heat-hour";
-      if (h === 0 || h === 6 || h === 12 || h === 18 || h === 23) lab.textContent = String(h);
+      if (h0 === 0 || h0 === 6 || h0 === 12 || h0 === 18) lab.textContent = String(h0);
+      else if (b === AN_HEAT_BUCKETS - 1) lab.textContent = "24";
       wrap.appendChild(lab);
     }
   }
