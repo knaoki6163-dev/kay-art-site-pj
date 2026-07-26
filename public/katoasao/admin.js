@@ -80,7 +80,12 @@
 
   /* ---------- 画面の切り替え ---------- */
   function showLogin() { loginView.hidden = false; appView.hidden = true; document.body.classList.remove("is-authed"); }
-  function showApp() { loginView.hidden = true; appView.hidden = false; document.body.classList.add("is-authed"); init(); }
+  function showApp() {
+    loginView.hidden = true; appView.hidden = false; document.body.classList.add("is-authed");
+    // 管理者としてログインしたブラウザに印を付け、以後の閲覧をGA4計測から除外する（analytics.js側で参照）
+    try { localStorage.setItem("akatoOwner", "1"); } catch (e) {}
+    init();
+  }
 
   /* ---------- 起動時：ログイン状態を確認 ---------- */
   async function checkAuth() {
@@ -147,11 +152,11 @@
   }
   function anDeltaAvg(diffSec) {
     const up = diffSec >= 0;
-    return { text: (up ? "▲ " : "▼ ") + Math.abs(diffSec) + "秒 前日比", cls: up ? "is-up" : "" };
+    return { text: (up ? "▲ " : "▼ ") + Math.abs(diffSec) + "秒 前月比", cls: up ? "is-up" : "" };
   }
-  function anDeltaBounce(diffPt) {
-    const down = diffPt <= 0;
-    return { text: (down ? "▼ " : "▲ ") + Math.abs(diffPt) + "pt 前日比" + (down ? " 改善" : ""), cls: down ? "is-good" : "" };
+  function anDeltaEngage(diffPt) {
+    const up = diffPt >= 0;
+    return { text: (up ? "▲ " : "▼ ") + Math.abs(diffPt) + "pt 前月比" + (up ? " 改善" : ""), cls: up ? "is-good" : "" };
   }
   function anSetUpdatedNow() {
     const d = new Date();
@@ -180,7 +185,7 @@
   }
 
   /* --- トレンドの期間切替（24h / 7日 / 28日 / 90日） --- */
-  let anTrendPeriod = "24h";
+  let anTrendPeriod = "90d";
   let anTrend24 = [];   // 概要APIが返す24hデータの控え（切替時の再取得を減らす）
   const AN_PERIOD_INFO = {
     "24h": { range: "直近24時間", axis: ["24h前", "18h前", "12h前", "6h前", "現在"] },
@@ -222,13 +227,15 @@
   // 積み上げの各セグメント色。「その他」は常に控えめなグレーにする。
   const AN_STACK_COLORS = ["#c2764e", "#5d7a96", "#8fa06e", "#d8927a", "#b3a065"];
   const AN_STACK_OTHER = "#8a8073";
+  // 「スパムボット」（リファラースパムの集約）はさらに暗い色で目立たせない
+  const AN_STACK_SPAM = "#575044";
   function renderTraffic(list) {
     const bar = $("an-stack");
     const legend = $("an-stack-legend");
     bar.innerHTML = ""; legend.innerHTML = "";
     if (!list || !list.length) { legend.innerHTML = '<p class="an-hint">データがまだありません。</p>'; return; }
     list.forEach((t, i) => {
-      const color = t.label === "その他" ? AN_STACK_OTHER : AN_STACK_COLORS[i % AN_STACK_COLORS.length];
+      const color = t.label === "スパムボット" ? AN_STACK_SPAM : t.label === "その他" ? AN_STACK_OTHER : AN_STACK_COLORS[i % AN_STACK_COLORS.length];
       const seg = document.createElement("div");
       seg.className = "an-stack__seg";
       seg.style.flexGrow = String(Math.max(1, t.pct)); // 幅は割合で按分（合計が100未満でも全幅を使う）
@@ -387,18 +394,14 @@
           if (buckets[d][b] > 0) slots.push({ d: d, b: b, v: buckets[d][b] });
         }
       }
-      slots.sort((x, y) => y.v - x.v).slice(0, 3).forEach((s, i) => {
+      const top = slots.sort((x, y) => y.v - x.v).slice(0, 3);
+      const pmax = top.length ? top[0].v : 0;
+      top.forEach((s) => {
         const li = document.createElement("li");
-        const rank = document.createElement("span");
-        rank.className = "an-heat-peak-list__rank";
-        rank.textContent = String(i + 1);
-        const label = document.createElement("span");
-        label.className = "an-heat-peak-list__label";
-        label.textContent = AN_DAY_LABELS[s.d] + "曜 " + s.b * 2 + "–" + (s.b * 2 + 2) + "時";
-        const num = document.createElement("span");
-        num.className = "an-heat-peak-list__num";
-        num.textContent = s.v + "人";
-        li.appendChild(rank); li.appendChild(label); li.appendChild(num);
+        li.innerHTML =
+          '<div class="an-heat-peak__head"><span>' + AN_DAY_LABELS[s.d] + "曜 " + s.b * 2 + "–" + (s.b * 2 + 2) + '時</span>' +
+          '<span class="an-heat-peak__n">' + s.v + '人</span></div>' +
+          '<div class="an-bar-track"><div class="an-bar-fill" style="width:' + (pmax > 0 ? Math.round((s.v / pmax) * 100) : 0) + '%"></div></div>';
         peakList.appendChild(li);
       });
     }
@@ -439,9 +442,9 @@
     const da = anDeltaAvg(t ? t.dAvgSecs : 0);
     $("an-kpi-avg-delta").textContent = da.text; $("an-kpi-avg-delta").className = "an-delta " + da.cls;
 
-    $("an-kpi-bounce").textContent = t ? t.bounce.toFixed(1) + "%" : "—";
-    const db = anDeltaBounce(t ? t.dBounce : 0);
-    $("an-kpi-bounce-delta").textContent = db.text; $("an-kpi-bounce-delta").className = "an-delta " + db.cls;
+    $("an-kpi-engage").textContent = t ? t.engage.toFixed(1) + "%" : "—";
+    const de = anDeltaEngage(t ? t.dEngage : 0);
+    $("an-kpi-engage-delta").textContent = de.text; $("an-kpi-engage-delta").className = "an-delta " + de.cls;
 
     anTrend24 = data.trend || [];
     renderTrendForPeriod(anTrendPeriod); // 選択中の期間を維持したまま更新（24h以外は個別APIで再取得）
@@ -971,7 +974,16 @@
     // GitHubの履歴が取得できなかったときは、その理由を上部に表示する
     // （サイトの情報更新ログだけになって「消えた」ように見えるのを防ぐ）。
     const errEl = $("version-github-error");
-    if (errEl) { errEl.hidden = !githubError; errEl.textContent = githubError || ""; }
+    if (errEl) {
+      errEl.hidden = !githubError;
+      // 直近の取得に失敗しても、キャッシュ済みのGitHub履歴を表示できている間は
+      // 赤い警告ではなく控えめな注意表示にする（履歴自体は見えているため）。
+      const hasGithubItems = items.some((i) => i.source === "github");
+      errEl.classList.toggle("is-warn", hasGithubItems);
+      errEl.textContent = githubError
+        ? (hasGithubItems ? "（表示中の履歴は少し前のものです）" + githubError : githubError)
+        : "";
+    }
 
     // 月ごとにグループ化（新しい順を維持したまま、月が変わるところで区切る）
     const groups = [];

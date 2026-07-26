@@ -932,7 +932,7 @@ async function fetchGithubCommits() {
   } catch (e) {
     // 失敗時：理由を残し、直近の成功データがあればそれも残す（管理ログは必ず表示できる）。
     const msg = e && e.status ? githubErrorMessage(e.status, { remaining: e.remaining, ghMessage: e.ghMessage }) : "GitHubに接続できませんでした（ネットワークエラー）。";
-    console.error("⚠ GitHubコミット取得に失敗:", e && (e.message || e));
+    console.error("⚠ GitHubコミット取得に失敗:", e && (e.message || e), e && e.ghMessage ? "| " + String(e.ghMessage).replace(/\s+/g, " ").slice(0, 200) : "");
     githubCache = { at: now, items: githubCache.items || [], error: msg };
     return githubCache;
   }

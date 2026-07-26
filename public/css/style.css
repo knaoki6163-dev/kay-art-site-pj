@@ -615,6 +615,9 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 
 /* バージョン管理（GitHubのコード修正履歴 ＋ 管理画面からの更新履歴） */
 .version-github-error { margin: 0 0 1rem; padding: 0.7rem 0.9rem; border: 1px solid #b23b2a; border-radius: 5px; background: rgba(178,59,42,0.08); font-size: 0.85rem; line-height: 1.7; }
+/* キャッシュ済みの履歴を表示できている間は、赤い警告ではなく控えめな注意にする */
+.version-github-error.is-warn { border-color: rgba(138,128,115,0.55); background: rgba(138,128,115,0.10); color: var(--ink-soft); }
+.admin-body .version-github-error.is-warn { border-color: #575044; background: rgba(87,80,68,0.25); color: #b3a999; }
 .version-list { display: flex; flex-direction: column; gap: 0.7rem; }
 .version-item { border: 1px solid var(--line); border-radius: 3px; background: rgba(255,255,255,0.55); padding: 0.8rem 1.1rem; }
 .version-item--github { border-left: 3px solid var(--blue-blot); }
@@ -694,9 +697,9 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
    ========================================================= */
 .an-head { display: flex; justify-content: space-between; align-items: baseline; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.4rem; }
 .an-head__title { display: flex; align-items: baseline; gap: 0.6rem; }
-.an-head__title h2 { font-size: 1.15rem; font-weight: 600; }
+.an-head__title h2 { font-size: 1.3rem; font-weight: 600; }
 .an-head__live { display: flex; align-items: center; gap: 0.5rem; }
-.an-eyebrow { font-family: var(--serif-en); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
+.an-eyebrow { font-family: var(--serif-en); font-size: 0.8rem; letter-spacing: 0.16em; text-transform: uppercase; color: var(--ink-soft); }
 .an-eyebrow--accent { color: var(--accent); }
 .an-live-dot { width: 7px; height: 7px; border-radius: 50%; background: var(--accent); animation: an-pulse 1.8s infinite ease-in-out; }
 @keyframes an-pulse { 0%, 100% { transform: scale(1); opacity: 1; } 50% { transform: scale(1.6); opacity: .35; } }
@@ -715,7 +718,7 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .an-card__head { display: flex; justify-content: space-between; align-items: flex-start; gap: 0.8rem; }
 .an-card__num { text-align: right; flex-shrink: 0; }
 .an-card__label { display: flex; align-items: baseline; gap: 0.6rem; margin-bottom: 0.4rem; flex-wrap: wrap; }
-.an-sub { font-family: var(--serif-jp); font-size: 0.78rem; color: var(--ink-soft); }
+.an-sub { font-family: var(--serif-jp); font-size: 0.95rem; color: var(--ink-soft); }
 .an-num { font-family: var(--serif-en); font-size: 2.1rem; font-weight: 500; line-height: 0.95; color: var(--ink); }
 .an-card--wide .an-num { font-size: 2.4rem; }
 .an-num--rt { font-size: 2.8rem; }
@@ -757,16 +760,15 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
    12行×7列のコンパクトな縦型マトリクス。右側にピーク時間帯と色の凡例を並べる） */
 .an-heat-wrap { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: stretch; }
 .an-heatmap { display: grid; grid-template-columns: auto repeat(7, 21px); gap: 2px; flex: none; }
-.an-heat-day { font-size: 0.72rem; color: var(--ink-soft); text-align: center; padding-bottom: 0.2em; }
+.an-heat-day { font-size: 0.95rem; font-weight: 600; color: var(--ink-soft); text-align: center; padding-bottom: 0.2em; }
 .an-heat-cell { height: 20px; border-radius: 2px; background: rgba(0,0,0,0.05); }
-.an-heat-hour { font-family: var(--serif-en); font-size: 0.62rem; color: var(--ink-soft); display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5em; }
+.an-heat-hour { font-family: var(--serif-en); font-size: 0.8rem; color: var(--ink-soft); display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5em; }
 .an-heat-peaks { flex: 1; min-width: 110px; display: flex; flex-direction: column; gap: 0.55rem; }
 .an-heat-peaks__title { font-size: 0.72rem; letter-spacing: 0.08em; color: var(--ink-soft); }
-.an-heat-peak-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
-.an-heat-peak-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
-.an-heat-peak-list__rank { font-family: var(--serif-en); color: var(--accent); width: 1.1em; text-align: center; }
-.an-heat-peak-list__label { flex: 1; white-space: nowrap; }
-.an-heat-peak-list__num { font-family: var(--serif-en); font-size: 0.8rem; white-space: nowrap; }
+.an-heat-peak-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
+.an-heat-peak__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.3rem; font-size: 0.82rem; white-space: nowrap; gap: 0.5rem; }
+.an-heat-peak__n { font-family: var(--serif-en); font-size: 0.95rem; }
+.an-heat-peak-list .an-bar-track { height: 5px; }
 .an-heat-scale { display: flex; align-items: center; gap: 0.45rem; font-size: 0.66rem; color: var(--ink-soft); margin-top: auto; }
 .an-heat-scale__bar { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(to right, rgba(194,118,78,0.15), rgba(194,118,78,1)); }
 
@@ -901,7 +903,7 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .admin-body .an-eyebrow { color: #b3a999; }
 .admin-body .an-updated { color: #8a8073; }
 .admin-body .an-card { background: #2a2622; border-color: #463f35; }
-.admin-body .an-sub { color: #b3a999; }
+.admin-body .an-sub { color: #cfc7b8; }
 .admin-body .an-num { color: #f3efe6; }
 .admin-body .an-delta { color: #8a8073; }
 .admin-body .an-delta.is-good { color: #8fa06e; }
@@ -917,8 +919,9 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .admin-body .an-mini-tab.is-active { background: var(--accent); border-color: var(--accent); color: #fff; }
 .admin-body .an-stack { background: #332e29; }
 .admin-body .an-stack__seg + .an-stack__seg { border-left-color: rgba(30,27,23,0.6); }
-.admin-body .an-heat-cell { background: #332e29; }
-.admin-body .an-heat-day, .admin-body .an-heat-hour { color: #8a8073; }
+.admin-body .an-heat-cell { background: #35302a; }
+.admin-body .an-heat-day { color: #e0d9cc; }
+.admin-body .an-heat-hour { color: #8a8073; }
 .admin-body .an-heat-peaks__title, .admin-body .an-heat-scale { color: #8a8073; }
 .admin-body .an-heat-scale__bar { background: linear-gradient(to right, #332e29, rgba(194,118,78,1)); }
 

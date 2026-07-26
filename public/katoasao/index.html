@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="stylesheet" href="/css/style.css?v=26" />
+  <link rel="stylesheet" href="/css/style.css?v=27" />
 </head>
 <body class="admin-body">
   <div class="paper-grain" aria-hidden="true"></div>
@@ -214,7 +214,7 @@
             <div class="an-card__head">
               <div>
                 <div class="an-eyebrow">TOTAL VISITORS</div>
-                <div class="an-sub">総訪問者数（本日） · グラフは<span id="an-trend-range">直近24時間</span>の推移</div>
+                <div class="an-sub">総訪問者数（本日） · グラフは<span id="an-trend-range">直近90日</span>の推移</div>
               </div>
               <div class="an-card__num">
                 <div class="an-num" id="an-kpi-visitors">—</div>
@@ -222,10 +222,10 @@
               </div>
             </div>
             <div class="an-mini-tabs an-mini-tabs--right" id="an-trend-tabs">
-              <button type="button" class="an-mini-tab is-active" data-period="24h">24h</button>
+              <button type="button" class="an-mini-tab" data-period="24h">24h</button>
               <button type="button" class="an-mini-tab" data-period="7d">7日</button>
               <button type="button" class="an-mini-tab" data-period="28d">28日</button>
-              <button type="button" class="an-mini-tab" data-period="90d">90日</button>
+              <button type="button" class="an-mini-tab is-active" data-period="90d">90日</button>
             </div>
             <div class="an-chart">
               <svg id="an-trend-svg" viewBox="0 0 320 96" preserveAspectRatio="none">
@@ -242,22 +242,22 @@
                 <polyline id="an-trend-line" fill="none" stroke="var(--accent)" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"></polyline>
                 <circle id="an-trend-dot" r="3.5" fill="var(--accent)"></circle>
               </svg>
-              <div class="an-chart__axis" id="an-trend-axis"><span>24h前</span><span>18h前</span><span>12h前</span><span>6h前</span><span>現在</span></div>
+              <div class="an-chart__axis" id="an-trend-axis"><span>90日前</span><span>68日前</span><span>45日前</span><span>23日前</span><span>現在</span></div>
             </div>
           </div>
 
           <div class="an-card">
             <div class="an-eyebrow">AVG. TIME ON SITE</div>
-            <div class="an-sub">平均滞在時間</div>
+            <div class="an-sub">平均滞在時間 · 直近28日</div>
             <div class="an-num" id="an-kpi-avg">—</div>
             <span class="an-delta" id="an-kpi-avg-delta"></span>
           </div>
 
           <div class="an-card">
-            <div class="an-eyebrow">BOUNCE RATE</div>
-            <div class="an-sub">直帰率</div>
-            <div class="an-num" id="an-kpi-bounce">—</div>
-            <span class="an-delta" id="an-kpi-bounce-delta"></span>
+            <div class="an-eyebrow">ENGAGEMENT RATE</div>
+            <div class="an-sub">エンゲージメント率 · 直近28日</div>
+            <div class="an-num" id="an-kpi-engage">—</div>
+            <span class="an-delta" id="an-kpi-engage-delta"></span>
           </div>
         </div>
 
@@ -332,6 +332,7 @@
               </div>
             </div>
             <p class="an-hint" id="an-heatmap-hint" hidden>データが集まり次第、色の濃淡で「よく見られている曜日・時間帯」が表示されます。</p>
+            <p class="an-hint">※ 管理者としてログインしたことのあるこのブラウザからの閲覧は、今後アクセス解析に含まれません（自分のアクセスで数値が濁るのを防ぐため）。</p>
           </div>
         </div>
       </div>
@@ -416,6 +417,6 @@
     </div>
   </div>
 
-  <script src="/katoasao/admin.js?v=26"></script>
+  <script src="/katoasao/admin.js?v=27"></script>
 </body>
 </html>

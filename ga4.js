@@ -86,33 +86,37 @@ function cached(key, ttlMs, fn) {
    個別レポート
    ========================================================= */
 
-// 本日 / 前日の合計（総訪問者数・平均滞在時間・直帰率）→ 前日比の算出に使う
+// 合計値（総訪問者数・平均滞在時間・エンゲージメント率）。
+// 訪問者数は本日/前日、滞在時間とエンゲージメント率は直近28日/その前28日で比較する
+// （1日単位だとサンプルが少なすぎて数値が暴れるため）。
 async function fetchTotalsFor(dateRange) {
   const data = await runReport({
     dateRanges: [dateRange],
-    metrics: [{ name: "activeUsers" }, { name: "averageSessionDuration" }, { name: "bounceRate" }],
+    metrics: [{ name: "activeUsers" }, { name: "averageSessionDuration" }, { name: "engagementRate" }],
   });
   const row = data.rows && data.rows[0];
   return {
     visitors: Math.round(num(row, 0)),
     avgSecs: Math.round(num(row, 1)),
-    bounce: +(num(row, 2) * 100).toFixed(1),
+    engage: +(num(row, 2) * 100).toFixed(1),
   };
 }
 function fetchTotals() {
   return cached("totals", 45_000, async () => {
-    const [today, yesterday] = await Promise.all([
+    const [today, yesterday, cur28, prev28] = await Promise.all([
       fetchTotalsFor({ startDate: "today", endDate: "today" }),
       fetchTotalsFor({ startDate: "yesterday", endDate: "yesterday" }),
+      fetchTotalsFor({ startDate: "27daysAgo", endDate: "today" }),
+      fetchTotalsFor({ startDate: "55daysAgo", endDate: "28daysAgo" }),
     ]);
     const pct = (cur, prev) => (prev > 0 ? +(((cur - prev) / prev) * 100).toFixed(1) : null);
     return {
       visitors: today.visitors,
       dVisitorsPct: pct(today.visitors, yesterday.visitors),
-      avgSecs: today.avgSecs,
-      dAvgSecs: today.avgSecs - yesterday.avgSecs,
-      bounce: today.bounce,
-      dBounce: +(today.bounce - yesterday.bounce).toFixed(1),
+      avgSecs: cur28.avgSecs,
+      dAvgSecs: cur28.avgSecs - prev28.avgSecs,
+      engage: cur28.engage,
+      dEngage: +(cur28.engage - prev28.engage).toFixed(1),
     };
   });
 }
@@ -148,12 +152,20 @@ function fetchTrend(period) {
   });
 }
 
-// 流入元の詳細（instagram.com / google / 直接 … の実名）。
+// 流入元の詳細（instagram.com / google / URL直接 … の実名）。
 // よく知られたソースは日本語/サービス名に寄せ、Instagram系のドメイン違いは1つに束ねる。
-// 上位5＋その他 を積み上げ棒グラフ用に割合で返す。
+// リファラースパム（ゴーストスパム）は「スパムボット」に集約し、個別のURLは表示しない。
+// 判定は「スパムがよく使う安価なTLD＋手口キーワード＋既知の常連ドメイン」の3段構え。
+// 上位5＋その他 を積み上げ棒グラフ用に割合で返す（スパムは上位に混ぜず最後に足す）。
+const SPAM_TLD_RE = /\.(space|store|icu|top|xyz|club|online|fun|website|site|buzz|win|rest|cyou|sbs|pw|quest|lol)$/;
+const SPAM_WORD_RE = /(seo|traffic|backlink|aisearch|search.?index|share.?button|buttons?.?for|dollars|money|crawl|spider|audit|rank(ing)?s?[-.]|bot[-.]|[-.]bot)/;
+const SPAM_KNOWN = ["semalt.com", "darodar.com", "event-tracking.com", "sitevaluation.org", "uptimebot.net", "uptime.com"];
+function isSpamSource(s) {
+  return SPAM_TLD_RE.test(s) || SPAM_WORD_RE.test(s) || SPAM_KNOWN.includes(s);
+}
 function sourceLabel(src) {
   const s = (src || "").toLowerCase();
-  if (s === "(direct)" || s === "(not set)") return "直接";
+  if (s === "(direct)" || s === "(not set)") return "URL直接";
   if (s.includes("instagram")) return "Instagram";
   if (s === "google" || s === "google.com") return "Google検索";
   if (s.includes("yahoo")) return "Yahoo!";
@@ -161,6 +173,7 @@ function sourceLabel(src) {
   if (s.includes("bing")) return "Bing";
   if (s.includes("facebook") || s === "m.facebook.com" || s === "fb.me") return "Facebook";
   if (s.includes("pinterest")) return "Pinterest";
+  if (isSpamSource(s)) return "スパムボット";
   return src;
 }
 function fetchTraffic() {
@@ -177,12 +190,16 @@ function fetchTraffic() {
       const label = sourceLabel(dim(r, 0));
       byLabel.set(label, (byLabel.get(label) || 0) + num(r, 0));
     });
+    // スパムボットは正規の流入と並べず、集計の最後に1行だけ足す
+    const spamN = byLabel.get("スパムボット") || 0;
+    byLabel.delete("スパムボット");
     const rows = [...byLabel.entries()].map(([label, n]) => ({ label, n })).sort((a, b) => b.n - a.n);
-    const total = rows.reduce((a, b) => a + b.n, 0);
+    const total = rows.reduce((a, b) => a + b.n, 0) + spamN;
     const top = rows.slice(0, 5);
     const restN = rows.slice(5).reduce((a, b) => a + b.n, 0);
     const items = top.map((r) => ({ label: r.label, pct: total > 0 ? Math.round((r.n / total) * 100) : 0 }));
     if (restN > 0) items.push({ label: "その他", pct: Math.round((restN / total) * 100) });
+    if (spamN > 0) items.push({ label: "スパムボット", pct: Math.round((spamN / total) * 100) });
     return items.filter((i) => i.pct > 0);
   });
 }

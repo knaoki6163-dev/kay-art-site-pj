@@ -18,6 +18,11 @@
   // ローカル確認時（file:// で開いた場合）は計測しない（任意の安全策）
   if (location.protocol === "file:") return;
 
+  // 管理者（サイトの持ち主）の閲覧は計測しない。
+  // 管理画面へログインしたブラウザには印が付き、以後そのブラウザからの
+  // 閲覧はアクセス解析に含まれない（自分のアクセスで数値が濁るのを防ぐ）。
+  try { if (localStorage.getItem("akatoOwner") === "1") return; } catch (e) {}
+
   // 1) Googleのタグ本体(gtag.js)を読み込む
   var s = document.createElement("script");
   s.async = true;
