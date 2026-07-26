@@ -763,14 +763,21 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .an-heat-day { font-size: 0.95rem; font-weight: 600; color: var(--ink-soft); text-align: center; padding-bottom: 0.2em; }
 .an-heat-cell { height: 20px; border-radius: 2px; background: rgba(0,0,0,0.05); }
 .an-heat-hour { font-family: var(--serif-en); font-size: 0.8rem; color: var(--ink-soft); display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5em; }
-.an-heat-peaks { flex: 1; min-width: 110px; display: flex; flex-direction: column; gap: 0.55rem; }
+.an-heat-side { flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 0.9rem; }
+.an-heat-peaks { display: flex; flex-direction: column; gap: 0.55rem; max-width: 210px; }
+/* 管理者除外の注記は右カラムの下端にまとめる */
+.an-heat-note { margin-top: auto; }
 .an-heat-peaks__title { font-size: 0.72rem; letter-spacing: 0.08em; color: var(--ink-soft); }
 .an-heat-peak-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.6rem; }
 .an-heat-peak__head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 0.3rem; font-size: 0.82rem; white-space: nowrap; gap: 0.5rem; }
 .an-heat-peak__n { font-family: var(--serif-en); font-size: 0.95rem; }
 .an-heat-peak-list .an-bar-track { height: 5px; }
-.an-heat-scale { display: flex; align-items: center; gap: 0.45rem; font-size: 0.66rem; color: var(--ink-soft); margin-top: auto; }
+.an-heat-scale { display: flex; align-items: center; gap: 0.45rem; font-size: 0.66rem; color: var(--ink-soft); margin-top: 0.15rem; }
 .an-heat-scale__bar { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(to right, rgba(194,118,78,0.15), rgba(194,118,78,1)); }
+@media (min-width: 721px) {
+  .an-heatmap { grid-template-columns: auto repeat(7, 27px); }
+  .an-heat-cell { height: 26px; }
+}
 
 .an-works { display: flex; flex-direction: column; gap: 0.75rem; }
 .an-work-row { display: flex; align-items: center; gap: 0.7rem; }

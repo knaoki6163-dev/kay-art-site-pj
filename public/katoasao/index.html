@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="stylesheet" href="/css/style.css?v=27" />
+  <link rel="stylesheet" href="/css/style.css?v=28" />
 </head>
 <body class="admin-body">
   <div class="paper-grain" aria-hidden="true"></div>
@@ -325,14 +325,16 @@
             </div>
             <div class="an-heat-wrap" id="an-heat-wrap">
               <div class="an-heatmap" id="an-heatmap"></div>
-              <div class="an-heat-peaks" id="an-heat-peaks" hidden>
-                <p class="an-heat-peaks__title">ピーク時間帯</p>
-                <ol class="an-heat-peak-list" id="an-heat-peak-list"></ol>
-                <div class="an-heat-scale"><span>少</span><span class="an-heat-scale__bar"></span><span>多</span></div>
+              <div class="an-heat-side">
+                <div class="an-heat-peaks" id="an-heat-peaks" hidden>
+                  <p class="an-heat-peaks__title">ピーク時間帯</p>
+                  <ol class="an-heat-peak-list" id="an-heat-peak-list"></ol>
+                  <div class="an-heat-scale"><span>少</span><span class="an-heat-scale__bar"></span><span>多</span></div>
+                </div>
+                <p class="an-hint an-heat-note">※ 管理者としてログインしたことのあるこのブラウザからの閲覧は、今後アクセス解析に含まれません（自分のアクセスで数値が濁るのを防ぐため）。</p>
               </div>
             </div>
             <p class="an-hint" id="an-heatmap-hint" hidden>データが集まり次第、色の濃淡で「よく見られている曜日・時間帯」が表示されます。</p>
-            <p class="an-hint">※ 管理者としてログインしたことのあるこのブラウザからの閲覧は、今後アクセス解析に含まれません（自分のアクセスで数値が濁るのを防ぐため）。</p>
           </div>
         </div>
       </div>
@@ -417,6 +419,6 @@
     </div>
   </div>
 
-  <script src="/katoasao/admin.js?v=27"></script>
+  <script src="/katoasao/admin.js?v=28"></script>
 </body>
 </html>
