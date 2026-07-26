@@ -152,7 +152,7 @@ function fetchTrend(period) {
   });
 }
 
-// 流入元の詳細（instagram.com / google / URL直接 … の実名）。
+// 流入元の詳細（instagram.com / google / 直接流入 … の実名）。
 // よく知られたソースは日本語/サービス名に寄せ、Instagram系のドメイン違いは1つに束ねる。
 // リファラースパム（ゴーストスパム）は「スパムボット」に集約し、個別のURLは表示しない。
 // 判定は「スパムがよく使う安価なTLD＋手口キーワード＋既知の常連ドメイン」の3段構え。
@@ -165,7 +165,7 @@ function isSpamSource(s) {
 }
 function sourceLabel(src) {
   const s = (src || "").toLowerCase();
-  if (s === "(direct)" || s === "(not set)") return "URL直接";
+  if (s === "(direct)" || s === "(not set)") return "直接流入（URL/QR/リンク）";
   if (s.includes("instagram")) return "Instagram";
   if (s === "google" || s === "google.com") return "Google検索";
   if (s.includes("yahoo")) return "Yahoo!";

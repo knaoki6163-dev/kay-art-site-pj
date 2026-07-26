@@ -143,7 +143,12 @@
   /* ---------- アクセス解析（GA4 Data API） ---------- */
   function anFmtSecs(sec) {
     sec = Math.max(0, Math.round(sec));
-    return Math.floor(sec / 60) + ":" + String(sec % 60).padStart(2, "0");
+    const h = Math.floor(sec / 3600);
+    const m = Math.floor((sec % 3600) / 60);
+    const r = sec % 60;
+    if (h > 0) return h + "時間" + m + "分" + r + "秒";
+    if (m > 0) return m + "分" + r + "秒";
+    return r + "秒";
   }
   function anDeltaVisitors(pct) {
     if (pct == null) return { text: "前日比 —", cls: "" };
@@ -372,7 +377,11 @@
       const h0 = b * 2;
       const lab = document.createElement("div");
       lab.className = "an-heat-hour";
-      if (h0 % 6 === 0) lab.textContent = h0 + "時";
+      // 目盛りはセルの上端＝その時刻の境目に合わせ、短い線を添えてどこが区切りか示す
+      if (h0 % 6 === 0) {
+        lab.classList.add("is-tick");
+        lab.innerHTML = '<span class="an-heat-hour__t">' + h0 + "時</span>";
+      }
       wrap.appendChild(lab);
       for (let d = 0; d < 7; d++) {
         const v = buckets[d][b];
@@ -386,6 +395,11 @@
         wrap.appendChild(cell);
       }
     }
+    // 最下段：24時（最終セルの下端＝1日の終わり）の目盛り
+    const endLab = document.createElement("div");
+    endLab.className = "an-heat-hour an-heat-hour--end is-tick";
+    endLab.innerHTML = '<span class="an-heat-hour__t">24時</span>';
+    wrap.appendChild(endLab);
     // 右パネル：よく見られている曜日・時間帯の上位3つ
     if (peakList && hasData) {
       const slots = [];

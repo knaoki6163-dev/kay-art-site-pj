@@ -762,7 +762,11 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .an-heatmap { display: grid; grid-template-columns: auto repeat(7, 21px); gap: 2px; flex: none; }
 .an-heat-day { font-size: 0.95rem; font-weight: 600; color: var(--ink-soft); text-align: center; padding-bottom: 0.2em; }
 .an-heat-cell { height: 20px; border-radius: 2px; background: rgba(0,0,0,0.05); }
-.an-heat-hour { font-family: var(--serif-en); font-size: 0.8rem; color: var(--ink-soft); display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5em; }
+/* 時間の目盛りはセルの上端（＝その時刻の境目）に置き、短い線で区切りを示す */
+.an-heat-hour { font-family: var(--serif-en); font-size: 0.8rem; color: var(--ink-soft); display: flex; align-items: flex-start; justify-content: flex-end; padding-right: 0.5em; position: relative; line-height: 1; }
+.an-heat-hour__t { display: inline-block; transform: translateY(-50%); white-space: nowrap; }
+.an-heat-hour.is-tick::after { content: ""; position: absolute; right: 0; top: 0; width: 0.3em; height: 1px; background: currentColor; opacity: 0.75; }
+.an-heat-hour--end { height: 0; }
 .an-heat-side { flex: 1; min-width: 150px; display: flex; flex-direction: column; gap: 0.9rem; }
 .an-heat-peaks { display: flex; flex-direction: column; gap: 0.55rem; max-width: 210px; }
 /* 管理者除外の注記は右カラムの下端にまとめる */
