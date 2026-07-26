@@ -753,11 +753,22 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .an-stack-legend { display: flex; flex-direction: column; gap: 0.55rem; }
 .an-stack-legend__item { display: flex; align-items: center; gap: 0.6rem; }
 
-/* 曜日×時間帯ヒートマップ（7行×12列＝2時間ごとに集約。左に曜日、最下段に時間の目盛り） */
-.an-heatmap { display: grid; grid-template-columns: auto repeat(12, minmax(0, 1fr)); gap: 2px; }
-.an-heat-day { font-size: 0.72rem; color: var(--ink-soft); padding-right: 0.45em; display: flex; align-items: center; }
-.an-heat-cell { height: 20px; min-height: 20px; border-radius: 2px; background: rgba(0,0,0,0.05); }
-.an-heat-hour { font-family: var(--serif-en); font-size: 0.62rem; color: var(--ink-soft); text-align: center; line-height: 1.6; }
+/* 曜日×時間帯ヒートマップ（曜日を横＝最上段のヘッダー、2時間ごとに集約した時間を縦＝左の目盛り。
+   12行×7列のコンパクトな縦型マトリクス。右側にピーク時間帯と色の凡例を並べる） */
+.an-heat-wrap { display: flex; flex-wrap: wrap; gap: 1.2rem; align-items: stretch; }
+.an-heatmap { display: grid; grid-template-columns: auto repeat(7, 21px); gap: 2px; flex: none; }
+.an-heat-day { font-size: 0.72rem; color: var(--ink-soft); text-align: center; padding-bottom: 0.2em; }
+.an-heat-cell { height: 20px; border-radius: 2px; background: rgba(0,0,0,0.05); }
+.an-heat-hour { font-family: var(--serif-en); font-size: 0.62rem; color: var(--ink-soft); display: flex; align-items: center; justify-content: flex-end; padding-right: 0.5em; }
+.an-heat-peaks { flex: 1; min-width: 110px; display: flex; flex-direction: column; gap: 0.55rem; }
+.an-heat-peaks__title { font-size: 0.72rem; letter-spacing: 0.08em; color: var(--ink-soft); }
+.an-heat-peak-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 0.45rem; }
+.an-heat-peak-list li { display: flex; align-items: center; gap: 0.5rem; font-size: 0.8rem; }
+.an-heat-peak-list__rank { font-family: var(--serif-en); color: var(--accent); width: 1.1em; text-align: center; }
+.an-heat-peak-list__label { flex: 1; white-space: nowrap; }
+.an-heat-peak-list__num { font-family: var(--serif-en); font-size: 0.8rem; white-space: nowrap; }
+.an-heat-scale { display: flex; align-items: center; gap: 0.45rem; font-size: 0.66rem; color: var(--ink-soft); margin-top: auto; }
+.an-heat-scale__bar { flex: 1; height: 8px; border-radius: 4px; background: linear-gradient(to right, rgba(194,118,78,0.15), rgba(194,118,78,1)); }
 
 .an-works { display: flex; flex-direction: column; gap: 0.75rem; }
 .an-work-row { display: flex; align-items: center; gap: 0.7rem; }
@@ -908,6 +919,8 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .admin-body .an-stack__seg + .an-stack__seg { border-left-color: rgba(30,27,23,0.6); }
 .admin-body .an-heat-cell { background: #332e29; }
 .admin-body .an-heat-day, .admin-body .an-heat-hour { color: #8a8073; }
+.admin-body .an-heat-peaks__title, .admin-body .an-heat-scale { color: #8a8073; }
+.admin-body .an-heat-scale__bar { background: linear-gradient(to right, #332e29, rgba(194,118,78,1)); }
 
 /* ---------- 専用ページ（works / info / blog / artist / contact） ---------- */
 /* サブページでも背景は擬似要素側に（上記と同じ包含ブロック問題を避けるため） */

@@ -10,7 +10,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600&family=Shippori+Mincho:wght@400;500;600&family=Spline+Sans+Mono:wght@400;500&display=swap" rel="stylesheet" />
   <link rel="icon" type="image/png" href="/favicon.png" />
-  <link rel="stylesheet" href="/css/style.css?v=25" />
+  <link rel="stylesheet" href="/css/style.css?v=26" />
 </head>
 <body class="admin-body">
   <div class="paper-grain" aria-hidden="true"></div>
@@ -323,7 +323,14 @@
               <span class="an-eyebrow an-eyebrow--accent">ACTIVE HOURS</span>
               <span class="an-sub">曜日×時間帯の訪問傾向 · 直近28日</span>
             </div>
-            <div class="an-heatmap" id="an-heatmap"></div>
+            <div class="an-heat-wrap" id="an-heat-wrap">
+              <div class="an-heatmap" id="an-heatmap"></div>
+              <div class="an-heat-peaks" id="an-heat-peaks" hidden>
+                <p class="an-heat-peaks__title">ピーク時間帯</p>
+                <ol class="an-heat-peak-list" id="an-heat-peak-list"></ol>
+                <div class="an-heat-scale"><span>少</span><span class="an-heat-scale__bar"></span><span>多</span></div>
+              </div>
+            </div>
             <p class="an-hint" id="an-heatmap-hint" hidden>データが集まり次第、色の濃淡で「よく見られている曜日・時間帯」が表示されます。</p>
           </div>
         </div>
@@ -409,6 +416,6 @@
     </div>
   </div>
 
-  <script src="/katoasao/admin.js?v=25"></script>
+  <script src="/katoasao/admin.js?v=26"></script>
 </body>
 </html>

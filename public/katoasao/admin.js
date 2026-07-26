@@ -323,15 +323,19 @@
     });
   }
 
-  /* --- 曜日×時間帯ヒートマップ（2時間ごとに集約：24時間→12バケット） --- */
+  /* --- 曜日×時間帯ヒートマップ（曜日を横＝最上段のヘッダー、2時間ごとに集約した12行を縦に。
+         右側に「ピーク時間帯」の上位3つと色の凡例を表示する） --- */
   const AN_DAY_LABELS = ["日", "月", "火", "水", "木", "金", "土"]; // GA4のdayOfWeekは0=日曜
   const AN_HEAT_BUCKETS = 12; // 2時間ごと
   function renderHeatmap(hm) {
     const wrap = $("an-heatmap");
     const hint = $("an-heatmap-hint");
+    const peaksBox = $("an-heat-peaks");
+    const peakList = $("an-heat-peak-list");
     wrap.innerHTML = "";
+    if (peakList) peakList.innerHTML = "";
     const matrix = hm && hm.matrix;
-    if (!matrix) { if (hint) hint.hidden = false; return; }
+    if (!matrix) { if (hint) hint.hidden = false; if (peaksBox) peaksBox.hidden = true; return; }
     // 時間別（0..23）を2時間ごとに合算し、集約後の最大値で色を正規化する
     const buckets = [];
     let bmax = 0;
@@ -346,13 +350,24 @@
     }
     const hasData = bmax > 0;
     if (hint) hint.hidden = hasData;
+    if (peaksBox) peaksBox.hidden = !hasData;
+    // 最上段：左上の空きマス＋日〜土の曜日ラベル
+    const corner = document.createElement("div");
+    wrap.appendChild(corner);
     for (let d = 0; d < 7; d++) {
       const dayLabel = document.createElement("div");
       dayLabel.className = "an-heat-day";
       dayLabel.textContent = AN_DAY_LABELS[d];
       wrap.appendChild(dayLabel);
-      for (let b = 0; b < AN_HEAT_BUCKETS; b++) {
-        const h0 = b * 2;
+    }
+    // 2段目以降：各行が2時間分（左に時間の目盛り、続けて日〜土のセル）
+    for (let b = 0; b < AN_HEAT_BUCKETS; b++) {
+      const h0 = b * 2;
+      const lab = document.createElement("div");
+      lab.className = "an-heat-hour";
+      if (h0 % 6 === 0) lab.textContent = h0 + "時";
+      wrap.appendChild(lab);
+      for (let d = 0; d < 7; d++) {
         const v = buckets[d][b];
         const cell = document.createElement("div");
         cell.className = "an-heat-cell";
@@ -364,16 +379,28 @@
         wrap.appendChild(cell);
       }
     }
-    // 最下段：時間の目盛り（0 / 6 / 12 / 18 / 24 時だけ表示）
-    const corner = document.createElement("div");
-    wrap.appendChild(corner);
-    for (let b = 0; b < AN_HEAT_BUCKETS; b++) {
-      const h0 = b * 2;
-      const lab = document.createElement("div");
-      lab.className = "an-heat-hour";
-      if (h0 === 0 || h0 === 6 || h0 === 12 || h0 === 18) lab.textContent = String(h0);
-      else if (b === AN_HEAT_BUCKETS - 1) lab.textContent = "24";
-      wrap.appendChild(lab);
+    // 右パネル：よく見られている曜日・時間帯の上位3つ
+    if (peakList && hasData) {
+      const slots = [];
+      for (let d = 0; d < 7; d++) {
+        for (let b = 0; b < AN_HEAT_BUCKETS; b++) {
+          if (buckets[d][b] > 0) slots.push({ d: d, b: b, v: buckets[d][b] });
+        }
+      }
+      slots.sort((x, y) => y.v - x.v).slice(0, 3).forEach((s, i) => {
+        const li = document.createElement("li");
+        const rank = document.createElement("span");
+        rank.className = "an-heat-peak-list__rank";
+        rank.textContent = String(i + 1);
+        const label = document.createElement("span");
+        label.className = "an-heat-peak-list__label";
+        label.textContent = AN_DAY_LABELS[s.d] + "曜 " + s.b * 2 + "–" + (s.b * 2 + 2) + "時";
+        const num = document.createElement("span");
+        num.className = "an-heat-peak-list__num";
+        num.textContent = s.v + "人";
+        li.appendChild(rank); li.appendChild(label); li.appendChild(num);
+        peakList.appendChild(li);
+      });
     }
   }
 
