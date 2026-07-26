@@ -876,6 +876,27 @@ function githubErrorMessage(status, info) {
   return "GitHubのコミット履歴を取得できませんでした（HTTP " + status + "）。";
 }
 
+/* ----- リポジトリ側の障害・凍結など、コミットが記録されない期間 -----
+   GitHubやGitLabが使えずサイトへの反映が止まっていた期間を、更新履歴に
+   グレーの行として残す（履歴が飛んでいる理由が後から分かるように）。
+   ・end を省略（null）にすると「継続中」と表示される。
+   ・新しい障害が起きたら、この配列の先頭に1件足すだけでよい。 */
+const REPO_INCIDENTS = [
+  {
+    start: "2026-07-07T22:35:00+09:00",
+    end: "2026-07-26T21:00:00+09:00",
+    summary: "GitHubアカウントの凍結により、サイトへの反映と更新履歴の取得ができない状態",
+  },
+];
+function repoIncidentItems() {
+  return REPO_INCIDENTS.map((x) => ({
+    source: "incident",
+    summary: x.summary,
+    createdAt: x.start ? new Date(x.start).getTime() : 0,
+    endAt: x.end ? new Date(x.end).getTime() : null,
+  }));
+}
+
 // GitHubのコミット履歴を取得。成功/失敗に関わらず { items, error } を返す。
 // 失敗時は直近の成功データ（あれば）を items に残しつつ error に理由を入れる。
 async function fetchGithubCommits() {
@@ -946,7 +967,7 @@ app.get("/api/admin/version-history", requireAuth, async (req, res) => {
     createdAt: a.createdAt || 0,
   }));
   const gh = await fetchGithubCommits();
-  const all = adminItems.concat(gh.items).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
+  const all = adminItems.concat(gh.items, repoIncidentItems()).sort((a, b) => (b.createdAt || 0) - (a.createdAt || 0));
   res.json({ items: all.slice(0, 300), githubError: gh.error || null });
 });
 

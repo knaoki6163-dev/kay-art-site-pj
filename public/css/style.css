@@ -627,6 +627,10 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .version-item--codex { border-left: 3px solid var(--green); }
 .version-item--claude .version-item__badge { color: var(--accent-soft); }
 .version-item--codex .version-item__badge { color: var(--green); }
+/* リポジトリ側の障害・凍結の期間。作業の記録ではないので目立たないグレーにする。 */
+.version-item--incident { border-left: 3px solid #9a9187; background: rgba(154,145,135,0.07); color: var(--ink-soft); }
+.version-item--incident .version-item__badge { color: #8a8073; }
+.version-item--incident .version-item__summary { color: var(--ink-soft); }
 /* 「サイトの情報更新」と「バグ修正」は数が多く内容も短いので、少し縦を詰めて表示する。 */
 .version-item--compact { padding: 0.45rem 1.1rem; }
 .version-item--compact .version-item__head { margin-bottom: 0.15rem; }
@@ -655,6 +659,9 @@ body:has(> .site-footer) > .site-footer { margin-top: auto; }
 .admin-body .version-item__badge, .admin-body .version-item__time { color: #b3a999; }
 .admin-body .version-item--claude .version-item__badge { color: var(--accent-soft); }
 .admin-body .version-item--codex .version-item__badge { color: #7fa06e; }
+.admin-body .version-item--incident { border-left-color: #6b6358; background: #262320; color: #a89f92; }
+.admin-body .version-item--incident .version-item__badge { color: #8a8073; }
+.admin-body .version-item--incident .version-item__summary { color: #a89f92; }
 
 /* バージョン管理タブの説明文の下の区切り線（旧：ヘッダー下にあったものをここへ移動） */
 .version-intro { margin-bottom: 1.2rem; }

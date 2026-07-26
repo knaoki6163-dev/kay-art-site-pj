@@ -933,7 +933,19 @@
     text: "サイトの項目の名称変更",
     minor: "その他の修正",
   };
+  // 障害・凍結の期間を「2026/7/7 〜 2026/7/26（19日間）」の形で表す
+  function fmtPeriod(startTs, endTs) {
+    const ymd = (ts) => {
+      const d = new Date(ts);
+      return d.getFullYear() + "/" + (d.getMonth() + 1) + "/" + d.getDate();
+    };
+    if (!startTs) return "";
+    if (!endTs) return ymd(startTs) + " 〜 継続中";
+    const days = Math.max(1, Math.round((endTs - startTs) / 86400000));
+    return ymd(startTs) + " 〜 " + ymd(endTs) + "（" + days + "日間）";
+  }
   function versionBadgeInfo(it) {
+    if (it.source === "incident") return { label: "リポジトリ側の障害・停止", cls: "incident", compact: false };
     if (it.source !== "github") return { label: "サイトの情報更新", cls: "admin", compact: true };
     const agentName = it.agent === "claude" ? "Claude" : it.agent === "codex" ? "Codex" : "GitHub";
     const cls = it.agent === "claude" ? "claude" : it.agent === "codex" ? "codex" : "github";
@@ -955,7 +967,10 @@
     li.className = "version-item version-item--" + badge.cls +
       (badge.compact ? " version-item--compact" : "") +
       (badge.major ? " version-item--major" : "");
+    const isIncident = it.source === "incident";
     const titleAttr = it.createdAt ? new Date(it.createdAt).toLocaleString("ja-JP") : "";
+    // 障害・凍結は「いつからいつまで」が要点なので、経過時間ではなく期間を出す
+    const timeText = isIncident ? fmtPeriod(it.createdAt, it.endAt) : fmtRelative(it.createdAt);
     const summaryHtml = it.url
       ? '<a href="' + esc(it.url) + '" target="_blank" rel="noopener">' + esc(it.summary) + "</a>"
       : esc(it.summary);
@@ -965,7 +980,7 @@
     li.innerHTML =
       '<div class="version-item__head">' +
         '<span class="version-item__badge">' + esc(badge.label) + "</span>" +
-        '<span class="version-item__time" title="' + esc(titleAttr) + '">' + esc(fmtRelative(it.createdAt)) + "</span>" +
+        '<span class="version-item__time" title="' + esc(titleAttr) + '">' + esc(timeText) + "</span>" +
       "</div>" +
       '<div class="version-item__summary">・' + summaryHtml + "</div>" +
       detailHtml;
